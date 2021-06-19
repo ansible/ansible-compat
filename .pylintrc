@@ -1,0 +1,32 @@
+[IMPORTS]
+preferred-modules =
+    unittest:pytest,
+
+[MESSAGES CONTROL]
+
+disable =
+    # On purpose disabled as we rely on black
+    line-too-long,
+    # TODO(ssbarnea): remove temporary skips adding during initial adoption:
+    bad-continuation,
+    broad-except,
+    dangerous-default-value,
+    duplicate-code,
+    fixme,
+    inconsistent-return-statements,
+    invalid-name,
+    missing-class-docstring,
+    missing-function-docstring,
+    missing-module-docstring,
+    no-member,
+    no-self-use,
+    not-callable,
+    protected-access,
+    raise-missing-from,
+    redefined-outer-name,
+    too-few-public-methods,
+    too-many-branches,
+    too-many-instance-attributes,
+    too-many-return-statements,
+    unused-argument,
+    unused-variable,
