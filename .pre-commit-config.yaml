@@ -46,16 +46,11 @@ repos:
   rev: v1.26.1
   hooks:
   - id: yamllint
-    exclude: >
-      (?x)^(
-        examples/playbooks/templates/.*|
-        examples/other/some.j2.yaml
-      )$
     files: \.(yaml|yml)$
     types: [file, yaml]
     entry: yamllint --strict
 - repo: https://github.com/pre-commit/mirrors-isort
-  rev: v5.8.0
+  rev: v5.9.1
   hooks:
   - id: isort
     args:
