@@ -8,6 +8,8 @@ attrs==21.2.0
     # via pytest
 coverage==5.5
     # via pytest-cov
+flaky==3.7.0
+    # via ansible-compat (setup.py)
 iniconfig==1.1.1
     # via pytest
 packaging==20.9
@@ -24,6 +26,12 @@ pytest==6.2.4
     # via
     #   ansible-compat (setup.py)
     #   pytest-cov
+pyyaml==5.4.1
+    # via ansible-compat (setup.py)
+six==1.16.0
+    # via tenacity
+tenacity==7.0.0
+    # via ansible-compat (setup.py)
 toml==0.10.2
     # via
     #   pytest
