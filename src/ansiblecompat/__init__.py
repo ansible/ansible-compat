@@ -1,1 +1,0 @@
-"""ansiblecompat package."""

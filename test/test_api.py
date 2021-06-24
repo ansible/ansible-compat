@@ -1,4 +1,4 @@
-"""Tests for ansiblecompat package."""
+"""Tests for ansible_compat package."""
 
 
 def test_placeholder() -> None:
