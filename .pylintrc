@@ -1,3 +1,13 @@
+[BASIC]
+good-names=f,  # filename
+           i,
+           j,
+           k,
+           ns,  # namespace
+           ex,
+           Run,
+           _
+
 [IMPORTS]
 preferred-modules =
     unittest:pytest,

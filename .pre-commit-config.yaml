@@ -72,14 +72,24 @@ repos:
     - flake8-docstrings>=1.5.0
     - flake8-pytest-style>=1.2.2
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v0.902
+  rev: v0.910
   hooks:
   - id: mypy
     # empty args needed in order to match mypy cli behavior
     args: ["--strict"]
-    additional_dependencies: []
+    additional_dependencies:
+    - flaky
+    - packaging
+    - pytest
+    - tenacity
+    - types-PyYAML
 - repo: https://github.com/pre-commit/mirrors-pylint
   rev: v3.0.0a3
   hooks:
   - id: pylint
-    additional_dependencies: []
+    additional_dependencies:
+    - flaky
+    - pytest
+    - PyYAML
+    - tenacity
+    - typing_extensions
