@@ -24,7 +24,11 @@ from ansible_compat.constants import (  # INVALID_CONFIG_RC,
     ANSIBLE_MISSING_RC,
     MSG_INVALID_FQRL,
 )
-from ansible_compat.errors import AnsibleCompatError, InvalidPrerequisiteError
+from ansible_compat.errors import (
+    AnsibleCommandError,
+    AnsibleCompatError,
+    InvalidPrerequisiteError,
+)
 from ansible_compat.loaders import yaml_from_file
 
 _logger = logging.getLogger(__name__)
@@ -155,7 +159,7 @@ def install_requirements(requirement: str, cache_dir) -> None:
     )
     if run.returncode != 0:
         _logger.error(run.stdout)
-        raise AnsibleCompatError(run.returncode)
+        raise AnsibleCommandError(run)
 
     # Run galaxy collection install works on v2 requirements.yml
     if "collections" in yaml_from_file(requirement):
@@ -180,7 +184,7 @@ def install_requirements(requirement: str, cache_dir) -> None:
         )
         if run.returncode != 0:
             _logger.error(run.stdout)
-            raise AnsibleCompatError(run.returncode)
+            raise AnsibleCommandError(run)
 
 
 def get_cache_dir(project_dir: str) -> str:

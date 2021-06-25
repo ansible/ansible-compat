@@ -28,8 +28,11 @@ pytest==6.2.4
     # via
     #   ansible-compat (setup.py)
     #   pytest-markdown
+    #   pytest-mock
     #   pytest-plus
 pytest-markdown==1.0.2
+    # via ansible-compat (setup.py)
+pytest-mock==3.6.1
     # via ansible-compat (setup.py)
 pytest-plus==0.2
     # via ansible-compat (setup.py)

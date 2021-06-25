@@ -1,7 +1,30 @@
 # ansible-compat
 
-A python package contains functions that facilitates working with various
-versions of Ansible, 2.9 and newer.
+A python package contains functions that facilitate working with various
+versions of Ansible 2.9 and newer.
+
+## Using Ansible runtime
+
+```python
+from ansible_compat.runtime import Runtime
+
+def test_runtime():
+
+    # instantiate the runtime using isolated mode, so installing new
+    # roles/collections do not pollute the default setup.
+    runtime = Runtime(isolated=True)
+
+    # Print Ansible core version
+    print(runtime.version)  # 2.9.10 (Version object)
+    # Get configuration info from runtime
+    print(runtime.config.collections_path)
+
+    # Install a new collection
+    # runtime.install_collection("community.general")
+
+    # Execute a command
+    result = runtime.exec(["ansible-doc", "--list"])
+```
 
 ## Access to Ansible configuration
 

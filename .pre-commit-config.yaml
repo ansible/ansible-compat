@@ -18,6 +18,12 @@ repos:
     language: system
     files: >-
       ^setup\.py$
+- repo: https://github.com/jazzband/pip-tools
+  rev: 6.2.0
+  hooks:
+  - id: pip-compile
+    files: ^(setup\.py|setup\.cfg|constraints\.txt)$
+    entry: pip-compile --extra test --output-file=constraints.txt setup.py
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v4.0.1
   hooks:
@@ -82,6 +88,7 @@ repos:
     - flaky
     - packaging
     - pytest
+    - pytest-mock
     - tenacity
     - types-PyYAML
 - repo: https://github.com/pre-commit/mirrors-pylint
