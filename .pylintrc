@@ -17,3 +17,5 @@ preferred-modules =
 disable =
     # On purpose disabled as we rely on black
     line-too-long,
+    # local imports do not work well with pre-commit hook
+    import-error,
