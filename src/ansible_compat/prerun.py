@@ -28,6 +28,7 @@ from ansible_compat.constants import (  # INVALID_CONFIG_RC,
 from ansible_compat.loaders import yaml_from_file
 
 _logger = logging.getLogger(__name__)
+SENTINEL = object()
 
 
 def check_ansible_presence(exit_on_error: bool = False) -> Tuple[str, str]:
@@ -335,7 +336,9 @@ def _update_env(varname: str, value: List[str], default: str = "") -> None:
             _logger.info("Added %s=%s", varname, value_str)
 
 
-def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str], None]:
+def ansible_config_get(
+    key: str, kind: Type[Any] = str, default: object = SENTINEL
+) -> Union[str, List[str], None, object]:
     """Return configuration item from ansible config."""
     env = os.environ.copy()
     # Avoid possible ANSI garbage
@@ -361,8 +364,11 @@ def ansible_config_get(key: str, kind: Type[Any] = str) -> Union[str, List[str],
                 raise RuntimeError(f"Unexpected data read for {key}: {val}")
             return val
     else:
-        raise RuntimeError("Unknown data type.")
-    return None
+        raise NotImplementedError("Unknown data type %s." % kind)
+
+    if default == SENTINEL:
+        raise KeyError(key)
+    return default
 
 
 def require_collection(  # noqa: C901
