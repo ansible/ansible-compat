@@ -213,6 +213,27 @@ def test_ansible_config_get() -> None:
     assert len(paths) > 0
 
 
+@pytest.mark.parametrize(
+    "default",
+    (
+        (None,),
+        (123,),
+    ),
+)
+def test_ansible_config_get_default(default: object) -> None:
+    """Check that config get returns default when appropriate."""
+    result = prerun.ansible_config_get("NON_EXISTING_OPTION", default=default)
+    assert result is default
+
+
+def test_ansible_config_get_raise() -> None:
+    """Check that config get raise if key is not found."""
+    key = "NON_EXISTING_OPTION"
+    with pytest.raises(KeyError) as exc:
+        prerun.ansible_config_get(key)
+    assert exc.value.args[0] == key
+
+
 def test_install_collection() -> None:
     """Check that valid collection installs do not fail."""
     prerun.install_collection("containers.podman:>=1.0")
