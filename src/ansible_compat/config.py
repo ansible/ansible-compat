@@ -3,14 +3,13 @@ import ast
 import os
 import re
 import subprocess
-import sys
 from collections import UserDict
 from functools import lru_cache
 from typing import TYPE_CHECKING, List, Optional, Tuple
 
 from packaging.version import Version
 
-from ansible_compat.constants import ANSIBLE_MISSING_RC
+from ansible_compat.errors import MissingAnsibleError
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3285
@@ -75,13 +74,13 @@ def ansible_version(version: str = "") -> Version:
         version, error = parse_ansible_version(proc.stdout)
         if error is not None:
             print(error)
-            sys.exit(ANSIBLE_MISSING_RC)
+            raise MissingAnsibleError()
     else:
         print(
             "Unable to find a working copy of ansible executable.",
             proc,
         )
-        sys.exit(ANSIBLE_MISSING_RC)
+        raise MissingAnsibleError()
     return Version(version)
 
 

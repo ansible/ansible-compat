@@ -12,6 +12,7 @@ from flaky import flaky
 
 from ansible_compat import prerun
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
+from ansible_compat.errors import AnsibleCompatError, InvalidPrerequisiteError
 
 
 @contextmanager
@@ -185,9 +186,9 @@ def test_require_collection_wrong_version() -> None:
             "~/.ansible/collections",
         ]
     )
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
+    with pytest.raises(InvalidPrerequisiteError) as pytest_wrapped_e:
         prerun.require_collection("containers.podman", '9999.9.9')
-    assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 
 
@@ -200,9 +201,9 @@ def test_require_collection_wrong_version() -> None:
 )
 def test_require_collection_missing(name: str, version: str) -> None:
     """Tests behaviour of require_collection, missing case."""
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
+    with pytest.raises(AnsibleCompatError) as pytest_wrapped_e:
         prerun.require_collection(name, version)
-    assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 
 
@@ -241,7 +242,7 @@ def test_install_collection() -> None:
 
 def test_install_collection_fail() -> None:
     """Check that invalid collection install fails."""
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
+    with pytest.raises(AnsibleCompatError) as pytest_wrapped_e:
         prerun.install_collection("containers.podman:>=9999.0")
-    assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC

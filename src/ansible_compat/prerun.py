@@ -22,9 +22,9 @@ from ansible_compat.constants import (  # INVALID_CONFIG_RC,
     ANSIBLE_DEFAULT_ROLES_PATH,
     ANSIBLE_MIN_VERSION,
     ANSIBLE_MISSING_RC,
-    INVALID_PREREQUISITES_RC,
     MSG_INVALID_FQRL,
 )
+from ansible_compat.errors import AnsibleCompatError, InvalidPrerequisiteError
 from ansible_compat.loaders import yaml_from_file
 
 _logger = logging.getLogger(__name__)
@@ -121,7 +121,7 @@ def install_collection(collection: str, destination: Optional[str] = None) -> No
     )
     if run.returncode != 0:
         _logger.error("Command returned %s code:\n%s", run.returncode, run.stdout)
-        sys.exit(INVALID_PREREQUISITES_RC)
+        raise InvalidPrerequisiteError()
 
 
 @tenacity.retry(  # Retry up to 3 times as galaxy server can return errors
@@ -155,7 +155,7 @@ def install_requirements(requirement: str, cache_dir) -> None:
     )
     if run.returncode != 0:
         _logger.error(run.stdout)
-        raise RuntimeError(run.returncode)
+        raise AnsibleCompatError(run.returncode)
 
     # Run galaxy collection install works on v2 requirements.yml
     if "collections" in yaml_from_file(requirement):
@@ -180,7 +180,7 @@ def install_requirements(requirement: str, cache_dir) -> None:
         )
         if run.returncode != 0:
             _logger.error(run.stdout)
-            raise RuntimeError(run.returncode)
+            raise AnsibleCompatError(run.returncode)
 
 
 def get_cache_dir(project_dir: str) -> str:
@@ -229,7 +229,9 @@ def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
     if len(role_namespace) == 0:
         role_namespace = galaxy_infos.get('author', "")
     if not isinstance(role_namespace, str):
-        raise RuntimeError("Role namespace must be string, not %s" % role_namespace)
+        raise AnsibleCompatError(
+            "Role namespace must be string, not %s" % role_namespace
+        )
     # if there's a space in the name space, it's likely author name
     # and not the galaxy login, so act as if there was no namespace
     if re.match(r"^\w+ \w+", role_namespace):
@@ -278,7 +280,7 @@ def _install_galaxy_role(project_dir: str, role_name_check: int = 0) -> None:
                 _logger.warning(msg)
             else:
                 _logger.error(msg)
-                sys.exit(INVALID_PREREQUISITES_RC)
+                raise InvalidPrerequisiteError()
     else:
         # when 'role-name' is in skip_list, we stick to plain role names
         if 'role_name' in yaml['galaxy_info']:
@@ -291,7 +293,7 @@ def _install_galaxy_role(project_dir: str, role_name_check: int = 0) -> None:
     path.mkdir(parents=True, exist_ok=True)
     link_path = path / fqrn
     # despite documentation stating that is_file() reports true for symlinks,
-    # it appears that is_dir() reports true instead, so we rely on exits().
+    # it appears that is_dir() reports true instead, so we rely on exists().
     target = pathlib.Path(project_dir).absolute()
     if not link_path.exists() or os.readlink(link_path) != str(target):
         if link_path.exists():
@@ -361,7 +363,7 @@ def ansible_config_get(
         if result:
             val = eval(result.groups()[0])  # pylint: disable=eval-used
             if not isinstance(val, list):
-                raise RuntimeError(f"Unexpected data read for {key}: {val}")
+                raise AnsibleCompatError(f"Unexpected data read for {key}: {val}")
             return val
     else:
         raise NotImplementedError("Unknown data type %s." % kind)
@@ -384,12 +386,16 @@ def require_collection(  # noqa: C901
     """
     try:
         ns, coll = name.split('.', 1)
-    except ValueError:
-        sys.exit("Invalid collection name supplied: %s" % name)
+    except ValueError as exc:
+        raise InvalidPrerequisiteError(
+            "Invalid collection name supplied: %s" % name
+        ) from exc
 
     paths = ansible_config_get('COLLECTIONS_PATHS', list)
     if not paths or not isinstance(paths, list):
-        sys.exit(f"Unable to determine ansible collection paths. ({paths})")
+        raise InvalidPrerequisiteError(
+            f"Unable to determine ansible collection paths. ({paths})"
+        )
 
     if cache_dir:
         # if we have a cache dir, we want to be use that would be preferred
@@ -405,7 +411,7 @@ def require_collection(  # noqa: C901
                     "Found collection at '%s' but missing MANIFEST.json, cannot get info.",
                     collpath,
                 )
-                sys.exit(INVALID_PREREQUISITES_RC)
+                raise InvalidPrerequisiteError()
 
             with open(mpath, 'r') as f:
                 manifest = json.loads(f.read())
@@ -423,7 +429,7 @@ def require_collection(  # noqa: C901
                             found_version,
                             version,
                         )
-                        sys.exit(INVALID_PREREQUISITES_RC)
+                        raise InvalidPrerequisiteError()
             break
     else:
         if install:
@@ -433,4 +439,4 @@ def require_collection(  # noqa: C901
             )
         else:
             _logger.fatal("Collection '%s' not found in '%s'", name, paths)
-            sys.exit(INVALID_PREREQUISITES_RC)
+            raise InvalidPrerequisiteError()
