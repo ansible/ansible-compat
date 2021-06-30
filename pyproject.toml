@@ -7,6 +7,10 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
 [tool.black]
 skip-string-normalization = true
 
