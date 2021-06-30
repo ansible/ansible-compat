@@ -1,14 +1,22 @@
 """Store configuration options as a singleton."""
+import ast
 import os
 import re
 import subprocess
 import sys
+from collections import UserDict
 from functools import lru_cache
-from typing import List, Optional, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
 from packaging.version import Version
 
 from ansible_compat.constants import ANSIBLE_MISSING_RC
+
+if TYPE_CHECKING:
+    # https://github.com/PyCQA/pylint/issues/3285
+    _UserDict = UserDict[str, object]  # pylint: disable=unsubscriptable-object
+else:
+    _UserDict = UserDict
 
 # Used to store collection list paths (with mock paths if needed)
 collection_list: List[str] = []
@@ -75,6 +83,53 @@ def ansible_version(version: str = "") -> Version:
         )
         sys.exit(ANSIBLE_MISSING_RC)
     return Version(version)
+
+
+class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
+    """Interface to query Ansible configuration.
+
+    This should allow user to access everything provided by `ansible-config dump` without having to parse the data himself.
+    """
+
+    _aliases = {
+        'COLLECTIONS_PATHS': 'COLLECTIONS_PATH',  # 2.9 -> 2.10+
+        'COLLECTIONS_PATH': 'COLLECTIONS_PATHS',  # 2.10+ -> 2.9
+    }
+
+    def __init__(self, config_dump: Optional[str] = None) -> None:
+        """Load config dictionary."""
+        super().__init__()
+
+        if not config_dump:
+            env = os.environ.copy()
+            # Avoid possible ANSI garbage
+            env["ANSIBLE_FORCE_COLOR"] = "0"
+            config_dump = subprocess.check_output(
+                ["ansible-config", "dump"], universal_newlines=True, env=env
+            )
+
+        for match in re.finditer(
+            r"^(?P<key>[A-Za-z0-9_]+).* = (?P<value>.*)$", config_dump, re.MULTILINE
+        ):
+            key = match.groupdict()['key']
+            value = match.groupdict()['value']
+            try:
+                self[key] = ast.literal_eval(value)
+            except (NameError, SyntaxError, ValueError):
+                self[key] = value
+
+    def __getattr__(self, attr_name: str) -> object:
+        """Allow access of config options as attributes."""
+        name = attr_name.upper()
+        if name in self.data:
+            return self.data[name]
+        if name in self._aliases:
+            return self.data[self._aliases[name]]
+        raise AttributeError(attr_name)
+
+    def __getitem__(self, name: str) -> object:
+        """Allow access to config options using indexing."""
+        return super().__getitem__(name.upper())
 
 
 if ansible_collections_path() in os.environ:
