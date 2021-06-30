@@ -13,5 +13,8 @@ skip-string-normalization = true
 [tool.isort]
 profile = "black"
 
+[tool.pytest.ini_options]
+addopts = "--no-success-flaky-report"
+
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
