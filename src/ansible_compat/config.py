@@ -1,11 +1,12 @@
 """Store configuration options as a singleton."""
 import ast
+import copy
 import os
 import re
 import subprocess
 from collections import UserDict
 from functools import lru_cache
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Optional, Tuple
 
 from packaging.version import Version
 
@@ -92,9 +93,17 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         'COLLECTIONS_PATH': 'COLLECTIONS_PATHS',  # 2.10+ -> 2.9
     }
 
-    def __init__(self, config_dump: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        config_dump: Optional[str] = None,
+        data: Optional[Dict[str, object]] = None,
+    ) -> None:
         """Load config dictionary."""
         super().__init__()
+
+        if data:
+            self.data = copy.copy(data)
+            return
 
         if not config_dump:
             env = os.environ.copy()
@@ -126,3 +135,11 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     def __getitem__(self, name: str) -> object:
         """Allow access to config options using indexing."""
         return super().__getitem__(name.upper())
+
+    def __copy__(self) -> "AnsibleConfig":
+        """Allow users to run copy on Config."""
+        return AnsibleConfig(data=self.data)
+
+    def __deepcopy__(self, memo: object) -> "AnsibleConfig":
+        """Allow users to run deeepcopy on Config."""
+        return AnsibleConfig(data=self.data)
