@@ -19,3 +19,5 @@ disable =
     line-too-long,
     # local imports do not work well with pre-commit hook
     import-error,
+    # Temporary disable duplicate detection we remove old code from prerun
+    duplicate-code,
