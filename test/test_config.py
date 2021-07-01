@@ -1,4 +1,6 @@
 """Tests for ansible_compat.config submodule."""
+import copy
+
 import pytest
 
 import ansible_compat
@@ -20,3 +22,15 @@ def test_config() -> None:
 
     with pytest.raises(AttributeError):
         print(config.THIS_DOES_NOT_EXIST)
+
+
+def test_config_copy() -> None:
+    """Checks ability to use copy/deepcopy."""
+    config = ansible_compat.config.AnsibleConfig()
+    new_config = copy.copy(config)
+    assert isinstance(new_config, ansible_compat.config.AnsibleConfig)
+    assert new_config is not config
+    # deepcopy testing
+    new_config = copy.deepcopy(config)
+    assert isinstance(new_config, ansible_compat.config.AnsibleConfig)
+    assert new_config is not config
