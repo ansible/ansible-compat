@@ -5,7 +5,7 @@ import re
 import subprocess
 from collections import UserDict
 from functools import lru_cache
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple
 
 from packaging.version import Version
 
@@ -16,9 +16,6 @@ if TYPE_CHECKING:
     _UserDict = UserDict[str, object]  # pylint: disable=unsubscriptable-object
 else:
     _UserDict = UserDict
-
-# Used to store collection list paths (with mock paths if needed)
-collection_list: List[str] = []
 
 
 @lru_cache()
@@ -129,7 +126,3 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     def __getitem__(self, name: str) -> object:
         """Allow access to config options using indexing."""
         return super().__getitem__(name.upper())
-
-
-if ansible_collections_path() in os.environ:
-    collection_list = os.environ[ansible_collections_path()].split(':')

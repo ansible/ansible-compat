@@ -97,8 +97,9 @@ repos:
   - id: pylint
     additional_dependencies:
     - .
-    - flaky
-    - pytest
     - PyYAML
+    - flaky
+    - pylint-pytest
+    - pytest
     - tenacity
     - typing_extensions

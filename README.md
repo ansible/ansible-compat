@@ -20,7 +20,7 @@ def test_runtime():
     print(runtime.config.collections_path)
 
     # Install a new collection
-    # runtime.install_collection("community.general")
+    runtime.install_collection("containers.podman")
 
     # Execute a command
     result = runtime.exec(["ansible-doc", "--list"])
