@@ -143,11 +143,11 @@ class Runtime:
             "ansible-galaxy",
             "role",
             "install",
-            "--roles-path",
-            f"{self.cache_dir}/roles",
             "-vr",
             f"{requirement}",
         ]
+        if self.cache_dir:
+            cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
 
         _logger.info("Running %s", " ".join(cmd))
         run = subprocess.run(
@@ -168,11 +168,11 @@ class Runtime:
                 "ansible-galaxy",
                 "collection",
                 "install",
-                "-p",
-                f"{self.cache_dir}/collections",
                 "-vr",
                 f"{requirement}",
             ]
+            if self.cache_dir:
+                cmd.extend(["-p", f"{self.cache_dir}/collections"])
 
             _logger.info("Running %s", " ".join(cmd))
             run = subprocess.run(
