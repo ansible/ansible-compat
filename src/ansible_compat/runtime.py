@@ -9,8 +9,8 @@ import subprocess
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import packaging
-import tenacity
 
+from ansible_compat._compat import retry
 from ansible_compat.config import (
     AnsibleConfig,
     ansible_collections_path,
@@ -128,12 +128,7 @@ class Runtime:
             _logger.error("Command returned %s code:\n%s", run.returncode, run.stdout)
             raise InvalidPrerequisiteError()
 
-    @tenacity.retry(  # Retry up to 3 times as galaxy server can return errors
-        reraise=True,
-        wait=tenacity.wait_fixed(30),  # type: ignore
-        stop=tenacity.stop_after_attempt(3),  # type: ignore
-        before_sleep=tenacity.after_log(_logger, logging.WARNING),  # type: ignore
-    )
+    @retry
     def install_requirements(self, requirement: str) -> None:
         """Install dependencies from a requirements.yml."""
         if not os.path.exists(requirement):
