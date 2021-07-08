@@ -34,9 +34,8 @@ def test_runtime_version_fail(mocker: MockerFixture) -> None:
         autospec=True,
     )
     runtime = Runtime()
-    with pytest.raises(RuntimeError) as exc:
-        _ = runtime.version
-    assert exc.value.args[0] == "some error"
+    with pytest.raises(RuntimeError, match="some error"):
+        runtime.version  # pylint: disable=pointless-statement
 
 
 @contextmanager
