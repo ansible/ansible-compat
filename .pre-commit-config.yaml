@@ -18,12 +18,21 @@ repos:
     language: system
     files: >-
       ^setup\.py$
-- repo: https://github.com/jazzband/pip-tools
-  rev: 6.2.0
-  hooks:
-  - id: pip-compile
+  - id: pip-compile-upgrade
+    # To run it execute: `pre-commit run pip-compile-upgrade --hook-stage manual`
+    name: Upgrade contraints files and requirements
     files: ^(setup\.py|setup\.cfg|constraints\.txt)$
-    entry: pip-compile --extra test --output-file=constraints.txt setup.py
+    language: system
+    entry: pip-compile --upgrade -q --extra test --output-file=constraints.txt setup.cfg
+    pass_filenames: false
+    stages:
+    - manual
+  - id: pip-compile
+    name: Check contraints files and requirements
+    files: ^(setup\.py|setup\.cfg|constraints\.txt)$
+    language: system
+    entry: pip-compile -q --extra test --output-file=constraints.txt setup.cfg
+    pass_filenames: false
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v4.0.1
   hooks:
