@@ -56,6 +56,7 @@ class Runtime:
         being used instead.
         """
         self.project_dir = project_dir or os.getcwd()
+        self.isolated = isolated
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig()
@@ -279,15 +280,25 @@ class Runtime:
         if not isinstance(collections_path, list):
             raise RuntimeError(f"Unexpected collection_path value: {collections_path}")
 
-        for path_list, path in (
-            (library_paths, "plugins/modules"),
-            (library_paths, f"{self.cache_dir}/modules"),
-            (collections_path, f"{self.cache_dir}/collections"),
-            (roles_path, "roles"),
-            (roles_path, f"{self.cache_dir}/roles"),
-        ):
-            if path not in path_list and os.path.exists(path):
-                path_list.append(path)
+        alterations_list = [
+            (library_paths, "plugins/modules", True),
+            (roles_path, "roles", True),
+        ]
+
+        if self.isolated:
+            alterations_list.extend(
+                [
+                    (roles_path, f"{self.cache_dir}/roles", False),
+                    (library_paths, f"{self.cache_dir}/modules", False),
+                    (collections_path, f"{self.cache_dir}/collections", False),
+                ]
+            )
+
+        for path_list, path, must_be_present in alterations_list:
+            if must_be_present and not os.path.exists(path):
+                continue
+            if path not in path_list:
+                path_list.insert(0, path)
 
         _update_env('ANSIBLE_LIBRARY', library_paths)
         _update_env(ansible_collections_path(), collections_path)
@@ -356,12 +367,16 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
 
 
 def _update_env(varname: str, value: List[str], default: str = "") -> None:
-    """Update colon based environment variable if needed. by appending."""
+    """Update colon based environment variable if needed.
+
+    New values are added by inserting them to assure they take precedence
+    over the existing ones.
+    """
     if value:
         orig_value = os.environ.get(varname, default=default)
         if orig_value:
             # Prepend original or default variable content to custom content.
-            value = [*orig_value.split(':'), *value]
+            value = [*value, *orig_value.split(':')]
         value_str = ":".join(value)
         if value_str != os.environ.get(varname, ""):
             os.environ[varname] = value_str

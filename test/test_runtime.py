@@ -140,8 +140,8 @@ def test__update_env_no_old_value_no_default(
 @pytest.mark.parametrize(
     ("default", "value", "result"),
     (
-        ("a:b", ["c"], "a:b:c"),
-        ("a:b", ["c:d"], "a:b:c:d"),
+        ("a:b", ["c"], "c:a:b"),
+        ("a:b", ["c:d"], "c:d:a:b"),
     ),
 )
 def test__update_env_no_old_value(
@@ -158,8 +158,8 @@ def test__update_env_no_old_value(
 @pytest.mark.parametrize(
     ("old_value", "value", "result"),
     (
-        ("a:b", ["c"], "a:b:c"),
-        ("a:b", ["c:d"], "a:b:c:d"),
+        ("a:b", ["c"], "c:a:b"),
+        ("a:b", ["c:d"], "c:d:a:b"),
     ),
 )
 def test__update_env_no_default(
@@ -177,9 +177,9 @@ def test__update_env_no_default(
     ("old_value", "default", "value", "result"),
     (
         ("", "", ["e"], "e"),
-        ("a", "", ["e"], "a:e"),
+        ("a", "", ["e"], "e:a"),
         ("", "c", ["e"], "e"),
-        ("a", "c", ["e:f"], "a:e:f"),
+        ("a", "c", ["e:f"], "e:f:a"),
     ),
 )
 def test__update_env(
