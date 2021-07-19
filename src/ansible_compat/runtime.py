@@ -47,13 +47,18 @@ class Runtime:
     collections_path: List[str]
 
     def __init__(
-        self, project_dir: Optional[str] = None, isolated: bool = False
+        self,
+        project_dir: Optional[str] = None,
+        isolated: bool = False,
     ) -> None:
         """Initialize Ansible runtime environment.
 
-        Isolated mode assures that installation of collections or roles
-        does not affect Ansible installation, an unique cache directory
-        being used instead.
+        :param project_dir: The directory containing the Ansible project. If
+                            not mentioned it will be guessed from the current
+                            working directory.
+        :param isolated: Assure that installation of collections or roles
+                         does not affect Ansible installation, an unique cache
+                         directory being used instead.
         """
         self.project_dir = project_dir or os.getcwd()
         self.isolated = isolated

@@ -83,9 +83,10 @@ repos:
     language_version: python3
     additional_dependencies:
     - flake8-2020>=1.6.0
-    # - flake8-black>=0.1.1
     - flake8-docstrings>=1.5.0
     - flake8-pytest-style>=1.2.2
+    - flake8-rst-docstrings>=0.2.3
+    - flake8-rst>=0.8.0
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v0.910
   hooks:

@@ -31,6 +31,7 @@ jobs:
         - ubuntu-20.04
         env:
         - TOXENV: lint
+        - TOXENV: docs
         - TOXENV: packaging
     env:
       TOX_PARALLEL_NO_SPINNER: 1
