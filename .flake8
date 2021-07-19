@@ -59,3 +59,8 @@ pytest-parametrize-names-type = tuple
 # PT007:
 pytest-parametrize-values-type = tuple
 pytest-parametrize-values-row-type = tuple
+
+# flake8-rst-docstrings
+rst-roles =
+    class,
+    func,
