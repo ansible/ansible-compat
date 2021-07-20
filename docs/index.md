@@ -1,5 +1,10 @@
 # ansible-compat
 
+```{include} examples.md
+```
+
+## API
+
 ```{eval-rst}
 .. toctree::
    :maxdepth: 2
@@ -17,4 +22,5 @@
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
 ```
