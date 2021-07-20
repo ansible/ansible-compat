@@ -50,6 +50,7 @@ class Runtime:
         self,
         project_dir: Optional[str] = None,
         isolated: bool = False,
+        min_required_version: Optional[str] = None,
     ) -> None:
         """Initialize Ansible runtime environment.
 
@@ -59,12 +60,23 @@ class Runtime:
         :param isolated: Assure that installation of collections or roles
                          does not affect Ansible installation, an unique cache
                          directory being used instead.
+        :param min_required_version: Minimal version of Ansible required. If
+                                     not found, a :class:`RuntimeError`
+                                     exception is raised.
         """
         self.project_dir = project_dir or os.getcwd()
         self.isolated = isolated
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig()
+
+        if (
+            min_required_version is not None
+            and packaging.version.Version(min_required_version) > self.version
+        ):
+            raise RuntimeError(
+                f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
+            )
 
     def clean(self) -> None:
         """Remove content of cache_dir."""

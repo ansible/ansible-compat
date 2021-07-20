@@ -26,6 +26,12 @@ def test_runtime_version(runtime: Runtime) -> None:
     assert version == runtime.version
 
 
+def test_runtime_version_outdated() -> None:
+    """Checks that instantiation raises if version is outdated."""
+    with pytest.raises(RuntimeError, match="Found incompatible version of ansible"):
+        Runtime(min_required_version="9999.9.9")
+
+
 def test_runtime_version_fail(mocker: MockerFixture) -> None:
     """Tests for failure to detect Ansible version."""
     mocker.patch(
