@@ -1,4 +1,5 @@
 """Ansible runtime environment maanger."""
+import importlib
 import json
 import logging
 import os
@@ -51,6 +52,7 @@ class Runtime:
         project_dir: Optional[str] = None,
         isolated: bool = False,
         min_required_version: Optional[str] = None,
+        require_module: bool = False,
     ) -> None:
         """Initialize Ansible runtime environment.
 
@@ -63,6 +65,11 @@ class Runtime:
         :param min_required_version: Minimal version of Ansible required. If
                                      not found, a :class:`RuntimeError`
                                      exception is raised.
+        :param: require_module: If set, instantiation will fail if Ansible
+                                Python module is missing or is not matching
+                                the same version as the Ansible command line.
+                                That is useful for consumers that expect to
+                                also perform Python imports from Ansible.
         """
         self.project_dir = project_dir or os.getcwd()
         self.isolated = isolated
@@ -76,6 +83,29 @@ class Runtime:
         ):
             raise RuntimeError(
                 f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
+            )
+        if require_module:
+            self._ensure_module_available()
+
+    def _ensure_module_available(self) -> None:
+        """Assure that Ansible Python module is installed and matching CLI version."""
+        ansible_release_module = None
+        try:
+            ansible_release_module = importlib.import_module("ansible.release")
+        except (ModuleNotFoundError, ImportError):
+            pass
+
+        if ansible_release_module is None:
+            raise RuntimeError("Unable to find Ansible python module.")
+
+        ansible_module_version = packaging.version.parse(
+            ansible_release_module.__version__  # type: ignore
+        )
+        if ansible_module_version != self.version:
+            raise RuntimeError(
+                f"Ansible CLI ({self.version}) and python module"
+                f" ({ansible_module_version}) versions do not match. This "
+                "indicates a broken execution environment."
             )
 
     def clean(self) -> None:

@@ -5,7 +5,7 @@ import os
 import pathlib
 import subprocess
 from contextlib import contextmanager
-from typing import Iterator, List
+from typing import Any, Iterator, List
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -26,10 +26,37 @@ def test_runtime_version(runtime: Runtime) -> None:
     assert version == runtime.version
 
 
-def test_runtime_version_outdated() -> None:
+@pytest.mark.parametrize(
+    "require_module",
+    (True, False),
+    ids=("module-required", "module-unrequired"),
+)
+def test_runtime_version_outdated(require_module: bool) -> None:
     """Checks that instantiation raises if version is outdated."""
     with pytest.raises(RuntimeError, match="Found incompatible version of ansible"):
-        Runtime(min_required_version="9999.9.9")
+        Runtime(min_required_version="9999.9.9", require_module=require_module)
+
+
+def test_runtime_missing_ansible_module(monkeypatch: MonkeyPatch) -> None:
+    """Checks that we produce a RuntimeError when ansible module is missing."""
+
+    class RaiseException:
+        """Class to raise an exception."""
+
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            raise ModuleNotFoundError()
+
+    monkeypatch.setattr("importlib.import_module", RaiseException)
+
+    with pytest.raises(RuntimeError, match="Unable to find Ansible python module."):
+        Runtime(require_module=True)
+
+
+def test_runtime_mismatch_ansible_module(monkeypatch: MonkeyPatch) -> None:
+    """Test that missing module is detected."""
+    monkeypatch.setattr("ansible.release.__version__", "0.0.0", raising=False)
+    with pytest.raises(RuntimeError, match="versions do not match"):
+        Runtime(require_module=True)
 
 
 def test_runtime_version_fail(mocker: MockerFixture) -> None:
