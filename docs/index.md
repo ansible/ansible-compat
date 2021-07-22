@@ -15,12 +15,3 @@
    :members:
    :special-members: __init__
 ```
-
-## Indices and tables
-
-```{eval-rst}
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
-```

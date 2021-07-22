@@ -1,4 +1,6 @@
-### Using Ansible runtime
+# Examples
+
+## Using Ansible runtime
 
 ```python
 from ansible_compat.runtime import Runtime
@@ -21,7 +23,7 @@ def test_runtime():
     result = runtime.exec(["ansible-doc", "--list"])
 ```
 
-### Access to Ansible configuration
+## Access to Ansible configuration
 
 As you may not want to parse `ansible-config dump` yourself, you
 can make use of a simple python class that facilitates access to
