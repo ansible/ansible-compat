@@ -15,7 +15,7 @@ from pytest_mock import MockerFixture
 
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
 from ansible_compat.errors import AnsibleCompatError, InvalidPrerequisiteError
-from ansible_compat.runtime import Runtime, _update_env
+from ansible_compat.runtime import CompletedProcess, Runtime, _update_env
 
 
 def test_runtime_version(runtime: Runtime) -> None:
@@ -59,7 +59,7 @@ def test_runtime_mismatch_ansible_module(monkeypatch: MonkeyPatch) -> None:
         Runtime(require_module=True)
 
 
-def test_runtime_version_fail(mocker: MockerFixture) -> None:
+def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
     """Tests for failure to detect Ansible version."""
     mocker.patch(
         "ansible_compat.runtime.parse_ansible_version",
@@ -69,6 +69,29 @@ def test_runtime_version_fail(mocker: MockerFixture) -> None:
     runtime = Runtime()
     with pytest.raises(RuntimeError, match="some error"):
         runtime.version  # pylint: disable=pointless-statement
+
+
+def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
+    """Tests for failure to detect Ansible version."""
+    mocker.patch(
+        "ansible_compat.runtime.Runtime.exec",
+        return_value=CompletedProcess(
+            ["x"], returncode=123, stdout="oops", stderr="some error"
+        ),
+        autospec=True,
+    )
+    runtime = Runtime()
+    with pytest.raises(
+        RuntimeError, match="Unable to find a working copy of ansible executable."
+    ):
+        runtime.version  # pylint: disable=pointless-statement
+
+
+def test_runtime_install_requirements_missing_file() -> None:
+    """Check that missing requirements file is ignored."""
+    # Do not rely on this behavior, it may be removed in the future
+    runtime = Runtime()
+    runtime.install_requirements("/that/does/not/exist")
 
 
 @contextmanager
