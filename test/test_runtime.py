@@ -87,6 +87,34 @@ def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
         runtime.version  # pylint: disable=pointless-statement
 
 
+@pytest.mark.parametrize(
+    ("folder", "role_name"),
+    (
+        ("ansible-role-sample", "acme.sample"),
+        ("acme.sample2", "acme.sample2"),
+        ("sample3", "acme.sample3"),
+    ),
+    ids=("sample", "sample2", "sample3"),
+)
+def test_runtime_install_role(
+    caplog: pytest.LogCaptureFixture, folder: str, role_name: str
+) -> None:
+    """Checks that we can install roles."""
+    caplog.set_level(logging.INFO)
+    project_dir = os.path.join(os.path.dirname(__file__), "roles", folder)
+    runtime = Runtime(isolated=True, project_dir=project_dir)
+    runtime.prepare_environment()
+    assert (
+        "symlink to current repository in order to enable Ansible to find the role"
+        in caplog.text
+    )
+    # check that role appears as installed now
+    result = runtime.exec(["ansible-galaxy", "list"])
+    assert result.returncode == 0, result
+    assert role_name in result.stdout
+    runtime.clean()
+
+
 def test_runtime_install_requirements_missing_file() -> None:
     """Check that missing requirements file is ignored."""
     # Do not rely on this behavior, it may be removed in the future

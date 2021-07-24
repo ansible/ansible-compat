@@ -14,7 +14,7 @@ ANSIBLE_MISSING_RC = 4
 INVALID_PREREQUISITES_RC = 10
 
 MSG_INVALID_FQRL = """\
-Computed fully qualified role name of %s does not follow current galaxy requirements.
+Computed fully qualified role name of {0} does not follow current galaxy requirements.
 Please edit meta/main.yml and assure we can correctly determine full role name:
 
 galaxy_info:

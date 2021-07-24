@@ -1,0 +1,16 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: sample
+  author: acme
+  description: ACME sample role
+  company: "ACME LTD"
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Debian
+      versions:
+        - any
+  galaxy_tags:
+    - samples
