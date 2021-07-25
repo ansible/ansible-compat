@@ -240,7 +240,9 @@ class Runtime:
 
         if not offline:
             self.install_requirements("requirements.yml")
-            for req in pathlib.Path(".").glob("molecule/*/requirements.yml"):
+            for req in pathlib.Path(self.project_dir).glob(
+                "molecule/*/requirements.yml"
+            ):
                 self.install_requirements(str(req))
 
         for name, min_version in required_collections.items():
@@ -249,9 +251,8 @@ class Runtime:
                 destination=f"{self.cache_dir}/collections" if self.cache_dir else None,
             )
 
-        _install_galaxy_role(self.project_dir)
-        # _perform_mockings()
         self._prepare_ansible_paths()
+        _install_galaxy_role(self.project_dir)
 
     def require_collection(  # noqa: C901
         self,
@@ -362,13 +363,14 @@ def _install_galaxy_role(project_dir: str, role_name_check: int = 0) -> None:
     1: warn if name is not compliant
     2: bypass any name checking
     """
-    if not os.path.exists("meta/main.yml"):
+    meta_filename = os.path.join(project_dir, 'meta', 'main.yml')
+    if not os.path.exists(meta_filename):
         return
-    yaml = yaml_from_file("meta/main.yml")
+    yaml = yaml_from_file(meta_filename)
     if 'galaxy_info' not in yaml:
         return
 
-    fqrn = _get_role_fqrn(yaml['galaxy_info'])
+    fqrn = _get_role_fqrn(yaml['galaxy_info'], project_dir)
 
     if role_name_check in [0, 1]:
         if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
@@ -385,7 +387,7 @@ def _install_galaxy_role(project_dir: str, role_name_check: int = 0) -> None:
             role_name = _get_galaxy_role_name(yaml['galaxy_info'])
             fqrn = f"{role_namespace}{role_name}"
         else:
-            fqrn = pathlib.Path(".").absolute().name
+            fqrn = pathlib.Path(project_dir).absolute().name
     path = pathlib.Path(f"{get_cache_dir(project_dir)}/roles")
     path.mkdir(parents=True, exist_ok=True)
     link_path = path / fqrn
@@ -402,13 +404,15 @@ def _install_galaxy_role(project_dir: str, role_name_check: int = 0) -> None:
     )
 
 
-def _get_role_fqrn(galaxy_infos: Dict[str, Any]) -> str:
+def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
     """Compute role fqrn."""
     role_namespace = _get_galaxy_role_ns(galaxy_infos)
     role_name = _get_galaxy_role_name(galaxy_infos)
     if len(role_name) == 0:
-        role_name = pathlib.Path(".").absolute().name
-        role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name)
+        role_name = pathlib.Path(project_dir).absolute().name
+        role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name).split(
+            ".", maxsplit=2
+        )[-1]
 
     return f"{role_namespace}{role_name}"
 
@@ -441,7 +445,7 @@ def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
         )
     # if there's a space in the name space, it's likely author name
     # and not the galaxy login, so act as if there was no namespace
-    if re.match(r"^\w+ \w+", role_namespace):
+    if not role_namespace or re.match(r"^\w+ \w+", role_namespace):
         role_namespace = ""
     else:
         role_namespace = f"{role_namespace}."
