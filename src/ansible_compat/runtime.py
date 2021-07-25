@@ -181,31 +181,37 @@ class Runtime:
         """Install dependencies from a requirements.yml."""
         if not os.path.exists(requirement):
             return
+        reqs_yaml = yaml_from_file(requirement)
+        if not isinstance(reqs_yaml, (dict, list)):
+            raise InvalidPrerequisiteError(
+                f"{requirement} file is not a valid Ansible requirements file."
+            )
 
-        cmd = [
-            "ansible-galaxy",
-            "role",
-            "install",
-            "-vr",
-            f"{requirement}",
-        ]
-        if self.cache_dir:
-            cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
+        if isinstance(reqs_yaml, list) or 'roles' in reqs_yaml:
+            cmd = [
+                "ansible-galaxy",
+                "role",
+                "install",
+                "-vr",
+                f"{requirement}",
+            ]
+            if self.cache_dir:
+                cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
 
-        _logger.info("Running %s", " ".join(cmd))
-        run = subprocess.run(
-            cmd,
-            universal_newlines=True,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-        if run.returncode != 0:
-            _logger.error(run.stdout)
-            raise AnsibleCommandError(run)
+            _logger.info("Running %s", " ".join(cmd))
+            run = subprocess.run(
+                cmd,
+                universal_newlines=True,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+            if run.returncode != 0:
+                _logger.error(run.stdout)
+                raise AnsibleCommandError(run)
 
         # Run galaxy collection install works on v2 requirements.yml
-        if "collections" in yaml_from_file(requirement):
+        if "collections" in reqs_yaml:
 
             cmd = [
                 "ansible-galaxy",
