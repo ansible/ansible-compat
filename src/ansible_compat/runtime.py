@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import packaging
 
-from ansible_compat._compat import retry
 from ansible_compat.config import (
     AnsibleConfig,
     ansible_collections_path,
@@ -46,12 +45,14 @@ class Runtime:
     _version: Optional[packaging.version.Version] = None
     cache_dir: Optional[str] = None
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         project_dir: Optional[str] = None,
         isolated: bool = False,
         min_required_version: Optional[str] = None,
         require_module: bool = False,
+        max_retries: int = 0,
     ) -> None:
         """Initialize Ansible runtime environment.
 
@@ -69,9 +70,12 @@ class Runtime:
                                 the same version as the Ansible command line.
                                 That is useful for consumers that expect to
                                 also perform Python imports from Ansible.
+        :param max_retries: Number of times it should retry network operations.
+                            Default is 0, no retries.
         """
         self.project_dir = project_dir or os.getcwd()
         self.isolated = isolated
+        self.max_retries = max_retries
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig()
@@ -112,16 +116,29 @@ class Runtime:
         if self.cache_dir:
             shutil.rmtree(self.cache_dir, ignore_errors=True)
 
-    # pylint: disable=no-self-use
-    def exec(self, args: Union[str, List[str]]) -> CompletedProcess:
-        """Execute a command inside an Ansible environment."""
-        return subprocess.run(
-            args,
-            universal_newlines=True,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+    def exec(
+        self, args: Union[str, List[str]], retry: bool = False
+    ) -> CompletedProcess:
+        """Execute a command inside an Ansible environment.
+
+        :param retry: Retry network operations on failures.
+        """
+        for _ in range(self.max_retries + 1 if retry else 1):
+            result = subprocess.run(
+                args,
+                universal_newlines=True,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            if result.returncode == 0:
+                break
+            _logger.warning(
+                "Retrying execution failure %s of: %s",
+                result.returncode,
+                " ".join(args),
+            )
+        return result
 
     @property
     def version(self) -> packaging.version.Version:
@@ -164,13 +181,15 @@ class Runtime:
         cmd.append(f"{collection}")
 
         _logger.info("Running %s", " ".join(cmd))
-        run = self.exec(cmd)
+        run = self.exec(
+            cmd,
+            retry=True,
+        )
         if run.returncode != 0:
             _logger.error("Command returned %s code:\n%s", run.returncode, run.stdout)
             raise InvalidPrerequisiteError()
 
-    @retry
-    def install_requirements(self, requirement: str) -> None:
+    def install_requirements(self, requirement: str, retry: bool = False) -> None:
         """Install dependencies from a requirements.yml."""
         if not os.path.exists(requirement):
             return
@@ -192,7 +211,7 @@ class Runtime:
                 cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
 
             _logger.info("Running %s", " ".join(cmd))
-            run = self.exec(cmd)
+            run = self.exec(cmd, retry=retry)
             if run.returncode != 0:
                 _logger.error(run.stdout)
                 raise AnsibleCommandError(run)
@@ -211,20 +230,19 @@ class Runtime:
                 cmd.extend(["-p", f"{self.cache_dir}/collections"])
 
             _logger.info("Running %s", " ".join(cmd))
-            run = self.exec(cmd)
+            run = self.exec(cmd, retry=retry)
             if run.returncode != 0:
                 _logger.error(run.stdout)
                 raise AnsibleCommandError(run)
 
     def prepare_environment(
-        self,
-        required_collections: Optional[Dict[str, str]] = None,
+        self, required_collections: Optional[Dict[str, str]] = None, retry: bool = False
     ) -> None:
         """Make dependencies available if needed."""
         if required_collections is None:
             required_collections = {}
 
-        self.install_requirements("requirements.yml")
+        self.install_requirements("requirements.yml", retry=retry)
 
         for name, min_version in required_collections.items():
             self.install_collection(

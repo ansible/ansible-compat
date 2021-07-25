@@ -44,8 +44,6 @@ pytest-plus==0.2
     # via ansible-compat (setup.cfg)
 pyyaml==5.4.1
     # via ansible-compat (setup.cfg)
-tenacity==8.0.1
-    # via ansible-compat (setup.cfg)
 toml==0.10.2
     # via
     #   pep517
