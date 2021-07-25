@@ -5,7 +5,7 @@ import os
 import pathlib
 import subprocess
 from contextlib import contextmanager
-from typing import Any, Iterator, List
+from typing import Any, Iterator, List, Type
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -14,7 +14,11 @@ from packaging.version import Version
 from pytest_mock import MockerFixture
 
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
-from ansible_compat.errors import AnsibleCompatError, InvalidPrerequisiteError
+from ansible_compat.errors import (
+    AnsibleCommandError,
+    AnsibleCompatError,
+    InvalidPrerequisiteError,
+)
 from ansible_compat.runtime import CompletedProcess, Runtime, _update_env
 
 
@@ -120,6 +124,47 @@ def test_runtime_install_requirements_missing_file() -> None:
     # Do not rely on this behavior, it may be removed in the future
     runtime = Runtime()
     runtime.install_requirements("/that/does/not/exist")
+
+
+@pytest.mark.parametrize(
+    ("file", "exc", "msg"),
+    (
+        (
+            "/dev/null",
+            InvalidPrerequisiteError,
+            "file is not a valid Ansible requirements file",
+        ),
+        (
+            os.path.join(
+                os.path.dirname(__file__),
+                "assets",
+                "requirements-invalid-collection.yml",
+            ),
+            AnsibleCommandError,
+            "Got 1 exit code while running: ansible-galaxy",
+        ),
+        (
+            os.path.join(
+                os.path.dirname(__file__),
+                "assets",
+                "requirements-invalid-role.yml",
+            ),
+            AnsibleCommandError,
+            "Got 1 exit code while running: ansible-galaxy",
+        ),
+    ),
+    ids=("empty", "invalid-collection", "invalid-role"),
+)
+def test_runtime_install_requirements_invalid_file(
+    file: str, exc: Type[Any], msg: str
+) -> None:
+    """Check that invalid requirements file is raising."""
+    runtime = Runtime()
+    with pytest.raises(
+        exc,
+        match=msg,
+    ):
+        runtime.install_requirements(file)
 
 
 @contextmanager

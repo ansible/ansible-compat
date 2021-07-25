@@ -1,0 +1,3 @@
+# file expected to make "ansible-galaxy role install" to fail
+roles:
+  - this_role_does_not_exist
