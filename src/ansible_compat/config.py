@@ -6,7 +6,7 @@ import re
 import subprocess
 from collections import UserDict
 from functools import lru_cache
-from typing import TYPE_CHECKING, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 from packaging.version import Version
 
@@ -92,6 +92,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         'COLLECTIONS_PATHS': 'COLLECTIONS_PATH',  # 2.9 -> 2.10+
         'COLLECTIONS_PATH': 'COLLECTIONS_PATHS',  # 2.10+ -> 2.9
     }
+    collections_path: List[str]
 
     def __init__(
         self,

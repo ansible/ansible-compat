@@ -91,6 +91,14 @@ def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
         runtime.version  # pylint: disable=pointless-statement
 
 
+def test_runtime_prepare_ansible_paths_validation() -> None:
+    """Check that we validate collection_path."""
+    runtime = Runtime()
+    runtime.config.collections_path = "invalid"  # type: ignore
+    with pytest.raises(RuntimeError, match="Unexpected collection_path value:"):
+        runtime._prepare_ansible_paths()
+
+
 @pytest.mark.parametrize(
     ("folder", "role_name"),
     (
@@ -342,6 +350,14 @@ def test_require_collection_wrong_version(runtime: Runtime) -> None:
         runtime.require_collection("containers.podman", '9999.9.9')
     assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
+
+
+def test_require_collection_invalid_name(runtime: Runtime) -> None:
+    """Check that require_collection raise with invalid collection name."""
+    with pytest.raises(
+        InvalidPrerequisiteError, match="Invalid collection name supplied:"
+    ):
+        runtime.require_collection("that-is-invalid")
 
 
 @pytest.mark.parametrize(
