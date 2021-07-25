@@ -165,13 +165,7 @@ class Runtime:
         cmd.append(f"{collection}")
 
         _logger.info("Running %s", " ".join(cmd))
-        run = subprocess.run(
-            cmd,
-            universal_newlines=True,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
+        run = self.exec(cmd)
         if run.returncode != 0:
             _logger.error("Command returned %s code:\n%s", run.returncode, run.stdout)
             raise InvalidPrerequisiteError()
@@ -199,13 +193,7 @@ class Runtime:
                 cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
 
             _logger.info("Running %s", " ".join(cmd))
-            run = subprocess.run(
-                cmd,
-                universal_newlines=True,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
+            run = self.exec(cmd)
             if run.returncode != 0:
                 _logger.error(run.stdout)
                 raise AnsibleCommandError(run)
@@ -224,13 +212,7 @@ class Runtime:
                 cmd.extend(["-p", f"{self.cache_dir}/collections"])
 
             _logger.info("Running %s", " ".join(cmd))
-            run = subprocess.run(
-                cmd,
-                universal_newlines=True,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
+            run = self.exec(cmd)
             if run.returncode != 0:
                 _logger.error(run.stdout)
                 raise AnsibleCommandError(run)
