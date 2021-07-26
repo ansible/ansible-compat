@@ -219,19 +219,13 @@ class Runtime:
 
     def prepare_environment(
         self,
-        offline: bool = False,
         required_collections: Optional[Dict[str, str]] = None,
     ) -> None:
         """Make dependencies available if needed."""
         if required_collections is None:
             required_collections = {}
 
-        if not offline:
-            self.install_requirements("requirements.yml")
-            for req in pathlib.Path(self.project_dir).glob(
-                "molecule/*/requirements.yml"
-            ):
-                self.install_requirements(str(req))
+        self.install_requirements("requirements.yml")
 
         for name, min_version in required_collections.items():
             self.install_collection(
