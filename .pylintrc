@@ -12,9 +12,6 @@ good-names=f,  # filename
 preferred-modules =
     unittest:pytest,
 
-[MASTER]
-load-plugins=pylint_pytest
-
 [MESSAGES CONTROL]
 
 disable =
