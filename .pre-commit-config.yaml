@@ -120,10 +120,8 @@ repos:
   hooks:
   - id: pylint
     additional_dependencies:
-    - .
     - PyYAML
     - flaky
-    - pylint-pytest
     - pytest
     - tenacity
     - typing_extensions
