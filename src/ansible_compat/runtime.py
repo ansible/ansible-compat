@@ -270,11 +270,9 @@ class Runtime:
             if os.path.exists(collpath):
                 mpath = os.path.join(collpath, 'MANIFEST.json')
                 if not os.path.exists(mpath):
-                    _logger.fatal(
-                        "Found collection at '%s' but missing MANIFEST.json, cannot get info.",
-                        collpath,
-                    )
-                    raise InvalidPrerequisiteError()
+                    msg = f"Found collection at '{collpath}' but missing MANIFEST.json, cannot get info."
+                    _logger.fatal(msg)
+                    raise InvalidPrerequisiteError(msg)
 
                 with open(mpath, 'r') as f:
                     manifest = json.loads(f.read())

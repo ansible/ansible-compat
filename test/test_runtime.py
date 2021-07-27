@@ -127,6 +127,12 @@ def test_runtime_install_role(
     runtime.clean()
 
 
+def test_prepare_environment_with_collections(tmp_path: pathlib.Path) -> None:
+    """Check that collections are correctly installed."""
+    runtime = Runtime(isolated=True, project_dir=str(tmp_path))
+    runtime.prepare_environment(required_collections={"community.molecule": "0.1.0"})
+
+
 def test_runtime_install_requirements_missing_file() -> None:
     """Check that missing requirements file is ignored."""
     # Do not rely on this behavior, it may be removed in the future
@@ -358,6 +364,25 @@ def test_require_collection_invalid_name(runtime: Runtime) -> None:
         InvalidPrerequisiteError, match="Invalid collection name supplied:"
     ):
         runtime.require_collection("that-is-invalid")
+
+
+def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
+    """Check that require_collection raise with invalid collections path."""
+    runtime.config.collections_path = '/that/is/invalid'  # type: ignore
+    with pytest.raises(
+        InvalidPrerequisiteError, match="Unable to determine ansible collection paths"
+    ):
+        runtime.require_collection("community.molecule")
+
+
+def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
+    """Check that require_collection raise with broken pre-existing collection."""
+    runtime = Runtime(isolated=True, project_dir=str(tmp_path))
+    dest_path: str = runtime.config.collections_path[0]  # type: ignore
+    dest = os.path.join(dest_path, "ansible_collections", "foo", "bar")
+    os.makedirs(dest, exist_ok=True)
+    with pytest.raises(InvalidPrerequisiteError, match="missing MANIFEST.json"):
+        runtime.require_collection("foo.bar")
 
 
 @pytest.mark.parametrize(
