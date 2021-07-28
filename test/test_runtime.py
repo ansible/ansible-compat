@@ -19,7 +19,12 @@ from ansible_compat.errors import (
     AnsibleCompatError,
     InvalidPrerequisiteError,
 )
-from ansible_compat.runtime import CompletedProcess, Runtime, _update_env
+from ansible_compat.runtime import (
+    CompletedProcess,
+    Runtime,
+    _install_galaxy_role,
+    _update_env,
+)
 
 
 def test_runtime_version(runtime: Runtime) -> None:
@@ -420,3 +425,17 @@ def test_install_collection_fail(runtime: Runtime) -> None:
         runtime.install_collection("containers.podman:>=9999.0")
     assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
+
+
+def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
+    """Check install role with empty galaxy file."""
+    pathlib.Path(f'{runtime_tmp.project_dir}/galaxy.yml').touch()
+    pathlib.Path(f'{runtime_tmp.project_dir}/meta').mkdir()
+    pathlib.Path(f'{runtime_tmp.project_dir}/meta/main.yml').touch()
+    # this should only raise a warning
+    _install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+    # this should raise an error
+    with pytest.raises(
+        InvalidPrerequisiteError, match="does not follow current galaxy requirements"
+    ):
+        _install_galaxy_role(runtime_tmp.project_dir, role_name_check=0)
