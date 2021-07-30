@@ -112,7 +112,6 @@ repos:
     - packaging
     - pytest
     - pytest-mock
-    - tenacity
     - types-PyYAML
 - repo: https://github.com/pre-commit/mirrors-pylint
   rev: v3.0.0a3
@@ -122,5 +121,4 @@ repos:
     - PyYAML
     - flaky
     - pytest
-    - tenacity
     - typing_extensions
