@@ -441,6 +441,22 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
         _install_galaxy_role(runtime_tmp.project_dir, role_name_check=0)
 
 
+def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
+    """Check install role with bad namespace in galaxy info."""
+    # pathlib.Path(f'{runtime_tmp.project_dir}/galaxy.yml').touch()
+    pathlib.Path(f'{runtime_tmp.project_dir}/meta').mkdir()
+    pathlib.Path(f'{runtime_tmp.project_dir}/meta/main.yml').write_text(
+        """galaxy_info:
+  role_name: foo
+  author: bar
+  namespace: ["xxx"]
+"""
+    )
+    # this should raise an error regardless the role_name_check value
+    with pytest.raises(AnsibleCompatError, match="Role namespace must be string, not"):
+        _install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+
+
 def test_upgrade_collection(runtime_tmp: Runtime) -> None:
     """Check that collection upgrade is possible."""
     # ensure that we inject our tmp folders in ansible paths
@@ -454,6 +470,5 @@ def test_upgrade_collection(runtime_tmp: Runtime) -> None:
     ):
         # we check that when install=False, we raise error
         runtime_tmp.require_collection("containers.podman", "1.6.1", install=False)
-        # breakpoint()
     # now we really perform the upgrade
     runtime_tmp.require_collection("containers.podman", "1.6.1")
