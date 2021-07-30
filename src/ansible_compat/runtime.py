@@ -176,6 +176,12 @@ class Runtime:
             "install",
             "-v",
         ]
+
+        # ansible-galaxy before 2.11 fails to upgrade collection unless --force
+        # is present, newer versions do not need it
+        if self.version < packaging.version.parse("2.11"):
+            cmd.append("--force")
+
         if destination:
             cmd.extend(["-p", str(destination)])
         cmd.append(f"{collection}")
@@ -186,8 +192,9 @@ class Runtime:
             retry=True,
         )
         if run.returncode != 0:
-            _logger.error("Command returned %s code:\n%s", run.returncode, run.stdout)
-            raise InvalidPrerequisiteError()
+            msg = f"Command returned {run.returncode} code:\n{run.stdout}\n{run.stderr}"
+            _logger.error(msg)
+            raise InvalidPrerequisiteError(msg)
 
     def install_requirements(self, requirement: str, retry: bool = False) -> None:
         """Install dependencies from a requirements.yml."""
@@ -302,21 +309,18 @@ class Runtime:
                             self.install_collection(f"{name}:>={version}")
                             self.require_collection(name, version, install=False)
                         else:
-                            _logger.fatal(
-                                "Found %s collection %s but %s or newer is required.",
-                                name,
-                                found_version,
-                                version,
-                            )
-                            raise InvalidPrerequisiteError()
+                            msg = f"Found {name} collection {found_version} but {version} or newer is required."
+                            _logger.fatal(msg)
+                            raise InvalidPrerequisiteError(msg)
                 break
         else:
             if install:
                 self.install_collection(f"{name}:>={version}")
                 self.require_collection(name=name, version=version, install=False)
             else:
-                _logger.fatal("Collection '%s' not found in '%s'", name, paths)
-                raise InvalidPrerequisiteError()
+                msg = f"Collection '{name}' not found in '{paths}'"
+                _logger.fatal(msg)
+                raise InvalidPrerequisiteError(msg)
 
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""

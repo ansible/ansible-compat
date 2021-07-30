@@ -439,3 +439,21 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
         InvalidPrerequisiteError, match="does not follow current galaxy requirements"
     ):
         _install_galaxy_role(runtime_tmp.project_dir, role_name_check=0)
+
+
+def test_upgrade_collection(runtime_tmp: Runtime) -> None:
+    """Check that collection upgrade is possible."""
+    # ensure that we inject our tmp folders in ansible paths
+    runtime_tmp.prepare_environment()
+
+    # we install specific oudated version of a collection
+    runtime_tmp.install_collection("containers.podman:==1.6.0")
+    with pytest.raises(
+        InvalidPrerequisiteError,
+        match="Found containers.podman collection 1.6.0 but 1.6.1 or newer is required.",
+    ):
+        # we check that when install=False, we raise error
+        runtime_tmp.require_collection("containers.podman", "1.6.1", install=False)
+        # breakpoint()
+    # now we really perform the upgrade
+    runtime_tmp.require_collection("containers.podman", "1.6.1")
