@@ -45,7 +45,6 @@ class Runtime:
 
     _version: Optional[packaging.version.Version] = None
     cache_dir: Optional[str] = None
-    collections_path: List[str]
 
     def __init__(
         self,
@@ -255,7 +254,7 @@ class Runtime:
                 "Invalid collection name supplied: %s" % name
             ) from exc
 
-        paths = self.config.collections_path
+        paths = self.config.collections_paths
         if not paths or not isinstance(paths, list):
             raise InvalidPrerequisiteError(
                 f"Unable to determine ansible collection paths. ({paths})"

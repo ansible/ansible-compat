@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 import sys
+import warnings
 from collections import UserDict
 from functools import lru_cache
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
@@ -98,8 +99,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     """
 
     _aliases = {
-        'COLLECTIONS_PATHS': 'COLLECTIONS_PATH',  # 2.9 -> 2.10+
-        'COLLECTIONS_PATH': 'COLLECTIONS_PATHS',  # 2.10+ -> 2.9
+        'COLLECTIONS_PATH': 'COLLECTIONS_PATHS',  # 2.9 -> 2.10
     }
     # Expose some attributes to enable auto-complete in editors, based on
     # https://docs.ansible.com/ansible/latest/reference_appendices/config.html
@@ -454,6 +454,10 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         if name in self.data:
             return self.data[name]
         if name in self._aliases:
+            warnings.warn(
+                f'Detected deprecated use of {name}, replace it with {self._aliases[name]}',
+                category=DeprecationWarning,
+            )
             return self.data[self._aliases[name]]
         raise AttributeError(attr_name)
 
