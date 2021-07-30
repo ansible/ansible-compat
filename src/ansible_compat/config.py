@@ -457,6 +457,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
             warnings.warn(
                 f'Detected deprecated use of {name}, replace it with {self._aliases[name]}',
                 category=DeprecationWarning,
+                stacklevel=2,
             )
             return self.data[self._aliases[name]]
         raise AttributeError(attr_name)
