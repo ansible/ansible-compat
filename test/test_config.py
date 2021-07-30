@@ -18,7 +18,9 @@ def test_config() -> None:
 
     # check lowercase and older name aliasing
     assert isinstance(config.collections_paths, list)
-    assert isinstance(config.collections_path, list)
+
+    with pytest.warns(DeprecationWarning, match='Detected deprecated use of'):
+        assert isinstance(config.collections_path, list)
 
     with pytest.raises(AttributeError):
         print(config.THIS_DOES_NOT_EXIST)

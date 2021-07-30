@@ -373,7 +373,7 @@ def test_require_collection_invalid_name(runtime: Runtime) -> None:
 
 def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
     """Check that require_collection raise with invalid collections path."""
-    runtime.config.collections_path = '/that/is/invalid'  # type: ignore
+    runtime.config.collections_paths = '/that/is/invalid'  # type: ignore
     with pytest.raises(
         InvalidPrerequisiteError, match="Unable to determine ansible collection paths"
     ):
@@ -383,7 +383,7 @@ def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
 def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
     """Check that require_collection raise with broken pre-existing collection."""
     runtime = Runtime(isolated=True, project_dir=str(tmp_path))
-    dest_path: str = runtime.config.collections_path[0]  # type: ignore
+    dest_path: str = runtime.config.collections_paths[0]
     dest = os.path.join(dest_path, "ansible_collections", "foo", "bar")
     os.makedirs(dest, exist_ok=True)
     with pytest.raises(InvalidPrerequisiteError, match="missing MANIFEST.json"):
