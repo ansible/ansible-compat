@@ -378,9 +378,10 @@ def _install_galaxy_role(
     galaxy_info = {}
     meta_filename = os.path.join(project_dir, 'meta', 'main.yml')
 
-    if ignore_errors:
-        if not os.path.exists(meta_filename):
+    if not os.path.exists(meta_filename):
+        if ignore_errors:
             return
+    else:
         yaml = yaml_from_file(meta_filename)
 
     if yaml and 'galaxy_info' in yaml:
@@ -424,6 +425,7 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
     """Compute role fqrn."""
     role_namespace = _get_galaxy_role_ns(galaxy_infos)
     role_name = _get_galaxy_role_name(galaxy_infos)
+
     if len(role_name) == 0:
         role_name = pathlib.Path(project_dir).absolute().name
         role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name).split(
