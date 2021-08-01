@@ -391,16 +391,20 @@ def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
 
 
 @pytest.mark.parametrize(
-    ("name", "version"),
+    ("name", "version", "install"),
     (
-        ("fake_namespace.fake_name", None),
-        ("fake_namespace.fake_name", "9999.9.9"),
+        ("fake_namespace.fake_name", None, True),
+        ("fake_namespace.fake_name", "9999.9.9", True),
+        ("fake_namespace.fake_name", None, False),
     ),
+    ids=("a", "b", "c"),
 )
-def test_require_collection_missing(name: str, version: str, runtime: Runtime) -> None:
+def test_require_collection_missing(
+    name: str, version: str, install: bool, runtime: Runtime
+) -> None:
     """Tests behaviour of require_collection, missing case."""
     with pytest.raises(AnsibleCompatError) as pytest_wrapped_e:
-        runtime.require_collection(name, version)
+        runtime.require_collection(name=name, version=version, install=install)
     assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 
