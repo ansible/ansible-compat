@@ -8,11 +8,11 @@ import sys
 import warnings
 from collections import UserDict
 from functools import lru_cache
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from packaging.version import Version
 
-from ansible_compat.errors import MissingAnsibleError
+from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
 
 # mypy/pylint idiom for py36-py38 compatibility
 # https://github.com/python/typeshed/issues/3500#issuecomment-560958608
@@ -43,7 +43,7 @@ def ansible_collections_path() -> str:
     return "ANSIBLE_COLLECTIONS_PATHS"
 
 
-def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
+def parse_ansible_version(stdout: str) -> Version:
     """Parse output of 'ansible --version'."""
     # Ansible can produce extra output before displaying version in debug mode.
 
@@ -52,12 +52,12 @@ def parse_ansible_version(stdout: str) -> Tuple[str, Optional[str]]:
         r"^ansible \[(?:core|base) (?P<version>[^\]]+)\]", stdout, re.MULTILINE
     )
     if match:
-        return match.group("version"), None
+        return Version(match.group("version"))
     # ansible-base 2.10 and Ansible 2.9: 'ansible 2.x.y'
     match = re.search(r"^ansible (?P<version>[^\s]+)", stdout, re.MULTILINE)
     if match:
-        return match.group("version"), None
-    return "", "FATAL: Unable parse ansible cli version: %s" % stdout
+        return Version(match.group("version"))
+    raise InvalidPrerequisiteError("Unable to parse ansible cli version: %s" % stdout)
 
 
 @lru_cache()
@@ -78,18 +78,12 @@ def ansible_version(version: str = "") -> Version:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    if proc.returncode == 0:
-        version, error = parse_ansible_version(proc.stdout)
-        if error is not None:
-            print(error)
-            raise MissingAnsibleError()
-    else:
-        print(
-            "Unable to find a working copy of ansible executable.",
-            proc,
+    if proc.returncode != 0:
+        raise MissingAnsibleError(
+            "Unable to find a working copy of ansible executable.", proc=proc
         )
-        raise MissingAnsibleError()
-    return Version(version)
+
+    return parse_ansible_version(proc.stdout)
 
 
 class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
