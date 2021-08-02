@@ -70,13 +70,17 @@ def test_runtime_mismatch_ansible_module(monkeypatch: MonkeyPatch) -> None:
 
 def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
     """Tests for failure to detect Ansible version."""
-    mocker.patch(
+    patched = mocker.patch(
         "ansible_compat.runtime.parse_ansible_version",
-        return_value=("", "some error"),
         autospec=True,
     )
+    patched.side_effect = InvalidPrerequisiteError(
+        "Unable to parse ansible cli version"
+    )
     runtime = Runtime()
-    with pytest.raises(RuntimeError, match="some error"):
+    with pytest.raises(
+        InvalidPrerequisiteError, match="Unable to parse ansible cli version"
+    ):
         runtime.version  # pylint: disable=pointless-statement
 
 

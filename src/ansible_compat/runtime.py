@@ -153,15 +153,11 @@ class Runtime:
 
         proc = self.exec(["ansible", "--version"])
         if proc.returncode == 0:
-            version, error = parse_ansible_version(proc.stdout)
-            if error is not None:
-                raise MissingAnsibleError(error)
-        else:
-            msg = "Unable to find a working copy of ansible executable."
-            raise MissingAnsibleError(msg, proc=proc)
+            self._version = parse_ansible_version(proc.stdout)
+            return self._version
 
-        self._version = packaging.version.Version(version)
-        return self._version
+        msg = "Unable to find a working copy of ansible executable."
+        raise MissingAnsibleError(msg, proc=proc)
 
     def install_collection(
         self, collection: str, destination: Optional[Union[str, pathlib.Path]] = None
