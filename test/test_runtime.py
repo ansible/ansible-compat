@@ -442,6 +442,8 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
     pathlib.Path(f'{runtime_tmp.project_dir}/meta/main.yml').touch()
     # this should only raise a warning
     _install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+    # this shoul test the bypass role name check path
+    _install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
     # this should raise an error
     with pytest.raises(
         InvalidPrerequisiteError, match="does not follow current galaxy requirements"
@@ -482,6 +484,23 @@ def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
     # this should raise an error regardless the role_name_check value
     with pytest.raises(AnsibleCompatError, match="Role namespace must be string, not"):
         _install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+
+
+def test_install_galaxy_role_no_checks(runtime_tmp: Runtime) -> None:
+    """Check install role with bad namespace in galaxy info."""
+    runtime_tmp.prepare_environment()
+    pathlib.Path(f'{runtime_tmp.project_dir}/meta').mkdir()
+    pathlib.Path(f'{runtime_tmp.project_dir}/meta/main.yml').write_text(
+        """galaxy_info:
+  role_name: foo
+  author: bar
+  namespace: acme
+"""
+    )
+    _install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
+    result = runtime_tmp.exec(["ansible-galaxy", "list"])
+    assert "- acme.foo," in result.stdout
+    assert result.returncode == 0, result
 
 
 def test_upgrade_collection(runtime_tmp: Runtime) -> None:
