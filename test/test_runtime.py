@@ -394,6 +394,11 @@ def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
         runtime.require_collection("foo.bar")
 
 
+def test_require_collection(runtime_tmp: Runtime) -> None:
+    """Check that require collection successful install case."""
+    runtime_tmp.require_collection("community.molecule", "0.1.0")
+
+
 @pytest.mark.parametrize(
     ("name", "version", "install"),
     (
