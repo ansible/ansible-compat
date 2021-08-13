@@ -25,6 +25,10 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "--no-success-flaky-report"
+# ensure we treat warnings as error
+filterwarnings = [
+  "error",
+]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
