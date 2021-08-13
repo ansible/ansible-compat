@@ -29,7 +29,7 @@ else:
     _UserDict = UserDict
 
 
-@lru_cache()
+# do not use lru_cache here, as environment can change between calls
 def ansible_collections_path() -> str:
     """Return collection path variable for current version of Ansible."""
     # respect Ansible behavior, which is to load old name if present
