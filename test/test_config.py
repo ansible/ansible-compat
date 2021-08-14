@@ -1,11 +1,18 @@
 """Tests for ansible_compat.config submodule."""
 import copy
+import subprocess
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from packaging.version import Version
 
-from ansible_compat.config import AnsibleConfig, ansible_collections_path
+from ansible_compat.config import (
+    AnsibleConfig,
+    ansible_collections_path,
+    ansible_version,
+    parse_ansible_version,
+)
+from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
 
 
 def test_config() -> None:
@@ -60,3 +67,24 @@ def test_ansible_collections_path_29(monkeypatch: MonkeyPatch) -> None:
         "ansible_compat.config.ansible_version", lambda x="2.9.0": Version(x)
     )
     assert ansible_collections_path() == "ANSIBLE_COLLECTIONS_PATHS"
+
+
+def test_parse_ansible_version_fail() -> None:
+    """Checks that parse_ansible_version raises an error on invalid input."""
+    with pytest.raises(
+        InvalidPrerequisiteError, match="Unable to parse ansible cli version"
+    ):
+        parse_ansible_version("foo")
+
+
+def test_ansible_version_missing(monkeypatch: MonkeyPatch) -> None:
+    """Validate ansible_version behavior when ansible is missing."""
+    monkeypatch.setattr(
+        "subprocess.run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(args=[], returncode=1),
+    )
+    with pytest.raises(
+        MissingAnsibleError,
+        match="Unable to find a working copy of ansible executable.",
+    ):
+        ansible_version()
