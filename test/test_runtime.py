@@ -68,6 +68,11 @@ def test_runtime_mismatch_ansible_module(monkeypatch: MonkeyPatch) -> None:
         Runtime(require_module=True)
 
 
+def test_runtime_require_module() -> None:
+    """Check that require_module successful pass."""
+    Runtime(require_module=True)
+
+
 def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
     """Tests for failure to detect Ansible version."""
     patched = mocker.patch(
@@ -118,7 +123,9 @@ def test_runtime_prepare_ansible_paths_validation() -> None:
     ids=("sample", "sample2", "sample3"),
 )
 def test_runtime_install_role(
-    caplog: pytest.LogCaptureFixture, folder: str, role_name: str
+    caplog: pytest.LogCaptureFixture,
+    folder: str,
+    role_name: str,
 ) -> None:
     """Checks that we can install roles."""
     caplog.set_level(logging.INFO)
@@ -134,6 +141,11 @@ def test_runtime_install_role(
     assert result.returncode == 0, result
     assert role_name in result.stdout
     runtime.clean()
+    # also test that clean does not break when cache_dir is missing
+    tmp_dir = runtime.cache_dir
+    runtime.cache_dir = None
+    runtime.clean()
+    runtime.cache_dir = tmp_dir
 
 
 def test_prepare_environment_with_collections(tmp_path: pathlib.Path) -> None:
