@@ -33,6 +33,12 @@ def test_config() -> None:
         print(config.THIS_DOES_NOT_EXIST)
 
 
+def test_config_with_dump() -> None:
+    """Tests that config can parse given dumps."""
+    config = AnsibleConfig(config_dump="ACTION_WARNINGS(default) = True")
+    assert config.ACTION_WARNINGS is True
+
+
 def test_config_copy() -> None:
     """Checks ability to use copy/deepcopy."""
     config = AnsibleConfig()
