@@ -5,7 +5,6 @@ import os
 import re
 import subprocess
 import sys
-import warnings
 from collections import UserDict
 from functools import lru_cache
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
@@ -448,11 +447,6 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         if name in self.data:
             return self.data[name]
         if name in self._aliases:
-            warnings.warn(
-                f'Detected deprecated use of {name}, replace it with {self._aliases[name]}',
-                category=DeprecationWarning,
-                stacklevel=2,
-            )
             return self.data[self._aliases[name]]
         raise AttributeError(attr_name)
 
