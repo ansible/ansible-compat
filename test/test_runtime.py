@@ -535,3 +535,10 @@ def test_upgrade_collection(runtime_tmp: Runtime) -> None:
         runtime_tmp.require_collection("containers.podman", "1.6.1", install=False)
     # now we really perform the upgrade
     runtime_tmp.require_collection("containers.podman", "1.6.1")
+
+
+def test_require_collection_no_cache_dir() -> None:
+    """Check require_collection without a cache directory."""
+    runtime = Runtime()
+    assert not runtime.cache_dir
+    runtime.require_collection("community.molecule", "0.1.0", install=True)
