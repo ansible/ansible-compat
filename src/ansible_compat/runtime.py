@@ -287,7 +287,9 @@ class Runtime:
             paths.insert(0, f"{self.cache_dir}/collections")
 
         for path in paths:
-            collpath = os.path.join(path, 'ansible_collections', ns, coll)
+            collpath = os.path.expanduser(
+                os.path.join(path, 'ansible_collections', ns, coll)
+            )
             if os.path.exists(collpath):
                 mpath = os.path.join(collpath, 'MANIFEST.json')
                 if not os.path.exists(mpath):
