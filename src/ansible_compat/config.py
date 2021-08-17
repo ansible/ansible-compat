@@ -240,7 +240,8 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     default_remote_user: Optional[str] = None
     default_roles_path: List[str] = [
         "~/.ansible/roles",
-        "/usr/share/ansible/roles:/etc/ansible/roles",
+        "/usr/share/ansible/roles",
+        "/etc/ansible/roles",
     ]
     default_selinux_special_fs: List[str] = [
         "fuse",
