@@ -16,10 +16,7 @@ from ansible_compat.config import (
     ansible_collections_path,
     parse_ansible_version,
 )
-from ansible_compat.constants import (  # INVALID_CONFIG_RC,
-    ANSIBLE_DEFAULT_ROLES_PATH,
-    MSG_INVALID_FQRL,
-)
+from ansible_compat.constants import MSG_INVALID_FQRL
 from ansible_compat.errors import (
     AnsibleCommandError,
     AnsibleCompatError,
@@ -275,7 +272,7 @@ class Runtime:
                 "Invalid collection name supplied: %s" % name
             ) from exc
 
-        paths = self.config.collections_paths
+        paths: List[str] = self.config.collections_paths
         if not paths or not isinstance(paths, list):
             raise InvalidPrerequisiteError(
                 f"Unable to determine ansible collection paths. ({paths})"
@@ -284,7 +281,8 @@ class Runtime:
         if self.cache_dir:
             # if we have a cache dir, we want to be use that would be preferred
             # destination when installing a missing collection
-            paths.insert(0, f"{self.cache_dir}/collections")
+            # https://github.com/PyCQA/pylint/issues/4667
+            paths.insert(0, f"{self.cache_dir}/collections")  # pylint: disable=E1101
 
         for path in paths:
             collpath = os.path.expanduser(
@@ -322,11 +320,12 @@ class Runtime:
 
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""
-        library_paths: List[str] = []
-        roles_path: List[str] = []
-        collections_path = self.config.collections_path
-        if not isinstance(collections_path, list):
-            raise RuntimeError(f"Unexpected collection_path value: {collections_path}")
+        try:
+            library_paths: List[str] = self.config.default_module_path.copy()
+            roles_path: List[str] = self.config.default_roles_path.copy()
+            collections_path: List[str] = self.config.collections_paths.copy()
+        except AttributeError as exc:
+            raise RuntimeError("Unexpected ansible configuration") from exc
 
         alterations_list = [
             (library_paths, "plugins/modules", True),
@@ -348,13 +347,13 @@ class Runtime:
             if path not in path_list:
                 path_list.insert(0, path)
 
-        _update_env('ANSIBLE_LIBRARY', library_paths)
-        _update_env(ansible_collections_path(), collections_path)
-        _update_env(
-            'ANSIBLE_ROLES_PATH', roles_path, default=ANSIBLE_DEFAULT_ROLES_PATH
-        )
+        if library_paths != self.config.DEFAULT_MODULE_PATH:
+            _update_env('ANSIBLE_LIBRARY', library_paths)
+        if collections_path != self.config.collections_paths:
+            _update_env(ansible_collections_path(), collections_path)
+        if roles_path != self.config.default_roles_path:
+            _update_env('ANSIBLE_ROLES_PATH', roles_path)
 
-    # pylint: disable=no-self-use
     def _install_galaxy_role(
         self, project_dir: str, role_name_check: int = 0, ignore_errors: bool = False
     ) -> None:
@@ -403,16 +402,17 @@ class Runtime:
                 fqrn = f"{role_namespace}{role_name}"
             else:
                 fqrn = pathlib.Path(project_dir).absolute().name
-        path = pathlib.Path(f"{get_cache_dir(project_dir)}/roles")
+        path = pathlib.Path(os.path.expanduser(self.config.default_roles_path[0]))
         path.mkdir(parents=True, exist_ok=True)
         link_path = path / fqrn
         # despite documentation stating that is_file() reports true for symlinks,
         # it appears that is_dir() reports true instead, so we rely on exists().
         target = pathlib.Path(project_dir).absolute()
-        if not link_path.exists() or os.readlink(link_path) != str(target):
-            if link_path.exists():
+        exists = link_path.exists() or link_path.is_symlink()
+        if not exists or os.readlink(link_path) != str(target):
+            if exists:
                 link_path.unlink()
-            link_path.symlink_to(target, target_is_directory=True)
+            link_path.symlink_to(str(target), target_is_directory=True)
         _logger.info(
             "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
             link_path,
