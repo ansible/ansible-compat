@@ -255,7 +255,7 @@ class Runtime:
 
         self._prepare_ansible_paths()
         # install role if current project looks like a standalone role
-        _install_galaxy_role(self.project_dir, ignore_errors=True)
+        self._install_galaxy_role(self.project_dir, ignore_errors=True)
 
     def require_collection(  # noqa: C901
         self,
@@ -354,69 +354,69 @@ class Runtime:
             'ANSIBLE_ROLES_PATH', roles_path, default=ANSIBLE_DEFAULT_ROLES_PATH
         )
 
+    # pylint: disable=no-self-use
+    def _install_galaxy_role(
+        self, project_dir: str, role_name_check: int = 0, ignore_errors: bool = False
+    ) -> None:
+        """Detect standalone galaxy role and installs it.
 
-def _install_galaxy_role(
-    project_dir: str, role_name_check: int = 0, ignore_errors: bool = False
-) -> None:
-    """Detect standalone galaxy role and installs it.
+        :param: role_name_check: logic to used to check role name
+            0: exit with error if name is not compliant (default)
+            1: warn if name is not compliant
+            2: bypass any name checking
 
-    :param: role_name_check: logic to used to check role name
-        0: exit with error if name is not compliant (default)
-        1: warn if name is not compliant
-        2: bypass any name checking
+        :param: ignore_errors: if True, bypass installing invalid roles.
 
-    :param: ignore_errors: if True, bypass installing invalid roles.
+        Our implementation aims to match ansible-galaxy's behaviour for installing
+        roles from a tarball or scm. For example ansible-galaxy will install a role
+        that has both galaxy.yml and meta/main.yml present but empty. Also missing
+        galaxy.yml is accepted but missing meta/main.yml is not.
+        """
+        yaml = None
+        galaxy_info = {}
+        meta_filename = os.path.join(project_dir, 'meta', 'main.yml')
 
-    Our implementation aims to match ansible-galaxy's behaviour for installing
-    roles from a tarball or scm. For example ansible-galaxy will install a role
-    that has both galaxy.yml and meta/main.yml present but empty. Also missing
-    galaxy.yml is accepted but missing meta/main.yml is not.
-    """
-    yaml = None
-    galaxy_info = {}
-    meta_filename = os.path.join(project_dir, 'meta', 'main.yml')
-
-    if not os.path.exists(meta_filename):
-        if ignore_errors:
-            return
-    else:
-        yaml = yaml_from_file(meta_filename)
-
-    if yaml and 'galaxy_info' in yaml:
-        galaxy_info = yaml['galaxy_info']
-
-    fqrn = _get_role_fqrn(galaxy_info, project_dir)
-
-    if role_name_check in [0, 1]:
-        if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
-            msg = MSG_INVALID_FQRL.format(fqrn)
-            if role_name_check == 1:
-                _logger.warning(msg)
-            else:
-                _logger.error(msg)
-                raise InvalidPrerequisiteError(msg)
-    else:
-        # when 'role-name' is in skip_list, we stick to plain role names
-        if 'role_name' in galaxy_info:
-            role_namespace = _get_galaxy_role_ns(galaxy_info)
-            role_name = _get_galaxy_role_name(galaxy_info)
-            fqrn = f"{role_namespace}{role_name}"
+        if not os.path.exists(meta_filename):
+            if ignore_errors:
+                return
         else:
-            fqrn = pathlib.Path(project_dir).absolute().name
-    path = pathlib.Path(f"{get_cache_dir(project_dir)}/roles")
-    path.mkdir(parents=True, exist_ok=True)
-    link_path = path / fqrn
-    # despite documentation stating that is_file() reports true for symlinks,
-    # it appears that is_dir() reports true instead, so we rely on exists().
-    target = pathlib.Path(project_dir).absolute()
-    if not link_path.exists() or os.readlink(link_path) != str(target):
-        if link_path.exists():
-            link_path.unlink()
-        link_path.symlink_to(target, target_is_directory=True)
-    _logger.info(
-        "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
-        link_path,
-    )
+            yaml = yaml_from_file(meta_filename)
+
+        if yaml and 'galaxy_info' in yaml:
+            galaxy_info = yaml['galaxy_info']
+
+        fqrn = _get_role_fqrn(galaxy_info, project_dir)
+
+        if role_name_check in [0, 1]:
+            if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
+                msg = MSG_INVALID_FQRL.format(fqrn)
+                if role_name_check == 1:
+                    _logger.warning(msg)
+                else:
+                    _logger.error(msg)
+                    raise InvalidPrerequisiteError(msg)
+        else:
+            # when 'role-name' is in skip_list, we stick to plain role names
+            if 'role_name' in galaxy_info:
+                role_namespace = _get_galaxy_role_ns(galaxy_info)
+                role_name = _get_galaxy_role_name(galaxy_info)
+                fqrn = f"{role_namespace}{role_name}"
+            else:
+                fqrn = pathlib.Path(project_dir).absolute().name
+        path = pathlib.Path(f"{get_cache_dir(project_dir)}/roles")
+        path.mkdir(parents=True, exist_ok=True)
+        link_path = path / fqrn
+        # despite documentation stating that is_file() reports true for symlinks,
+        # it appears that is_dir() reports true instead, so we rely on exists().
+        target = pathlib.Path(project_dir).absolute()
+        if not link_path.exists() or os.readlink(link_path) != str(target):
+            if link_path.exists():
+                link_path.unlink()
+            link_path.symlink_to(target, target_is_directory=True)
+        _logger.info(
+            "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
+            link_path,
+        )
 
 
 def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
