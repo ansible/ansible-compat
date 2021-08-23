@@ -28,6 +28,7 @@ def test_config() -> None:
     # check lowercase and older name aliasing
     assert isinstance(config.collections_paths, list)
     assert isinstance(config.collections_path, list)
+    assert config.collections_paths == config.collections_path
 
     with pytest.raises(AttributeError):
         print(config.THIS_DOES_NOT_EXIST)
