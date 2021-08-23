@@ -539,3 +539,14 @@ def test_require_collection_no_cache_dir() -> None:
     runtime = Runtime()
     assert not runtime.cache_dir
     runtime.require_collection("community.molecule", "0.1.0", install=True)
+
+
+def test_runtime_env_ansible_library(monkeypatch: MonkeyPatch) -> None:
+    """Verify that custom path specified using ANSIBLE_LIBRARY is not lost."""
+    path_name = "foo"
+    monkeypatch.setenv("ANSIBLE_LIBRARY", path_name)
+
+    path_name = os.path.realpath(path_name)
+    runtime = Runtime()
+    runtime.prepare_environment()
+    assert path_name in runtime.config.default_module_path

@@ -421,7 +421,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         super().__init__()
 
         if data:
-            self.data = copy.copy(data)
+            self.data = copy.deepcopy(data)
             return
 
         if not config_dump:
@@ -442,14 +442,23 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
             except (NameError, SyntaxError, ValueError):
                 self[key] = value
 
-    def __getattr__(self, attr_name: str) -> object:
+    def __getattribute__(self, attr_name: str) -> object:
         """Allow access of config options as attributes."""
+        _dict = super().__dict__  # pylint: disable=no-member
+        if attr_name in _dict:
+            return _dict[attr_name]
+
+        data = super().__getattribute__("data")
+        if attr_name == 'data':
+            return data
+
         name = attr_name.upper()
-        if name in self.data:
-            return self.data[name]
-        if name in self._aliases:
-            return self.data[self._aliases[name]]
-        raise AttributeError(attr_name)
+        if name in data:
+            return data[name]
+        if name in AnsibleConfig._aliases:
+            return data[AnsibleConfig._aliases[name]]
+
+        return super().__getattribute__(attr_name)
 
     def __getitem__(self, name: str) -> object:
         """Allow access to config options using indexing."""
