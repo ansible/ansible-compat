@@ -103,29 +103,31 @@ def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
 def test_runtime_prepare_ansible_paths_validation() -> None:
     """Check that we validate collection_path."""
     runtime = Runtime()
-    runtime.config.collections_path = "invalid"  # type: ignore
-    with pytest.raises(RuntimeError, match="Unexpected collection_path value:"):
+    runtime.config.collections_paths = "invalid-value"  # type: ignore
+    with pytest.raises(RuntimeError, match="Unexpected ansible configuration"):
         runtime._prepare_ansible_paths()
 
 
 @pytest.mark.parametrize(
-    ("folder", "role_name"),
+    ("folder", "role_name", "isolated"),
     (
-        ("ansible-role-sample", "acme.sample"),
-        ("acme.sample2", "acme.sample2"),
-        ("sample3", "acme.sample3"),
+        ("ansible-role-sample", "acme.sample", True),
+        ("acme.sample2", "acme.sample2", True),
+        ("sample3", "acme.sample3", True),
+        ("sample4", "acme.sample4", False),
     ),
-    ids=("sample", "sample2", "sample3"),
+    ids=("1", "2", "3", "4"),
 )
 def test_runtime_install_role(
     caplog: pytest.LogCaptureFixture,
     folder: str,
     role_name: str,
+    isolated: bool,
 ) -> None:
     """Checks that we can install roles."""
     caplog.set_level(logging.INFO)
     project_dir = os.path.join(os.path.dirname(__file__), "roles", folder)
-    runtime = Runtime(isolated=True, project_dir=project_dir)
+    runtime = Runtime(isolated=isolated, project_dir=project_dir)
     runtime.prepare_environment()
     assert (
         "symlink to current repository in order to enable Ansible to find the role"
