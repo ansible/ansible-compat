@@ -77,10 +77,7 @@ class Runtime:
             self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig()
 
-        if (
-            min_required_version is not None
-            and packaging.version.Version(min_required_version) > self.version
-        ):
+        if not self.version_in_range(lower=min_required_version):
             raise RuntimeError(
                 f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
             )
@@ -156,6 +153,19 @@ class Runtime:
         msg = "Unable to find a working copy of ansible executable."
         raise MissingAnsibleError(msg, proc=proc)
 
+    def version_in_range(
+        self, lower: Optional[str] = None, upper: Optional[str] = None
+    ) -> bool:
+        """Check if Ansible version is inside a required range.
+
+        The lower limit is inclusive and the upper one exclusive.
+        """
+        if lower and self.version < packaging.version.Version(lower):
+            return False
+        if upper and self.version >= packaging.version.Version(upper):
+            return False
+        return True
+
     def install_collection(
         self, collection: str, destination: Optional[Union[str, pathlib.Path]] = None
     ) -> None:
@@ -172,7 +182,7 @@ class Runtime:
 
         # ansible-galaxy before 2.11 fails to upgrade collection unless --force
         # is present, newer versions do not need it
-        if self.version < packaging.version.parse("2.11"):
+        if self.version_in_range(upper="2.11"):
             cmd.append("--force")
 
         if destination:
