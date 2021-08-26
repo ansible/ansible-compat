@@ -6,12 +6,12 @@ import re
 import subprocess
 import sys
 from collections import UserDict
-from functools import lru_cache
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from packaging.version import Version
 
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
+from ansible_compat.ports import cache
 
 # mypy/pylint idiom for py36-py38 compatibility
 # https://github.com/python/typeshed/issues/3500#issuecomment-560958608
@@ -59,7 +59,7 @@ def parse_ansible_version(stdout: str) -> Version:
     raise InvalidPrerequisiteError("Unable to parse ansible cli version: %s" % stdout)
 
 
-@lru_cache()
+@cache
 def ansible_version(version: str = "") -> Version:
     """Return current Version object for Ansible.
 
