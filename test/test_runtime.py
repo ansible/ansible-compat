@@ -5,7 +5,7 @@ import os
 import pathlib
 import subprocess
 from contextlib import contextmanager
-from typing import Any, Iterator, List, Type
+from typing import Any, Iterator, List, Type, Union
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -550,3 +550,21 @@ def test_runtime_env_ansible_library(monkeypatch: MonkeyPatch) -> None:
     runtime = Runtime()
     runtime.prepare_environment()
     assert path_name in runtime.config.default_module_path
+
+
+@pytest.mark.parametrize(
+    ("lower", "upper", "expected"),
+    (
+        ("1.0", "9999.0", True),
+        (None, "9999.0", True),
+        ("1.0", None, True),
+        ("9999.0", None, False),
+        (None, "1.0", False),
+    ),
+)
+def test_runtime_version_in_range(
+    lower: Union[str, None], upper: Union[str, None], expected: bool
+) -> None:
+    """Validate functioning of version_in_range."""
+    runtime = Runtime()
+    assert runtime.version_in_range(lower=lower, upper=upper) is expected
