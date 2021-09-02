@@ -7,6 +7,7 @@ import pathlib
 import re
 import shutil
 import subprocess
+import tempfile
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import packaging
@@ -167,7 +168,10 @@ class Runtime:
         return True
 
     def install_collection(
-        self, collection: str, destination: Optional[Union[str, pathlib.Path]] = None
+        self,
+        collection: str,
+        destination: Optional[Union[str, pathlib.Path]] = None,
+        force: bool = False,
     ) -> None:
         """Install an Ansible collection.
 
@@ -182,7 +186,7 @@ class Runtime:
 
         # ansible-galaxy before 2.11 fails to upgrade collection unless --force
         # is present, newer versions do not need it
-        if self.version_in_range(upper="2.11"):
+        if force or self.version_in_range(upper="2.11"):
             cmd.append("--force")
 
         if destination:
@@ -198,6 +202,35 @@ class Runtime:
             msg = f"Command returned {run.returncode} code:\n{run.stdout}\n{run.stderr}"
             _logger.error(msg)
             raise InvalidPrerequisiteError(msg)
+
+    def install_collection_from_disk(
+        self, path: str, destination: Optional[Union[str, pathlib.Path]] = None
+    ) -> None:
+        """Build and install collection from a given disk path."""
+        if not self.version_in_range(upper="2.11"):
+            self.install_collection(path, destination=destination, force=True)
+            return
+        # older versions of ansible able unable to install without building
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            cmd = [
+                "ansible-galaxy",
+                "collection",
+                "build",
+                "--output-path",
+                tmp_dir,
+                path,
+            ]
+            _logger.info("Running %s", " ".join(cmd))
+            run = self.exec(cmd, retry=False)
+            if run.returncode != 0:
+                _logger.error(run.stdout)
+                raise AnsibleCommandError(run)
+            for archive_file in os.listdir(tmp_dir):
+                self.install_collection(
+                    os.path.join(tmp_dir, archive_file),
+                    destination=destination,
+                    force=True,
+                )
 
     def install_requirements(self, requirement: str, retry: bool = False) -> None:
         """Install dependencies from a requirements.yml."""
