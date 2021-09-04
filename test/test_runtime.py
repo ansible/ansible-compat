@@ -568,3 +568,30 @@ def test_runtime_version_in_range(
     """Validate functioning of version_in_range."""
     runtime = Runtime()
     assert runtime.version_in_range(lower=lower, upper=upper) is expected
+
+
+def test_install_collection_from_disk() -> None:
+    """Tests ability to install a local collection."""
+    with remember_cwd("test/collections/acme.goodies"):
+        runtime = Runtime(isolated=True)
+        runtime.install_collection_from_disk(".")
+        # that molecule converge playbook can be used without molecule and
+        # should validate that the installed collection is available.
+        result = runtime.exec(["ansible-playbook", "molecule/default/converge.yml"])
+        assert result.returncode == 0, result.stdout
+        runtime.clean()
+
+
+def test_install_collection_from_disk_fail() -> None:
+    """Tests that we fail to install a broken collection."""
+    with remember_cwd("test/collections/acme.broken"):
+        runtime = Runtime(isolated=True)
+        exception: Type[Exception]
+        if runtime.version_in_range(upper="2.11"):
+            exception = AnsibleCommandError
+            msg = "Got 1 exit code while running: ansible-galaxy collection build"
+        else:
+            exception = InvalidPrerequisiteError
+            msg = "is missing the following mandatory"
+        with pytest.raises(exception, match=msg):
+            runtime.install_collection_from_disk(".")
