@@ -5,6 +5,7 @@ import os
 import pathlib
 import subprocess
 from contextlib import contextmanager
+from shutil import rmtree
 from typing import Any, Iterator, List, Type, Union
 
 import pytest
@@ -128,11 +129,7 @@ def test_runtime_install_role(
     caplog.set_level(logging.INFO)
     project_dir = os.path.join(os.path.dirname(__file__), "roles", folder)
     runtime = Runtime(isolated=isolated, project_dir=project_dir)
-    runtime.prepare_environment()
-    assert (
-        "symlink to current repository in order to enable Ansible to find the role"
-        in caplog.text
-    )
+    runtime.prepare_environment(install_local=True)
     # check that role appears as installed now
     result = runtime.exec(["ansible-galaxy", "list"])
     assert result.returncode == 0, result
@@ -568,6 +565,7 @@ def test_runtime_env_ansible_library(monkeypatch: MonkeyPatch) -> None:
         ("9999.0", None, False),
         (None, "1.0", False),
     ),
+    ids=("1", "2", "3", "4", "5"),
 )
 def test_runtime_version_in_range(
     lower: Union[str, None], upper: Union[str, None], expected: bool
@@ -577,14 +575,29 @@ def test_runtime_version_in_range(
     assert runtime.version_in_range(lower=lower, upper=upper) is expected
 
 
-def test_install_collection_from_disk() -> None:
+@pytest.mark.parametrize(
+    ("path", "scenario"),
+    (
+        ("test/collections/acme.goodies", "default"),
+        ("test/collections/acme.goodies/roles/baz", "deep_scenario"),
+    ),
+    ids=("normal", "deep"),
+)
+def test_install_collection_from_disk(path: str, scenario: str) -> None:
     """Tests ability to install a local collection."""
-    with remember_cwd("test/collections/acme.goodies"):
+    # ensure we do not have acme.google installed in user directory as it may
+    # produce false positives
+    rmtree(
+        os.path.expanduser("~/.ansible/collections/ansible_collections/acme/goodies"),
+        ignore_errors=True,
+    )
+    with remember_cwd(path):
         runtime = Runtime(isolated=True)
-        runtime.install_collection_from_disk(".")
+        # this should call install_collection_from_disk(".")
+        runtime.prepare_environment(install_local=True)
         # that molecule converge playbook can be used without molecule and
         # should validate that the installed collection is available.
-        result = runtime.exec(["ansible-playbook", "molecule/default/converge.yml"])
+        result = runtime.exec(["ansible-playbook", f"molecule/{scenario}/converge.yml"])
         assert result.returncode == 0, result.stdout
         runtime.clean()
 
@@ -601,4 +614,5 @@ def test_install_collection_from_disk_fail() -> None:
             exception = InvalidPrerequisiteError
             msg = "is missing the following mandatory"
         with pytest.raises(exception, match=msg):
-            runtime.install_collection_from_disk(".")
+            # this should call install_collection_from_disk(".")
+            runtime.prepare_environment(install_local=True)

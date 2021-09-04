@@ -284,7 +284,10 @@ class Runtime:
                 raise AnsibleCommandError(run)
 
     def prepare_environment(
-        self, required_collections: Optional[Dict[str, str]] = None, retry: bool = False
+        self,
+        required_collections: Optional[Dict[str, str]] = None,
+        retry: bool = False,
+        install_local: bool = False,
     ) -> None:
         """Make dependencies available if needed."""
         if required_collections is None:
@@ -292,15 +295,30 @@ class Runtime:
 
         self.install_requirements("requirements.yml", retry=retry)
 
+        destination = f"{self.cache_dir}/collections" if self.cache_dir else None
         for name, min_version in required_collections.items():
             self.install_collection(
                 f"{name}:>={min_version}",
-                destination=f"{self.cache_dir}/collections" if self.cache_dir else None,
+                destination=destination,
             )
 
         self._prepare_ansible_paths()
-        # install role if current project looks like a standalone role
-        self._install_galaxy_role(self.project_dir, ignore_errors=True)
+
+        if not install_local:
+            return
+
+        if os.path.exists("galaxy.yml"):
+            # molecule scenario within a collection
+            self.install_collection_from_disk(".", destination=destination)
+        elif pathlib.Path().resolve().parent.name == 'roles' and os.path.exists(
+            "../../galaxy.yml"
+        ):
+            # molecule scenario located within roles/<role-name>/molecule inside
+            # a collection
+            self.install_collection_from_disk("../..", destination=destination)
+        else:
+            # no collection, try to recognize and install a standalone role
+            self._install_galaxy_role(self.project_dir, ignore_errors=True)
 
     def require_collection(  # noqa: C901
         self,
@@ -380,18 +398,21 @@ class Runtime:
             (roles_path, "roles", True),
         ]
 
-        if self.isolated:
-            alterations_list.extend(
-                [
-                    (roles_path, f"{self.cache_dir}/roles", False),
-                    (library_paths, f"{self.cache_dir}/modules", False),
-                    (collections_path, f"{self.cache_dir}/collections", False),
-                ]
-            )
+        alterations_list.extend(
+            [
+                (roles_path, f"{self.cache_dir}/roles", False),
+                (library_paths, f"{self.cache_dir}/modules", False),
+                (collections_path, f"{self.cache_dir}/collections", False),
+            ]
+            if self.isolated
+            else []
+        )
 
         for path_list, path, must_be_present in alterations_list:
-            if must_be_present and not os.path.exists(path):
-                continue
+            if not os.path.exists(path):
+                if must_be_present:
+                    continue
+                os.makedirs(path, exist_ok=True)
             if path not in path_list:
                 path_list.insert(0, path)
 

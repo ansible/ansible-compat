@@ -14,7 +14,7 @@ def test_runtime_example() -> None:
     print(runtime.config.collections_path)
 
     # Detect if current project is a collection and install its requirements
-    runtime.prepare_environment()  # will retry 3 times if needed
+    runtime.prepare_environment(install_local=True)  # will retry 3 times if needed
 
     # Install a new collection (will retry 3 times if needed)
     runtime.install_collection("containers.podman")

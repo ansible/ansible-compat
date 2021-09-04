@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: localhost
+  tasks:
+    - name: "Sample testing task part of deep_scenario"
+      include_role:
+        name: acme.goodies.baz
