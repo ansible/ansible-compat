@@ -2,7 +2,7 @@
 from ansible_compat.runtime import Runtime
 
 
-def test_runtime() -> None:
+def test_runtime_example() -> None:
     """Test basic functionality of Runtime class."""
     # instantiate the runtime using isolated mode, so installing new
     # roles/collections do not pollute the default setup.
