@@ -12,7 +12,7 @@ repos:
     entry: >-
       sh -c 'git hash-object setup.py
       |
-      python -c raise\ SystemExit\(input\(\)\ !=\ \"f6d1010b609cbe816d3ef652eee452d09d52979f\"\)
+      python -c raise\ SystemExit\(input\(\)\ !=\ \"28da0d9dd407d1b3f931217f6f62ce34b98b74c6\"\)
       '
     pass_filenames: false
     language: system
