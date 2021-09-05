@@ -94,4 +94,5 @@ def test_ansible_version_missing(monkeypatch: MonkeyPatch) -> None:
         MissingAnsibleError,
         match="Unable to find a working copy of ansible executable.",
     ):
-        ansible_version()
+        # bypassing lru cache
+        ansible_version.__wrapped__()
