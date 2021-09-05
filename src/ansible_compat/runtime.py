@@ -51,6 +51,7 @@ class Runtime:
         min_required_version: Optional[str] = None,
         require_module: bool = False,
         max_retries: int = 0,
+        environ: Optional[Dict[str, str]] = None,
     ) -> None:
         """Initialize Ansible runtime environment.
 
@@ -70,10 +71,13 @@ class Runtime:
                                 also perform Python imports from Ansible.
         :param max_retries: Number of times it should retry network operations.
                             Default is 0, no retries.
+        :param environ: Environment dictionary to use, if undefined
+                        ``os.environ`` will be copied and used.
         """
         self.project_dir = project_dir or os.getcwd()
         self.isolated = isolated
         self.max_retries = max_retries
+        self.environ = environ or os.environ.copy()
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig()
@@ -125,6 +129,7 @@ class Runtime:
                 check=False,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                env=self.environ,
             )
             if result.returncode == 0:
                 break
@@ -391,11 +396,11 @@ class Runtime:
                 path_list.insert(0, path)
 
         if library_paths != self.config.DEFAULT_MODULE_PATH:
-            _update_env('ANSIBLE_LIBRARY', library_paths)
+            self._update_env('ANSIBLE_LIBRARY', library_paths)
         if collections_path != self.config.collections_paths:
-            _update_env(ansible_collections_path(), collections_path)
+            self._update_env(ansible_collections_path(), collections_path)
         if roles_path != self.config.default_roles_path:
-            _update_env('ANSIBLE_ROLES_PATH', roles_path)
+            self._update_env('ANSIBLE_ROLES_PATH', roles_path)
 
     def _install_galaxy_role(
         self, project_dir: str, role_name_check: int = 0, ignore_errors: bool = False
@@ -461,6 +466,21 @@ class Runtime:
             link_path,
         )
 
+    def _update_env(self, varname: str, value: List[str], default: str = "") -> None:
+        """Update colon based environment variable if needed.
+
+        New values are prepended to make sure they take precedence.
+        """
+        if not value:
+            return
+        orig_value = self.environ.get(varname, default)
+        if orig_value:
+            value = [*value, *orig_value.split(':')]
+        value_str = ":".join(value)
+        if value_str != self.environ.get(varname, ""):
+            self.environ[varname] = value_str
+            _logger.info("Set %s=%s", varname, value_str)
+
 
 def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
     """Compute role fqrn."""
@@ -474,23 +494,6 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
         )[-1]
 
     return f"{role_namespace}{role_name}"
-
-
-def _update_env(varname: str, value: List[str], default: str = "") -> None:
-    """Update colon based environment variable if needed.
-
-    New values are added by inserting them to assure they take precedence
-    over the existing ones.
-    """
-    if value:
-        orig_value = os.environ.get(varname, default=default)
-        if orig_value:
-            # Prepend original or default variable content to custom content.
-            value = [*value, *orig_value.split(':')]
-        value_str = ":".join(value)
-        if value_str != os.environ.get(varname, ""):
-            os.environ[varname] = value_str
-            _logger.info("Added %s=%s", varname, value_str)
 
 
 def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:

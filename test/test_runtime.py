@@ -19,7 +19,7 @@ from ansible_compat.errors import (
     AnsibleCompatError,
     InvalidPrerequisiteError,
 )
-from ansible_compat.runtime import CompletedProcess, Runtime, _update_env
+from ansible_compat.runtime import CompletedProcess, Runtime
 
 
 def test_runtime_version(runtime: Runtime) -> None:
@@ -256,27 +256,30 @@ def test__update_env_no_old_value_no_default_no_value(monkeypatch: MonkeyPatch) 
     """Make sure empty value does not touch environment."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
 
-    _update_env("DUMMY_VAR", [])
+    runtime = Runtime()
+    runtime._update_env("DUMMY_VAR", [])
 
-    assert "DUMMY_VAR" not in os.environ
+    assert "DUMMY_VAR" not in runtime.environ
 
 
 def test__update_env_no_old_value_no_value(monkeypatch: MonkeyPatch) -> None:
     """Make sure empty value does not touch environment."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
 
-    _update_env("DUMMY_VAR", [], "a:b")
+    runtime = Runtime()
+    runtime._update_env("DUMMY_VAR", [], "a:b")
 
-    assert "DUMMY_VAR" not in os.environ
+    assert "DUMMY_VAR" not in runtime.environ
 
 
 def test__update_env_no_default_no_value(monkeypatch: MonkeyPatch) -> None:
     """Make sure empty value does not touch environment."""
     monkeypatch.setenv("DUMMY_VAR", "a:b")
 
-    _update_env("DUMMY_VAR", [])
+    runtime = Runtime()
+    runtime._update_env("DUMMY_VAR", [])
 
-    assert os.environ["DUMMY_VAR"] == "a:b"
+    assert runtime.environ["DUMMY_VAR"] == "a:b"
 
 
 @pytest.mark.parametrize(
@@ -293,9 +296,10 @@ def test__update_env_no_old_value_no_default(
     """Values are concatenated using : as the separator."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
 
-    _update_env("DUMMY_VAR", value)
+    runtime = Runtime()
+    runtime._update_env("DUMMY_VAR", value)
 
-    assert os.environ["DUMMY_VAR"] == result
+    assert runtime.environ["DUMMY_VAR"] == result
 
 
 @pytest.mark.parametrize(
@@ -311,9 +315,10 @@ def test__update_env_no_old_value(
     """Values are appended to default value."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
 
-    _update_env("DUMMY_VAR", value, default)
+    runtime = Runtime()
+    runtime._update_env("DUMMY_VAR", value, default)
 
-    assert os.environ["DUMMY_VAR"] == result
+    assert runtime.environ["DUMMY_VAR"] == result
 
 
 @pytest.mark.parametrize(
@@ -329,9 +334,10 @@ def test__update_env_no_default(
     """Values are appended to preexisting value."""
     monkeypatch.setenv("DUMMY_VAR", old_value)
 
-    _update_env("DUMMY_VAR", value)
+    runtime = Runtime()
+    runtime._update_env("DUMMY_VAR", value)
 
-    assert os.environ["DUMMY_VAR"] == result
+    assert runtime.environ["DUMMY_VAR"] == result
 
 
 @pytest.mark.parametrize(
@@ -353,9 +359,10 @@ def test__update_env(
     """Defaults are ignored when preexisting value is present."""
     monkeypatch.setenv("DUMMY_VAR", old_value)
 
-    _update_env("DUMMY_VAR", value)
+    runtime = Runtime()
+    runtime._update_env("DUMMY_VAR", value)
 
-    assert os.environ["DUMMY_VAR"] == result
+    assert runtime.environ["DUMMY_VAR"] == result
 
 
 def test_require_collection_wrong_version(runtime: Runtime) -> None:
