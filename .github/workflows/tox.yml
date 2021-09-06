@@ -93,7 +93,7 @@ jobs:
       ${{ matrix.tox_env }}@${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      # fail-fast: false
+      fail-fast: false
       # max-parallel: 5
       # The matrix testing goal is to cover the *most likely* environments
       # which are expected to be used by users in production. Avoid adding a
@@ -185,21 +185,32 @@ jobs:
         TOXENV: ${{ matrix.tox_env }},${{ matrix.tox_env }}-ansible29,${{ matrix.tox_env }}-ansible210,${{ matrix.tox_env }}-ansible211,${{ matrix.tox_env }}-devel
     # sequential run improves browsing experience (almost no speed impact)
     - name: "Test with tox: ${{ matrix.tox_env }}-ansible29"
+      id: ansible29
       run: python3 -m tox
+      continue-on-error: true
       env:
         TOXENV: ${{ matrix.tox_env }}-ansible29
     - name: "Test with tox: ${{ matrix.tox_env }}-ansible210"
+      id: ansible210
       run: python3 -m tox
+      continue-on-error: true
       env:
         TOXENV: ${{ matrix.tox_env }}-ansible210
     - name: "Test with tox: ${{ matrix.tox_env }}-ansible211"
+      id: ansible211
       run: python3 -m tox
+      continue-on-error: true
       env:
         TOXENV: ${{ matrix.tox_env }}-ansible211
     - name: "Test with tox: ${{ matrix.tox_env }}-devel"
+      id: ansibledevel
       run: python3 -m tox
+      continue-on-error: true
       env:
         TOXENV: ${{ matrix.tox_env }}-devel
+    - name: Check for tox failures
+      if: steps.ansible29.outcome != 'success' || steps.ansible210.outcome != 'success' || steps.ansible211.outcome != 'success' || steps.ansibledevel.outcome != 'success'
+      run: exit 1
     - name: Combine coverage data
       # produce a single .coverage file at repo root
       run: coverage combine .tox/.coverage.*
