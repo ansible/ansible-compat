@@ -84,6 +84,7 @@ repos:
     - packaging
     - pytest
     - pytest-mock
+    - subprocess-tee>=0.3.3
     - types-PyYAML
 - repo: https://github.com/pre-commit/mirrors-pylint
   rev: v3.0.0a4
