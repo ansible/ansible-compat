@@ -616,3 +616,12 @@ def test_install_collection_from_disk_fail() -> None:
         with pytest.raises(exception, match=msg):
             # this should call install_collection_from_disk(".")
             runtime.prepare_environment(install_local=True)
+
+
+def test_runtime_run(runtime: Runtime) -> None:
+    """."""
+    result1 = runtime.exec(["seq", "10"])
+    result2 = runtime.exec(["seq", "10"], tee=True)
+    assert result1.returncode == result2.returncode
+    assert result1.stderr == result2.stderr
+    assert result1.stdout == result2.stdout

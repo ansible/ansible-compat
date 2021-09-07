@@ -8,9 +8,10 @@ import re
 import shutil
 import subprocess
 import tempfile
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 import packaging
+import subprocess_tee
 
 from ansible_compat.config import (
     AnsibleConfig,
@@ -116,14 +117,20 @@ class Runtime:
             shutil.rmtree(self.cache_dir, ignore_errors=True)
 
     def exec(
-        self, args: Union[str, List[str]], retry: bool = False
+        self, args: Union[str, List[str]], retry: bool = False, tee: bool = False
     ) -> CompletedProcess:
         """Execute a command inside an Ansible environment.
 
         :param retry: Retry network operations on failures.
+        :param tee: Also pass captured stdout/stderr to system while running.
         """
+        if tee:
+            run_func: Callable[..., CompletedProcess] = subprocess_tee.run
+        else:
+            run_func = subprocess.run
+
         for _ in range(self.max_retries + 1 if retry else 1):
-            result = subprocess.run(
+            result = run_func(
                 args,
                 universal_newlines=True,
                 check=False,
