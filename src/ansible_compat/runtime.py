@@ -117,7 +117,12 @@ class Runtime:
             shutil.rmtree(self.cache_dir, ignore_errors=True)
 
     def exec(
-        self, args: Union[str, List[str]], retry: bool = False, tee: bool = False
+        self,
+        args: Union[str, List[str]],
+        retry: bool = False,
+        tee: bool = False,
+        env: Optional[Dict[str, str]] = None,
+        cwd: Optional[str] = None,
     ) -> CompletedProcess:
         """Execute a command inside an Ansible environment.
 
@@ -136,7 +141,8 @@ class Runtime:
                 check=False,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                env=self.environ,
+                env=env or self.environ,
+                cwd=cwd,
             )
             if result.returncode == 0:
                 break

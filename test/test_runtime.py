@@ -619,9 +619,31 @@ def test_install_collection_from_disk_fail() -> None:
 
 
 def test_runtime_run(runtime: Runtime) -> None:
-    """."""
+    """Check if tee and non tee mode return same kind of results."""
     result1 = runtime.exec(["seq", "10"])
     result2 = runtime.exec(["seq", "10"], tee=True)
     assert result1.returncode == result2.returncode
     assert result1.stderr == result2.stderr
     assert result1.stdout == result2.stdout
+
+
+def test_runtime_exec_cwd(runtime: Runtime) -> None:
+    """Check if passing cwd works as expected."""
+    cwd = "/"
+    result1 = runtime.exec(["pwd"], cwd=cwd)
+    result2 = runtime.exec(["pwd"])
+    assert result1.stdout.rstrip() == cwd
+    assert result1.stdout != result2.stdout
+
+
+def test_runtime_exec_env(runtime: Runtime) -> None:
+    """Check if passing env works."""
+    result = runtime.exec(["printenv", "FOO"])
+    assert not result.stdout
+
+    result = runtime.exec(["printenv", "FOO"], env={"FOO": "bar"})
+    assert result.stdout.rstrip() == "bar"
+
+    runtime.environ["FOO"] = "bar"
+    result = runtime.exec(["printenv", "FOO"])
+    assert result.stdout.rstrip() == "bar"
