@@ -92,7 +92,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-subprocess-tee==0.3.3
+subprocess-tee==0.3.5
     # via ansible-compat (setup.cfg)
 tornado==6.1
     # via
