@@ -124,9 +124,11 @@ jobs:
         - tox_env: py38
           os: ubuntu-20.04
           python-version: 3.8
+          devel: true
         - tox_env: py39
           os: ubuntu-20.04
           python-version: 3.9
+          devel: true
         - tox_env: py36
           os: macOS-latest
           python-version: 3.6
@@ -167,7 +169,7 @@ jobs:
     #       ${{ runner.os }}-
     - name: Install tox
       run: |
-        python3 -m pip install --upgrade tox coverage
+        python3 -m pip install --upgrade tox 'coverage[toml]'
     - name: Log installed dists
       run: >-
         python3 -m pip freeze --all
@@ -182,7 +184,7 @@ jobs:
         --skip-missing-interpreters false
         -vv
       env:
-        TOXENV: ${{ matrix.tox_env }},${{ matrix.tox_env }}-ansible29,${{ matrix.tox_env }}-ansible210,${{ matrix.tox_env }}-ansible211,${{ matrix.tox_env }}-devel
+        TOXENV: ${{ matrix.tox_env }},${{ matrix.tox_env }}-ansible29,${{ matrix.tox_env }}-ansible210,${{ matrix.tox_env }}-ansible211
     # sequential run improves browsing experience (almost no speed impact)
     - name: "Test with tox: ${{ matrix.tox_env }}-ansible29"
       run: python3 -m tox
@@ -197,7 +199,9 @@ jobs:
       env:
         TOXENV: ${{ matrix.tox_env }}-ansible211
     - name: "Test with tox: ${{ matrix.tox_env }}-devel"
-      run: python3 -m tox
+      if: ${{ matrix.devel }}
+      run: |
+        python3 -m tox
       env:
         TOXENV: ${{ matrix.tox_env }}-devel
     - name: Combine coverage data
