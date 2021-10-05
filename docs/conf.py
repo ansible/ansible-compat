@@ -70,7 +70,7 @@ htmlhelp_basename = 'ansible-compat'
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'packaging': ('https://packaging.python.org/en/latest/', None),
+    'packaging': ('https://packaging.pypa.io/en/latest/', None),
 }
 
 
