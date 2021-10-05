@@ -8,7 +8,7 @@ else:
     from cached_property import cached_property
 
 if sys.version_info >= (3, 9):
-    from functools import cache
+    from functools import cache  # pylint: disable=no-name-in-module
 else:
     from functools import lru_cache
 
