@@ -9,7 +9,6 @@ jobs:
     uses: ansible-community/ansible-compat/.github/workflows/tox.yml@main
 
   release:
-    environment: release
     name: release ${{ github.event.ref }}
     needs: before-release
     uses: ansible-community/devtools/.github/workflows/release.yml@main
