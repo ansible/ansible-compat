@@ -9,3 +9,5 @@ A python package contains functions that facilitate working with various
 versions of Ansible 2.9 and newer.
 
 Documentation is available at [ansible-compat.readthedocs.io](https://ansible-compat.readthedocs.io/en/latest/).
+
+FOO!
