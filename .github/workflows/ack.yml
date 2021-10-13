@@ -6,4 +6,5 @@ on:
 
 jobs:
   call-ack:
+    name: call-ack
     uses: ansible-community/devtools/.github/workflows/ack.yml@main
