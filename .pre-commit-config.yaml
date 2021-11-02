@@ -15,24 +15,6 @@ default_language_version:
   # Needed in order to make pip-compile output predictable.
   python: python3.9
 repos:
-- repo: local
-  hooks:
-  - id: immutable-setup-py
-    name: Verify that setup.py stays immutable
-    description: >-
-      This is a sanity check that makes sure that
-      the `setup.py` file isn't changed.
-    # Using Python here because using
-    # shell test does not seem to work in CIs:
-    entry: >-
-      sh -c 'git hash-object setup.py
-      |
-      python -c raise\ SystemExit\(input\(\)\ !=\ \"28da0d9dd407d1b3f931217f6f62ce34b98b74c6\"\)
-      '
-    pass_filenames: false
-    language: system
-    files: >-
-      ^setup\.py$
 - repo: https://github.com/pre-commit/pre-commit-hooks.git
   rev: v4.0.1
   hooks:

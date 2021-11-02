@@ -6,31 +6,31 @@
 #
 attrs==21.2.0
     # via pytest
-click==8.0.1
+click==8.0.3
     # via pip-tools
 commonmark==0.9.1
     # via pytest-markdown
-coverage==5.5
+coverage==6.1.1
     # via ansible-compat (setup.cfg)
 flaky==3.7.0
     # via ansible-compat (setup.cfg)
 iniconfig==1.1.1
     # via pytest
-more-itertools==8.8.0
+more-itertools==8.10.0
     # via pytest-plus
-packaging==21.0
+packaging==21.2
     # via pytest
-pep517==0.10.0
+pep517==0.12.0
     # via pip-tools
-pip-tools==6.2.0
+pip-tools==6.4.0
     # via ansible-compat (setup.cfg)
-pluggy==0.13.1
+pluggy==1.0.0
     # via pytest
 py==1.10.0
     # via pytest
 pyparsing==2.4.7
     # via packaging
-pytest==6.2.4
+pytest==6.2.5
     # via
     #   ansible-compat (setup.cfg)
     #   pytest-markdown
@@ -42,15 +42,15 @@ pytest-mock==3.6.1
     # via ansible-compat (setup.cfg)
 pytest-plus==0.2
     # via ansible-compat (setup.cfg)
-pyyaml==5.4.1
+pyyaml==6.0
     # via ansible-compat (setup.cfg)
 subprocess-tee==0.3.5
     # via ansible-compat (setup.cfg)
 toml==0.10.2
-    # via
-    #   pep517
-    #   pytest
-wheel==0.36.2
+    # via pytest
+tomli==1.2.2
+    # via pep517
+wheel==0.37.0
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
