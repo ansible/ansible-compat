@@ -5,6 +5,5 @@ on:
     types: [opened, labeled, unlabeled, synchronize]
 
 jobs:
-  call-ack:
-    name: call-ack
+  ack:
     uses: ansible-community/devtools/.github/workflows/ack.yml@main
