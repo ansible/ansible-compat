@@ -47,21 +47,16 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    # - name: set PY_SHA256
-    #   run: echo "::set-env name=PY_SHA256::$(python -VV | sha256sum | cut -d' ' -f1)"
-    # - name: Pre-commit cache
-    #   uses: actions/cache@v1
-    #   with:
-    #     path: ~/.cache/pre-commit
-    #     key: ${{ runner.os }}-pre-commit-${{ env.PY_SHA256 }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tox.ini') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('pytest.ini') }}
-    # - name: Pip cache
-    #   uses: actions/cache@v1
-    #   with:
-    #     path: ~/.cache/pip
-    #     key: ${{ runner.os }}-pip-${{ env.PY_SHA256 }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tox.ini') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('pytest.ini') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-pip-
-    #       ${{ runner.os }}-
+    - name: Pre-commit cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pre-commit
+        key: ${{ runner.os }}-${{ matrix.env.TOXENV }}-pre-commit-${{ hashFiles('setup.cfg', 'tox.ini', 'pyproject.toml', '.pre-commit-config.yaml') }}
+    - name: Pip cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-${{ matrix.env.TOXENV }}-pip-${{ hashFiles('setup.cfg', 'tox.ini', 'pyproject.toml', '.pre-commit-config.yaml') }}
     - name: Install tox
       run: |
         python3 -m pip install --upgrade tox
@@ -166,14 +161,11 @@ jobs:
       run: |
         python --version --version
         which python
-    # - name: Pip cache
-    #   uses: actions/cache@v1
-    #   with:
-    #     path: ~/.cache/pip
-    #     key: ${{ runner.os }}-pip-${{ env.PY_SHA256 }}-${{ hashFiles('setup.cfg') }}-${{ hashFiles('tox.ini') }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('pytest.ini') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-pip-
-    #       ${{ runner.os }}-
+    - name: Pip cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-${{ matrix.tox_env }}-pip-${{ hashFiles('constraints.txt', 'setup.cfg', 'tox.ini', 'pyproject.toml', '.pre-commit-config.yaml', 'pytest.ini') }}
     - name: Install tox
       run: |
         python3 -m pip install --upgrade tox 'coverage[toml]'
