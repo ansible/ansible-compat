@@ -102,7 +102,7 @@ class Runtime:
             raise RuntimeError("Unable to find Ansible python module.")
 
         ansible_module_version = packaging.version.parse(
-            ansible_release_module.__version__  # type: ignore
+            ansible_release_module.__version__
         )
         if ansible_module_version != self.version:
             raise RuntimeError(
