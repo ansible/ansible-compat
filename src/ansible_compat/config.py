@@ -92,7 +92,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     """
 
     _aliases = {
-        'COLLECTIONS_PATH': 'COLLECTIONS_PATHS',  # 2.9 -> 2.10
+        "COLLECTIONS_PATH": "COLLECTIONS_PATHS",  # 2.9 -> 2.10
     }
     # Expose some attributes to enable auto-complete in editors, based on
     # https://docs.ansible.com/ansible/latest/reference_appendices/config.html
@@ -102,7 +102,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     ansible_connection_path: Optional[str] = None
     ansible_cow_acceptlist: List[str]
     ansible_cow_path: Optional[str] = None
-    ansible_cow_selection: str = 'default'
+    ansible_cow_selection: str = "default"
     ansible_force_color: bool = False
     ansible_nocolor: bool = False
     ansible_nocows: bool = False
@@ -188,7 +188,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     default_gathering: Union[
         Literal["smart"], Literal["explicit"], Literal["implicit"]
     ] = "smart"
-    default_gather_subset: List[str] = ['all']
+    default_gather_subset: List[str] = ["all"]
     default_gather_timeout: int = 10
     default_handler_includes_static: bool = False
     default_hash_behaviour: str = "replace"
@@ -302,7 +302,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     galaxy_display_progress: Optional[str] = None
     galaxy_ignore_certs: bool = False
     galaxy_role_skeleton: Optional[str] = None
-    galaxy_role_skeleton_ignore: List[str] = ['^.git$', '^.*/.git_keep$']
+    galaxy_role_skeleton_ignore: List[str] = ["^.git$", "^.*/.git_keep$"]
     galaxy_server: str = "https://galaxy.ansible.com"
     galaxy_server_list: Optional[str] = None
     galaxy_token_path: str = "~/.ansible/galaxy_token"
@@ -322,12 +322,12 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     inventory_cache_plugin_prefix: str = "ansible_facts"
     inventory_cache_timeout: int = 3600
     inventory_enabled: List[str] = [
-        'host_list',
-        'script',
-        'auto',
-        'yaml',
-        'ini',
-        'toml',
+        "host_list",
+        "script",
+        "auto",
+        "yaml",
+        "ini",
+        "toml",
     ]
     inventory_export: bool = False
     inventory_ignore_exts: str
@@ -338,28 +338,28 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
     module_ignore_exts: str
     netconf_ssh_config: Optional[str] = None
     network_group_modules: List[str] = [
-        'eos',
-        'nxos',
-        'ios',
-        'iosxr',
-        'junos',
-        'enos',
-        'ce',
-        'vyos',
-        'sros',
-        'dellos9',
-        'dellos10',
-        'dellos6',
-        'asa',
-        'aruba',
-        'aireos',
-        'bigip',
-        'ironware',
-        'onyx',
-        'netconf',
-        'exos',
-        'voss',
-        'slxos',
+        "eos",
+        "nxos",
+        "ios",
+        "iosxr",
+        "junos",
+        "enos",
+        "ce",
+        "vyos",
+        "sros",
+        "dellos9",
+        "dellos10",
+        "dellos6",
+        "asa",
+        "aruba",
+        "aireos",
+        "bigip",
+        "ironware",
+        "onyx",
+        "netconf",
+        "exos",
+        "voss",
+        "slxos",
     ]
     old_plugin_cache_clearing: bool = False
     paramiko_host_key_auto_add: bool = False
@@ -380,13 +380,13 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         Literal["warn"], Literal["error"], Literal["ignore"]
     ] = "warn"
     string_type_filters: List[str] = [
-        'string',
-        'to_json',
-        'to_nice_json',
-        'to_yaml',
-        'to_nice_yaml',
-        'ppretty',
-        'json',
+        "string",
+        "to_json",
+        "to_nice_json",
+        "to_yaml",
+        "to_nice_yaml",
+        "ppretty",
+        "json",
     ]
     system_warnings: bool = True
     tags_run: List[str] = []
@@ -397,20 +397,20 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         Literal["always"], Literal["never"], Literal["ignore"], Literal["silently"]
     ] = "never"
     use_persistent_connections: bool = False
-    variable_plugins_enabled: List[str] = ['host_group_vars']
+    variable_plugins_enabled: List[str] = ["host_group_vars"]
     variable_precedence: List[str] = [
-        'all_inventory',
-        'groups_inventory',
-        'all_plugins_inventory',
-        'all_plugins_play',
-        'groups_plugins_inventory',
-        'groups_plugins_play',
+        "all_inventory",
+        "groups_inventory",
+        "all_plugins_inventory",
+        "all_plugins_play",
+        "groups_plugins_inventory",
+        "groups_plugins_play",
     ]
     verbose_to_stderr: bool = False
     win_async_startup_timeout: int = 5
     worker_shutdown_poll_count: int = 0
     worker_shutdown_poll_delay: float = 0.1
-    yaml_filename_extensions: List[str] = ['.yml', '.yaml', '.json']
+    yaml_filename_extensions: List[str] = [".yml", ".yaml", ".json"]
 
     def __init__(
         self,
@@ -435,8 +435,8 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         for match in re.finditer(
             r"^(?P<key>[A-Za-z0-9_]+).* = (?P<value>.*)$", config_dump, re.MULTILINE
         ):
-            key = match.groupdict()['key']
-            value = match.groupdict()['value']
+            key = match.groupdict()["key"]
+            value = match.groupdict()["value"]
             try:
                 self[key] = ast.literal_eval(value)
             except (NameError, SyntaxError, ValueError):
@@ -449,7 +449,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
             return _dict[attr_name]
 
         data = super().__getattribute__("data")
-        if attr_name == 'data':
+        if attr_name == "data":
             return data
 
         name = attr_name.upper()
