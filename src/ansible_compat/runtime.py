@@ -260,7 +260,7 @@ class Runtime:
                 f"{requirement} file is not a valid Ansible requirements file."
             )
 
-        if isinstance(reqs_yaml, list) or 'roles' in reqs_yaml:
+        if isinstance(reqs_yaml, list) or "roles" in reqs_yaml:
             cmd = [
                 "ansible-galaxy",
                 "role",
@@ -323,7 +323,7 @@ class Runtime:
         if os.path.exists("galaxy.yml"):
             # molecule scenario within a collection
             self.install_collection_from_disk(".", destination=destination)
-        elif pathlib.Path().resolve().parent.name == 'roles' and os.path.exists(
+        elif pathlib.Path().resolve().parent.name == "roles" and os.path.exists(
             "../../galaxy.yml"
         ):
             # molecule scenario located within roles/<role-name>/molecule inside
@@ -345,7 +345,7 @@ class Runtime:
         collection before failing.
         """
         try:
-            ns, coll = name.split('.', 1)
+            ns, coll = name.split(".", 1)
         except ValueError as exc:
             raise InvalidPrerequisiteError(
                 "Invalid collection name supplied: %s" % name
@@ -365,19 +365,19 @@ class Runtime:
 
         for path in paths:
             collpath = os.path.expanduser(
-                os.path.join(path, 'ansible_collections', ns, coll)
+                os.path.join(path, "ansible_collections", ns, coll)
             )
             if os.path.exists(collpath):
-                mpath = os.path.join(collpath, 'MANIFEST.json')
+                mpath = os.path.join(collpath, "MANIFEST.json")
                 if not os.path.exists(mpath):
                     msg = f"Found collection at '{collpath}' but missing MANIFEST.json, cannot get info."
                     _logger.fatal(msg)
                     raise InvalidPrerequisiteError(msg)
 
-                with open(mpath, 'r') as f:
+                with open(mpath, "r") as f:
                     manifest = json.loads(f.read())
                     found_version = packaging.version.parse(
-                        manifest['collection_info']['version']
+                        manifest["collection_info"]["version"]
                     )
                     if version and found_version < packaging.version.parse(version):
                         if install:
@@ -430,11 +430,11 @@ class Runtime:
                 path_list.insert(0, path)
 
         if library_paths != self.config.DEFAULT_MODULE_PATH:
-            self._update_env('ANSIBLE_LIBRARY', library_paths)
+            self._update_env("ANSIBLE_LIBRARY", library_paths)
         if collections_path != self.config.collections_paths:
             self._update_env(ansible_collections_path(), collections_path)
         if roles_path != self.config.default_roles_path:
-            self._update_env('ANSIBLE_ROLES_PATH', roles_path)
+            self._update_env("ANSIBLE_ROLES_PATH", roles_path)
 
     def _install_galaxy_role(
         self, project_dir: str, role_name_check: int = 0, ignore_errors: bool = False
@@ -455,7 +455,7 @@ class Runtime:
         """
         yaml = None
         galaxy_info = {}
-        meta_filename = os.path.join(project_dir, 'meta', 'main.yml')
+        meta_filename = os.path.join(project_dir, "meta", "main.yml")
 
         if not os.path.exists(meta_filename):
             if ignore_errors:
@@ -463,8 +463,8 @@ class Runtime:
         else:
             yaml = yaml_from_file(meta_filename)
 
-        if yaml and 'galaxy_info' in yaml:
-            galaxy_info = yaml['galaxy_info']
+        if yaml and "galaxy_info" in yaml:
+            galaxy_info = yaml["galaxy_info"]
 
         fqrn = _get_role_fqrn(galaxy_info, project_dir)
 
@@ -478,7 +478,7 @@ class Runtime:
                     raise InvalidPrerequisiteError(msg)
         else:
             # when 'role-name' is in skip_list, we stick to plain role names
-            if 'role_name' in galaxy_info:
+            if "role_name" in galaxy_info:
                 role_namespace = _get_galaxy_role_ns(galaxy_info)
                 role_name = _get_galaxy_role_name(galaxy_info)
                 fqrn = f"{role_namespace}{role_name}"
@@ -509,7 +509,7 @@ class Runtime:
             return
         orig_value = self.environ.get(varname, default)
         if orig_value:
-            value = [*value, *orig_value.split(':')]
+            value = [*value, *orig_value.split(":")]
         value_str = ":".join(value)
         if value_str != self.environ.get(varname, ""):
             self.environ[varname] = value_str
@@ -523,7 +523,7 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
 
     if len(role_name) == 0:
         role_name = pathlib.Path(project_dir).absolute().name
-        role_name = re.sub(r'(ansible-|ansible-role-)', '', role_name).split(
+        role_name = re.sub(r"(ansible-|ansible-role-)", "", role_name).split(
             ".", maxsplit=2
         )[-1]
 
@@ -532,9 +532,9 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
 
 def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
     """Compute role namespace from meta/main.yml, including trailing dot."""
-    role_namespace = galaxy_infos.get('namespace', "")
+    role_namespace = galaxy_infos.get("namespace", "")
     if len(role_namespace) == 0:
-        role_namespace = galaxy_infos.get('author', "")
+        role_namespace = galaxy_infos.get("author", "")
     if not isinstance(role_namespace, str):
         raise AnsibleCompatError(
             "Role namespace must be string, not %s" % role_namespace
@@ -550,4 +550,4 @@ def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
 
 def _get_galaxy_role_name(galaxy_infos: Dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
-    return galaxy_infos.get('role_name', "")
+    return galaxy_infos.get("role_name", "")

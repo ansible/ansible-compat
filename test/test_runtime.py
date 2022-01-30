@@ -375,7 +375,7 @@ def test_require_collection_wrong_version(runtime: Runtime) -> None:
         ]
     )
     with pytest.raises(InvalidPrerequisiteError) as pytest_wrapped_e:
-        runtime.require_collection("containers.podman", '9999.9.9')
+        runtime.require_collection("containers.podman", "9999.9.9")
     assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 
@@ -390,7 +390,7 @@ def test_require_collection_invalid_name(runtime: Runtime) -> None:
 
 def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
     """Check that require_collection raise with invalid collections path."""
-    runtime.config.collections_paths = '/that/is/invalid'  # type: ignore
+    runtime.config.collections_paths = "/that/is/invalid"  # type: ignore
     with pytest.raises(
         InvalidPrerequisiteError, match="Unable to determine ansible collection paths"
     ):
@@ -455,9 +455,9 @@ def test_install_collection_fail(runtime: Runtime) -> None:
 
 def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
     """Check install role with empty galaxy file."""
-    pathlib.Path(f'{runtime_tmp.project_dir}/galaxy.yml').touch()
-    pathlib.Path(f'{runtime_tmp.project_dir}/meta').mkdir()
-    pathlib.Path(f'{runtime_tmp.project_dir}/meta/main.yml').touch()
+    pathlib.Path(f"{runtime_tmp.project_dir}/galaxy.yml").touch()
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").touch()
     # this should only raise a warning
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
     # this shoul test the bypass role name check path
@@ -475,10 +475,10 @@ def test_install_galaxy_role_unlink(
     """Test ability to unlink incorrect symlinked roles."""
     caplog.set_level(logging.INFO)
     runtime_tmp.prepare_environment()
-    pathlib.Path(f'{runtime_tmp.cache_dir}/roles').mkdir(parents=True, exist_ok=True)
-    pathlib.Path(f'{runtime_tmp.cache_dir}/roles/acme.get_rich').symlink_to("/dev/null")
-    pathlib.Path(f'{runtime_tmp.project_dir}/meta').mkdir()
-    pathlib.Path(f'{runtime_tmp.project_dir}/meta/main.yml').write_text(
+    pathlib.Path(f"{runtime_tmp.cache_dir}/roles").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f"{runtime_tmp.cache_dir}/roles/acme.get_rich").symlink_to("/dev/null")
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").write_text(
         """galaxy_info:
   role_name: get_rich
   namespace: acme
@@ -491,8 +491,8 @@ def test_install_galaxy_role_unlink(
 def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
     """Check install role with bad namespace in galaxy info."""
     # pathlib.Path(f'{runtime_tmp.project_dir}/galaxy.yml').touch()
-    pathlib.Path(f'{runtime_tmp.project_dir}/meta').mkdir()
-    pathlib.Path(f'{runtime_tmp.project_dir}/meta/main.yml').write_text(
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").write_text(
         """galaxy_info:
   role_name: foo
   author: bar
@@ -507,8 +507,8 @@ def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
 def test_install_galaxy_role_no_checks(runtime_tmp: Runtime) -> None:
     """Check install role with bad namespace in galaxy info."""
     runtime_tmp.prepare_environment()
-    pathlib.Path(f'{runtime_tmp.project_dir}/meta').mkdir()
-    pathlib.Path(f'{runtime_tmp.project_dir}/meta/main.yml').write_text(
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").write_text(
         """galaxy_info:
   role_name: foo
   author: bar
