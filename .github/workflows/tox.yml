@@ -175,20 +175,16 @@ jobs:
         --skip-missing-interpreters false
         -vv
       env:
-        TOXENV: ${{ matrix.tox_env }},${{ matrix.tox_env }}-ansible29,${{ matrix.tox_env }}-ansible210,${{ matrix.tox_env }}-ansible211
+        TOXENV: ${{ matrix.tox_env }},${{ matrix.tox_env }}-ansible29,${{ matrix.tox_env }}-ansible212
     # sequential run improves browsing experience (almost no speed impact)
     - name: "Test with tox: ${{ matrix.tox_env }}-ansible29"
       run: python3 -m tox
       env:
         TOXENV: ${{ matrix.tox_env }}-ansible29
-    - name: "Test with tox: ${{ matrix.tox_env }}-ansible210"
+    - name: "Test with tox: ${{ matrix.tox_env }}-ansible212"
       run: python3 -m tox
       env:
-        TOXENV: ${{ matrix.tox_env }}-ansible210
-    - name: "Test with tox: ${{ matrix.tox_env }}-ansible211"
-      run: python3 -m tox
-      env:
-        TOXENV: ${{ matrix.tox_env }}-ansible211
+        TOXENV: ${{ matrix.tox_env }}-ansible212
     - name: "Test with tox: ${{ matrix.tox_env }}-devel"
       if: ${{ matrix.devel }}
       run: |
