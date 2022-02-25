@@ -54,7 +54,7 @@ repos:
     # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
     - --filter-files
 - repo: https://github.com/psf/black
-  rev: 21.12b0
+  rev: 22.1.0
   hooks:
   - id: black
     language_version: python3
@@ -70,7 +70,7 @@ repos:
     - flake8-rst-docstrings>=0.2.3
     - flake8-rst>=0.8.0
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v0.930
+  rev: v0.931
   hooks:
   - id: mypy
     # empty args needed in order to match mypy cli behavior
@@ -106,7 +106,7 @@ repos:
     stages:
     - manual
     additional_dependencies:
-    - pip-tools>=6.4.0
+    - pip-tools>=6.5.1
   - id: pip-compile-docs-upgrade
     name: Upgrade contraints files and requirements for docs
     files: ^(setup\.py|setup\.cfg|docs\/requirements\.(txt|in))$
@@ -116,7 +116,7 @@ repos:
     stages:
     - manual
     additional_dependencies:
-    - pip-tools>=6.4.0
+    - pip-tools>=6.5.1
   - id: pip-compile
     name: Check contraints files and requirements
     files: ^(setup\.py|setup\.cfg|constraints\.txt)$
@@ -124,7 +124,7 @@ repos:
     entry: python -m piptools compile -q --extra test --output-file=constraints.txt setup.cfg
     pass_filenames: false
     additional_dependencies:
-    - pip-tools>=6.4.0
+    - pip-tools>=6.5.1
   - id: pip-compile-docs
     name: Check contraints files and requirements for docs
     files: ^(setup\.py|setup\.cfg|docs\/requirements\.(txt|in))$
@@ -132,4 +132,4 @@ repos:
     entry: python -m piptools compile -q docs/requirements.in --output-file=docs/requirements.txt setup.cfg
     pass_filenames: false
     additional_dependencies:
-    - pip-tools>=6.4.0
+    - pip-tools>=6.5.1
