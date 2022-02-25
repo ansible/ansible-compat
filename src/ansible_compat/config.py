@@ -4,22 +4,13 @@ import copy
 import os
 import re
 import subprocess
-import sys
 from collections import UserDict
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Union
 
 from packaging.version import Version
 
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
 from ansible_compat.ports import cache
-
-# mypy/pylint idiom for py36-py38 compatibility
-# https://github.com/python/typeshed/issues/3500#issuecomment-560958608
-if sys.version_info >= (3, 8):
-    from typing import Literal  # pylint: disable=no-name-in-module
-else:
-    from typing_extensions import Literal
-
 
 if TYPE_CHECKING:
     # https://github.com/PyCQA/pylint/issues/3285
