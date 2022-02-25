@@ -1,6 +1,7 @@
 # ansible-compat
 
 ```{include} examples.md
+
 ```
 
 ## API

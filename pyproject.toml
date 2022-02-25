@@ -1,7 +1,7 @@
 [build-system]
 requires = [
-  "setuptools >= 45.0.0",  # required by pyproject+setuptools_scm integration
-  "setuptools_scm >= 6.3.1",  # required for "no-local-version" scheme
+  "setuptools >= 45.0.0", # required by pyproject+setuptools_scm integration
+  "setuptools_scm >= 6.3.1", # required for "no-local-version" scheme
   "setuptools_scm_git_archive >= 1.0",
   "wheel",
 ]
@@ -12,10 +12,7 @@ source = ["src"]
 branch = true
 
 [tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "if TYPE_CHECKING:"
-]
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 
 [tool.isort]
 profile = "black"
@@ -23,9 +20,7 @@ profile = "black"
 [tool.pytest.ini_options]
 addopts = "--no-success-flaky-report"
 # ensure we treat warnings as error
-filterwarnings = [
-  "error",
-]
+filterwarnings = ["error"]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
