@@ -101,7 +101,7 @@ repos:
     name: Upgrade contraints files and requirements
     files: ^(setup\.py|setup\.cfg|constraints\.txt)$
     language: python
-    entry: python -m piptools compile --upgrade -q --extra test --extra retry --output-file=constraints.txt setup.cfg
+    entry: python -m piptools compile --upgrade -q --extra test --output-file=constraints.txt setup.cfg
     pass_filenames: false
     stages:
     - manual
@@ -121,7 +121,7 @@ repos:
     name: Check contraints files and requirements
     files: ^(setup\.py|setup\.cfg|constraints\.txt)$
     language: python
-    entry: python -m piptools compile -q --extra test --extra retry --output-file=constraints.txt setup.cfg
+    entry: python -m piptools compile -q --extra test --output-file=constraints.txt setup.cfg
     pass_filenames: false
     additional_dependencies:
     - pip-tools>=6.4.0
