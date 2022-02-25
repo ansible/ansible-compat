@@ -492,7 +492,7 @@ class Runtime:
         target = pathlib.Path(project_dir).absolute()
         exists = link_path.exists() or link_path.is_symlink()
         if not exists or os.readlink(link_path) != str(target):
-            if exists:
+            if link_path.exists():
                 link_path.unlink()
             link_path.symlink_to(str(target), target_is_directory=True)
         _logger.info(
