@@ -482,7 +482,8 @@ def test_install_galaxy_role_unlink(
         """galaxy_info:
   role_name: get_rich
   namespace: acme
-"""
+""",
+        encoding="utf-8",
     )
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir)
     assert "symlink to current repository" in caplog.text
