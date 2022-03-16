@@ -47,7 +47,7 @@ def parse_ansible_version(stdout: str) -> Version:
     match = re.search(r"^ansible (?P<version>[^\s]+)", stdout, re.MULTILINE)
     if match:
         return Version(match.group("version"))
-    raise InvalidPrerequisiteError("Unable to parse ansible cli version: %s" % stdout)
+    raise InvalidPrerequisiteError(f"Unable to parse ansible cli version: {stdout}")
 
 
 @cache

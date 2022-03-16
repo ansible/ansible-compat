@@ -348,7 +348,7 @@ class Runtime:
             ns, coll = name.split(".", 1)
         except ValueError as exc:
             raise InvalidPrerequisiteError(
-                "Invalid collection name supplied: %s" % name
+                f"Invalid collection name supplied: {name}%s"
             ) from exc
 
         paths: List[str] = self.config.collections_paths
@@ -374,7 +374,7 @@ class Runtime:
                     _logger.fatal(msg)
                     raise InvalidPrerequisiteError(msg)
 
-                with open(mpath, "r") as f:
+                with open(mpath, "r", encoding="utf-8") as f:
                     manifest = json.loads(f.read())
                     found_version = packaging.version.parse(
                         manifest["collection_info"]["version"]
@@ -536,9 +536,7 @@ def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
     if len(role_namespace) == 0:
         role_namespace = galaxy_infos.get("author", "")
     if not isinstance(role_namespace, str):
-        raise AnsibleCompatError(
-            "Role namespace must be string, not %s" % role_namespace
-        )
+        raise AnsibleCompatError(f"Role namespace must be string, not {role_namespace}")
     # if there's a space in the name space, it's likely author name
     # and not the galaxy login, so act as if there was no namespace
     if not role_namespace or re.match(r"^\w+ \w+", role_namespace):
