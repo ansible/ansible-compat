@@ -1,5 +1,6 @@
 """Tests for ansible_compat.prerun module."""
 import os
+
 from ansible_compat.prerun import get_cache_dir
 
 
