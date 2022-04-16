@@ -436,6 +436,13 @@ class Runtime:
         if roles_path != self.config.default_roles_path:
             self._update_env("ANSIBLE_ROLES_PATH", roles_path)
 
+    def _get_roles_path(self) -> pathlib.Path:
+        if self.cache_dir:
+            path = pathlib.Path(f"{self.cache_dir}/roles")
+        else:
+            path = pathlib.Path(os.path.expanduser(self.config.default_roles_path[0]))
+        return path
+
     def _install_galaxy_role(
         self, project_dir: str, role_name_check: int = 0, ignore_errors: bool = False
     ) -> None:
@@ -484,7 +491,7 @@ class Runtime:
                 fqrn = f"{role_namespace}{role_name}"
             else:
                 fqrn = pathlib.Path(project_dir).absolute().name
-        path = pathlib.Path(os.path.expanduser(self.config.default_roles_path[0]))
+        path = self._get_roles_path()
         path.mkdir(parents=True, exist_ok=True)
         link_path = path / fqrn
         # despite documentation stating that is_file() reports true for symlinks,
