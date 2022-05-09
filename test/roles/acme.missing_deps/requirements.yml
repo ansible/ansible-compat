@@ -1,0 +1,2 @@
+collections:
+  - foo.bar # collection that does not exist, so we can test offline mode
