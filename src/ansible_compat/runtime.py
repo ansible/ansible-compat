@@ -301,12 +301,14 @@ class Runtime:
         required_collections: Optional[Dict[str, str]] = None,
         retry: bool = False,
         install_local: bool = False,
+        offline: bool = False,
     ) -> None:
         """Make dependencies available if needed."""
         if required_collections is None:
             required_collections = {}
 
-        self.install_requirements("requirements.yml", retry=retry)
+        if not offline:
+            self.install_requirements("requirements.yml", retry=retry)
 
         destination = f"{self.cache_dir}/collections" if self.cache_dir else None
         for name, min_version in required_collections.items():
