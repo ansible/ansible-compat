@@ -78,7 +78,7 @@ repos:
           - flake8-rst-docstrings>=0.2.3
           - flake8-rst>=0.8.0
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.942
+    rev: v0.950
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -93,7 +93,7 @@ repos:
           - types-PyYAML
           - types-pkg_resources
   - repo: https://github.com/pycqa/pylint
-    rev: v2.13.5
+    rev: v2.13.8
     hooks:
       - id: pylint
         additional_dependencies:
