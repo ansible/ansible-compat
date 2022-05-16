@@ -308,7 +308,16 @@ class Runtime:
             required_collections = {}
 
         if not offline:
-            self.install_requirements("requirements.yml", retry=retry)
+            # first one is standard for collection layout repos and the last two
+            # are part of Tower specification
+            # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
+            # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
+            for req_file in [
+                "requirements.yml",
+                "roles/requirements.yml",
+                "collections/requirements.yml",
+            ]:
+                self.install_requirements(req_file, retry=retry)
 
         destination = f"{self.cache_dir}/collections" if self.cache_dir else None
         for name, min_version in required_collections.items():
