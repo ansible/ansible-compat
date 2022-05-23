@@ -10,7 +10,6 @@ ci:
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
-    - pip-compile-docs
 default_language_version:
   # Needed in order to make pip-compile output predictable.
   python: python3.9
@@ -106,38 +105,20 @@ repos:
     hooks:
       - id: pip-compile-upgrade
         # To run it execute: `pre-commit run pip-compile-upgrade --hook-stage manual`
-        name: Upgrade contraints files and requirements
-        files: ^(setup\.py|setup\.cfg|constraints\.txt)$
+        name: Upgrade constraints files and requirements
+        files: ^(setup\.py|setup\.cfg|requirements\.txt)$
         language: python
-        entry: python -m piptools compile --upgrade -q --extra test --output-file=constraints.txt setup.cfg
-        pass_filenames: false
-        stages:
-          - manual
-        additional_dependencies:
-          - pip-tools>=6.5.1
-      - id: pip-compile-docs-upgrade
-        name: Upgrade contraints files and requirements for docs
-        files: ^(setup\.py|setup\.cfg|docs\/requirements\.(txt|in))$
-        language: python
-        entry: python -m piptools compile --upgrade -q docs/requirements.in --output-file=docs/requirements.txt setup.cfg
+        entry: python -m piptools compile --upgrade -q --extra docs --extra test --output-file=requirements.txt setup.cfg
         pass_filenames: false
         stages:
           - manual
         additional_dependencies:
           - pip-tools>=6.5.1
       - id: pip-compile
-        name: Check contraints files and requirements
-        files: ^(setup\.py|setup\.cfg|constraints\.txt)$
+        name: Check constraints files and requirements
+        files: ^(setup\.py|setup\.cfg|requirements\.txt)$
         language: python
-        entry: python -m piptools compile -q --extra test --output-file=constraints.txt setup.cfg
-        pass_filenames: false
-        additional_dependencies:
-          - pip-tools>=6.5.1
-      - id: pip-compile-docs
-        name: Check contraints files and requirements for docs
-        files: ^(setup\.py|setup\.cfg|docs\/requirements\.(txt|in))$
-        language: python
-        entry: python -m piptools compile -q docs/requirements.in --output-file=docs/requirements.txt setup.cfg
+        entry: python -m piptools compile -q --extra docs --extra test --output-file=requirements.txt setup.cfg
         pass_filenames: false
         additional_dependencies:
           - pip-tools>=6.5.1

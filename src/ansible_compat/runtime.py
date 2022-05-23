@@ -308,7 +308,16 @@ class Runtime:
             required_collections = {}
 
         if not offline:
-            self.install_requirements("requirements.yml", retry=retry)
+            # first one is standard for collection layout repos and the last two
+            # are part of Tower specification
+            # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
+            # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
+            for req_file in [
+                "requirements.yml",
+                "roles/requirements.yml",
+                "collections/requirements.yml",
+            ]:
+                self.install_requirements(req_file, retry=retry)
 
         destination = f"{self.cache_dir}/collections" if self.cache_dir else None
         for name, min_version in required_collections.items():
@@ -506,10 +515,13 @@ class Runtime:
         # despite documentation stating that is_file() reports true for symlinks,
         # it appears that is_dir() reports true instead, so we rely on exists().
         target = pathlib.Path(project_dir).absolute()
-        exists = link_path.exists() or link_path.is_symlink()
-        if not exists or os.readlink(link_path) != str(target):
-            if link_path.exists():
-                link_path.unlink()
+        if not link_path.exists() or (
+            link_path.is_symlink() and os.readlink(link_path) != str(target)
+        ):
+            # must call unlink before checking exists because a broken
+            # link reports as not existing and we want to repair it
+            link_path.unlink(missing_ok=True)
+            # https://github.com/python/cpython/issues/73843
             link_path.symlink_to(str(target), target_is_directory=True)
         _logger.info(
             "Using %s symlink to current repository in order to enable Ansible to find the role using its expected full name.",
