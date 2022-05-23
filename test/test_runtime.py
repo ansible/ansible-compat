@@ -511,6 +511,36 @@ def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
         runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
 
 
+@pytest.mark.parametrize(
+    "galaxy_info",
+    (
+        """galaxy_info:
+  role_name: foo-bar
+  namespace: acme
+""",
+        """galaxy_info:
+  role_name: foo-bar
+""",
+    ),
+    ids=("bad-name", "bad-name-without-namespace"),
+)
+def test_install_galaxy_role_name_role_name_check_equals_to_1(
+    runtime_tmp: Runtime,
+    galaxy_info: str,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Check install role with bad role name in galaxy info."""
+    caplog.set_level(logging.WARN)
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").write_text(
+        galaxy_info,
+        encoding="utf-8",
+    )
+
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+    assert "Computed fully qualified role name of " in caplog.text
+
+
 def test_install_galaxy_role_no_checks(runtime_tmp: Runtime) -> None:
     """Check install role with bad namespace in galaxy info."""
     runtime_tmp.prepare_environment()

@@ -302,6 +302,7 @@ class Runtime:
         retry: bool = False,
         install_local: bool = False,
         offline: bool = False,
+        role_name_check: int = 0,
     ) -> None:
         """Make dependencies available if needed."""
         if required_collections is None:
@@ -342,7 +343,9 @@ class Runtime:
             self.install_collection_from_disk("../..", destination=destination)
         else:
             # no collection, try to recognize and install a standalone role
-            self._install_galaxy_role(self.project_dir, ignore_errors=True)
+            self._install_galaxy_role(
+                self.project_dir, role_name_check=role_name_check, ignore_errors=True
+            )
 
     def require_collection(  # noqa: C901
         self,
