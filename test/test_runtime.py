@@ -134,6 +134,12 @@ def test_runtime_install_role(
     result = runtime.exec(["ansible-galaxy", "list"])
     assert result.returncode == 0, result
     assert role_name in result.stdout
+    if isolated:
+        assert pathlib.Path(f"{runtime.cache_dir}/roles/{role_name}").is_symlink()
+    else:
+        assert pathlib.Path(
+            f"{os.path.expanduser(runtime.config.default_roles_path[0])}/{role_name}"
+        ).is_symlink()
     runtime.clean()
     # also test that clean does not break when cache_dir is missing
     tmp_dir = runtime.cache_dir
