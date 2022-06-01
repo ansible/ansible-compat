@@ -83,7 +83,7 @@ class Runtime:
         # paramiko/transport.py:236: CryptographyDeprecationWarning: Blowfish has been deprecated
         # https://github.com/paramiko/paramiko/issues/2038
         if "PYTHONWARNINGS" not in self.environ:
-            self.environ['PYTHONWARNINGS'] = "ignore::CryptographyDeprecationWarning"
+            self.environ["PYTHONWARNINGS"] = "ignore::CryptographyDeprecationWarning"
 
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
