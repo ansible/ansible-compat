@@ -1,13 +1,13 @@
 """Utils for JSON Schema validation."""
 import json
 from dataclasses import dataclass
-from typing import Any, Deque, Dict, List, Mapping, Union
+from typing import Any, Dict, List, Mapping, Sequence, Union
 
 import jsonschema
 from jsonschema.validators import validator_for
 
 
-def to_path(schema_path: Deque[str]) -> str:
+def to_path(schema_path: Sequence[Union[str, int]]) -> str:
     """Flatten a path to a dot delimited string.
 
     :param schema_path: The schema path
@@ -16,7 +16,7 @@ def to_path(schema_path: Deque[str]) -> str:
     return ".".join(str(index) for index in schema_path)
 
 
-def json_path(absolute_path: Deque[str]) -> str:
+def json_path(absolute_path: Sequence[Union[str, int]]) -> str:
     """Flatten a data path to a dot delimited string.
 
     :param absolute_path: The path
@@ -121,7 +121,7 @@ def validate(
                 schema_path=to_path(validation_error.schema_path),
                 relative_schema=validation_error.schema,
                 expected=validation_error.validator_value,
-                validator=validation_error.validator,
+                validator=str(validation_error.validator),
                 found=str(validation_error.instance),
             )
             errors.append(error)
