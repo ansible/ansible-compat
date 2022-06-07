@@ -50,8 +50,6 @@ def test_schema(index: int) -> None:
     data = json_from_asset(f"assets/validate{index}_data.json")
     expected = json_from_asset(f"assets/validate{index}_expected.json")
 
-    # results = validate(schema=schema, data=data)
-    # results_json = str(jsonify(results))
     # ensure we produce consistent results between runs
     for _ in range(1, 100):
         found_errors = validate(schema=schema, data=data)
