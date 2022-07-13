@@ -114,7 +114,7 @@ repos:
         stages:
           - manual
         additional_dependencies:
-          - pip-tools>=6.5.1
+          - pip-tools>=6.8.0
       - id: pip-compile
         name: Check constraints files and requirements
         files: ^(setup\.py|setup\.cfg|requirements\.txt)$
@@ -122,4 +122,4 @@ repos:
         entry: python -m piptools compile -q --extra docs --extra test --output-file=requirements.txt setup.cfg
         pass_filenames: false
         additional_dependencies:
-          - pip-tools>=6.5.1
+          - pip-tools>=6.8.0
