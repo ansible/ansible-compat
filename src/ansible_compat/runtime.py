@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 import packaging
 import subprocess_tee
+from packaging.version import Version
 
 from ansible_compat.config import (
     AnsibleConfig,
@@ -36,6 +37,8 @@ else:
     CompletedProcess = subprocess.CompletedProcess
 
 _logger = logging.getLogger(__name__)
+# regex to extract the first version from a collection range specifier
+version_re = re.compile(":[>=<]*([^,]*)")
 
 
 class Runtime:
@@ -212,6 +215,13 @@ class Runtime:
         # is present, newer versions do not need it
         if force or self.version_in_range(upper="2.11"):
             cmd.append("--force")
+
+        # As ansible-galaxy install is not able to automatically determine
+        # if the range requires a pre-release, we need to manuall add the --pre
+        # flag when needed.
+        matches = version_re.search(collection)
+        if matches and Version(matches[1]).is_prerelease:
+            cmd.append("--pre")
 
         if destination:
             cmd.extend(["-p", str(destination)])
@@ -410,7 +420,7 @@ class Runtime:
                 break
         else:
             if install:
-                self.install_collection(f"{name}:>={version}")
+                self.install_collection(f"{name}:>={version}" if version else name)
                 self.require_collection(name=name, version=version, install=False)
             else:
                 msg = f"Collection '{name}' not found in '{paths}'"
