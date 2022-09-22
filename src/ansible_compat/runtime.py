@@ -85,8 +85,11 @@ class Runtime:
         # Reduce noise from paramiko, unless user already defined PYTHONWARNINGS
         # paramiko/transport.py:236: CryptographyDeprecationWarning: Blowfish has been deprecated
         # https://github.com/paramiko/paramiko/issues/2038
+        # As CryptographyDeprecationWarning is not a builtin, we cannot use
+        # PYTHONWARNINGS to ignore it using category but we can use message.
+        # https://stackoverflow.com/q/68251969/99834
         if "PYTHONWARNINGS" not in self.environ:
-            self.environ["PYTHONWARNINGS"] = "ignore::CryptographyDeprecationWarning"
+            self.environ["PYTHONWARNINGS"] = "ignore:Blowfish has been deprecated"
 
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
