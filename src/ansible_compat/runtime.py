@@ -26,7 +26,7 @@ from ansible_compat.errors import (
     InvalidPrerequisiteError,
     MissingAnsibleError,
 )
-from ansible_compat.loaders import yaml_from_file
+from ansible_compat.loaders import colpath_from_path, yaml_from_file
 from ansible_compat.prerun import get_cache_dir
 
 if TYPE_CHECKING:
@@ -315,7 +315,7 @@ class Runtime:
                 _logger.error(run.stdout)
                 raise AnsibleCommandError(run)
 
-    def prepare_environment(
+    def prepare_environment(  # noqa: C901
         self,
         required_collections: Optional[Dict[str, str]] = None,
         retry: bool = False,
@@ -352,6 +352,21 @@ class Runtime:
             return
 
         if os.path.exists("galaxy.yml"):
+            if destination:
+                # while function can return None, that would not break the logic
+                colpath = f"{destination}/ansible_collections/{colpath_from_path(os.getcwd())}"
+                if os.path.islink(colpath):
+                    if os.path.realpath(colpath) == os.getcwd():
+                        _logger.warning(
+                            "Found symlinked collection, skipping its installation."
+                        )
+                        return
+                    _logger.warning(
+                        "Collection is symlinked, but not pointing to %s directory, so we will remove it.",
+                        os.getcwd(),
+                    )
+                    os.unlink(colpath)
+
             # molecule scenario within a collection
             self.install_collection_from_disk(".", destination=destination)
         elif pathlib.Path().resolve().parent.name == "roles" and os.path.exists(
