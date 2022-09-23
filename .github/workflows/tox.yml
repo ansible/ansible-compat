@@ -8,9 +8,6 @@ on:
     branches: # any integration branch but not tag
       - "main"
   pull_request:
-  release:
-    types:
-      - published # It seems that you can publish directly without creating
   schedule:
     - cron: 1 0 * * * # Run daily at 0:01 UTC
   # Run every Friday at 18:02 UTC
@@ -20,8 +17,7 @@ on:
 
 jobs:
   linters:
-    name: >-
-      ${{ matrix.env.TOXENV }}
+    name: ${{ matrix.env.TOXENV }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -83,42 +79,40 @@ jobs:
 
   unit:
     name: ${{ matrix.name || matrix.tox_env }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os || 'ubuntu-20.04' }}
     strategy:
-      # fail-fast: false
-      # max-parallel: 5
-      # The matrix testing goal is to cover the *most likely* environments
-      # which are expected to be used by users in production. Avoid adding a
-      # combination unless there are good reasons to test it, like having
-      # proof that we failed to catch a bug by not running it. Using
-      # distribution should be prefferred instead of custom builds.
+      fail-fast: false
       matrix:
         name:
           # cannot use "," in name as it will break actions/cache
           - py38
         tox_env:
-          - py38,py38-ansible29
+          - py38
         python-version:
           - "3.8"
-        os:
-          # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
-          - ubuntu-20.04
-        # - windows-latest
-        # - windows-2016
         include:
           # keep list sorted as it determines UI order too
           # linux (py38 comes from matrix):
+          - name: py38-ansible29
+            tox_env: py38-ansible29
+            python-version: 3.8
+          - name: py38-ansible210
+            tox_env: py38-ansible210
+            python-version: 3.8
+          - name: py38-ansible211
+            tox_env: py38-ansible211
+            python-version: 3.8
+          - name: py38-ansible212
+            tox_env: py38-ansible212
+            python-version: 3.8
           - name: py39
             tox_env: py39,py39-devel
-            os: ubuntu-20.04
             python-version: 3.9
           - name: py310
             tox_env: py310,py310-devel
-            os: ubuntu-20.04
             python-version: "3.10"
           - name: py311
             tox_env: py311,py311-devel
-            os: ubuntu-20.04
             python-version: "~3.11.0-0" # see https://github.com/actions/setup-python/issues/213#issuecomment-1146676713
           # macos
           - name: py38@macos
