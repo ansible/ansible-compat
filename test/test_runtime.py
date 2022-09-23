@@ -647,7 +647,12 @@ def test_install_collection_from_disk_fail() -> None:
             runtime.prepare_environment(install_local=True)
         # based on version of Ansible used, we might get a different error,
         # but both errors should be considered acceptable
-        assert exc_info.type in (RuntimeError, AnsibleCompatError, AnsibleCommandError, InvalidPrerequisiteError)
+        assert exc_info.type in (
+            RuntimeError,
+            AnsibleCompatError,
+            AnsibleCommandError,
+            InvalidPrerequisiteError,
+        )
         assert exc_info.match(
             "(is missing the following mandatory|Got 1 exit code while running: ansible-galaxy collection build)"
         )
