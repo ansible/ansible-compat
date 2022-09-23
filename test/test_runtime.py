@@ -643,16 +643,19 @@ def test_install_collection_from_disk_fail() -> None:
     """Tests that we fail to install a broken collection."""
     with remember_cwd("test/collections/acme.broken"):
         runtime = Runtime(isolated=True)
-        exception: Type[Exception]
-        if runtime.version_in_range(upper="2.11"):
-            exception = AnsibleCommandError
-            msg = "Got 1 exit code while running: ansible-galaxy collection build"
-        else:
-            exception = InvalidPrerequisiteError
-            msg = "is missing the following mandatory"
-        with pytest.raises(exception, match=msg):
-            # this should call install_collection_from_disk(".")
+        with pytest.raises(RuntimeError) as exc_info:
             runtime.prepare_environment(install_local=True)
+        # based on version of Ansible used, we might get a different error,
+        # but both errors should be considered acceptable
+        assert exc_info.type in (
+            RuntimeError,
+            AnsibleCompatError,
+            AnsibleCommandError,
+            InvalidPrerequisiteError,
+        )
+        assert exc_info.match(
+            "(is missing the following mandatory|Got 1 exit code while running: ansible-galaxy collection build)"
+        )
 
 
 def test_prepare_environment_offline_role() -> None:
