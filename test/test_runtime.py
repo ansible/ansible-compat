@@ -466,7 +466,7 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
     pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").touch()
     # this should only raise a warning
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
-    # this shoul test the bypass role name check path
+    # this should test the bypass role name check path
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
     # this should raise an error
     with pytest.raises(
