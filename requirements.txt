@@ -67,6 +67,7 @@ myst-parser==0.18.1
     # via ansible-compat (setup.cfg)
 packaging==21.3
     # via
+    #   ansible-compat (setup.cfg)
     #   build
     #   pytest
     #   sphinx
