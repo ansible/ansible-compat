@@ -312,9 +312,9 @@ class Runtime:
                 "-v",
             ]
             if offline:
-                if self.version_in_range(upper="2.13"):
+                if self.version_in_range(upper="2.14"):
                     _logger.warning(
-                        "Offline mode ignored because it is not supported by ansible versions before 2.13."
+                        "Offline mode ignored because it is not supported by ansible versions before 2.14."
                     )
                 else:
                     cmd.append("--offline")
