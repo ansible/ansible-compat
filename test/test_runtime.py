@@ -662,7 +662,8 @@ def test_prepare_environment_offline_role() -> None:
     """Ensure that we can make use of offline roles."""
     with remember_cwd("test/roles/acme.missing_deps"):
         runtime = Runtime(isolated=True)
-        runtime.prepare_environment(install_local=True, offline=True)
+        with pytest.raises(AnsibleCommandError):
+            runtime.prepare_environment(install_local=True, offline=True)
 
 
 def test_runtime_run(runtime: Runtime) -> None:
