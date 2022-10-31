@@ -269,7 +269,9 @@ class Runtime:
                     force=True,
                 )
 
-    def install_requirements(self, requirement: str, retry: bool = False) -> None:
+    def install_requirements(
+        self, requirement: str, retry: bool = False, offline: bool = False
+    ) -> None:
         """Install dependencies from a requirements.yml."""
         if not os.path.exists(requirement):
             return
@@ -290,11 +292,15 @@ class Runtime:
             if self.cache_dir:
                 cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
 
+            if offline:
+                _logger.warning(
+                    "Offline mode ignored because `ansible-galaxy role install` command does not support it."
+                )
             _logger.info("Running %s", " ".join(cmd))
-            run = self.exec(cmd, retry=retry)
-            if run.returncode != 0:
-                _logger.error(run.stdout)
-                raise AnsibleCommandError(run)
+            result = self.exec(cmd, retry=retry)
+            if result.returncode != 0:
+                _logger.error(result.stdout)
+                raise AnsibleCommandError(result)
 
         # Run galaxy collection install works on v2 requirements.yml
         if "collections" in reqs_yaml:
@@ -303,17 +309,24 @@ class Runtime:
                 "ansible-galaxy",
                 "collection",
                 "install",
-                "-vr",
-                f"{requirement}",
+                "-v",
             ]
+            if offline:
+                if self.version_in_range(upper="2.13"):
+                    _logger.warning(
+                        "Offline mode ignored because it is not supported by ansible versions before 2.13."
+                    )
+                else:
+                    cmd.append("--offline")
+            cmd.extend(["-r", requirement])
             if self.cache_dir:
                 cmd.extend(["-p", f"{self.cache_dir}/collections"])
-
             _logger.info("Running %s", " ".join(cmd))
-            run = self.exec(cmd, retry=retry)
-            if run.returncode != 0:
-                _logger.error(run.stdout)
-                raise AnsibleCommandError(run)
+            result = self.exec(cmd, retry=retry)
+            if result.returncode != 0:
+                _logger.error(result.stdout)
+                _logger.error(result.stderr)
+                raise AnsibleCommandError(result)
 
     def prepare_environment(  # noqa: C901
         self,
@@ -327,17 +340,16 @@ class Runtime:
         if required_collections is None:
             required_collections = {}
 
-        if not offline:
-            # first one is standard for collection layout repos and the last two
-            # are part of Tower specification
-            # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
-            # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
-            for req_file in [
-                "requirements.yml",
-                "roles/requirements.yml",
-                "collections/requirements.yml",
-            ]:
-                self.install_requirements(req_file, retry=retry)
+        # first one is standard for collection layout repos and the last two
+        # are part of Tower specification
+        # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
+        # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
+        for req_file in [
+            "requirements.yml",
+            "roles/requirements.yml",
+            "collections/requirements.yml",
+        ]:
+            self.install_requirements(req_file, retry=retry, offline=offline)
 
         destination = f"{self.cache_dir}/collections" if self.cache_dir else None
         for name, min_version in required_collections.items():
