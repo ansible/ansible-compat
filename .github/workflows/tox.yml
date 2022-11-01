@@ -105,6 +105,12 @@ jobs:
           - name: py38-ansible212
             tox_env: py38-ansible212
             python-version: 3.8
+          - name: py38-ansible213
+            tox_env: py38-ansible213
+            python-version: 3.8
+          - name: py39-ansible214
+            tox_env: py39-ansible214
+            python-version: 3.9
           - name: py39
             tox_env: py39,py39-devel
             python-version: 3.9
