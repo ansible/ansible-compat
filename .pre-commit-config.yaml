@@ -85,13 +85,14 @@ repos:
         additional_dependencies:
           - cached_property
           - flaky
+          - jinja2
           - packaging
           - pytest
           - pytest-mock
           - subprocess-tee>=0.3.5
           - types-PyYAML
-          - types-pkg_resources
           - types-jsonschema>=4.4.9
+          - types-pkg_resources
   - repo: https://github.com/pycqa/pylint
     rev: v2.15.3
     hooks:
