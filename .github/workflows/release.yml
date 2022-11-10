@@ -6,7 +6,7 @@ on:
 
 jobs:
   before-release:
-    uses: ansible-community/ansible-compat/.github/workflows/tox.yml@main
+    uses: ansible/ansible-compat/.github/workflows/tox.yml@main
 
   release:
     name: release ${{ github.event.ref }}
