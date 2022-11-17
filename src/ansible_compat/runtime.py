@@ -158,6 +158,7 @@ class Runtime:
             )
             if result.returncode == 0:
                 break
+            _logger.debug("Environment: %s", env or self.environ)
             _logger.warning(
                 "Retrying execution failure %s of: %s",
                 result.returncode,
@@ -211,7 +212,7 @@ class Runtime:
             "ansible-galaxy",
             "collection",
             "install",
-            "-v",
+            "-vvv",  # this is needed to make ansible display important info in case of failures
         ]
 
         # ansible-galaxy before 2.11 fails to upgrade collection unless --force
