@@ -230,7 +230,7 @@ class Runtime:
             cmd.extend(["-p", str(destination)])
         cmd.append(f"{collection}")
 
-        _logger.info("Running %s", " ".join(cmd))
+        _logger.info("Running from %s : %s", os.getcwd(), " ".join(cmd))
         run = self.exec(
             cmd,
             retry=True,
