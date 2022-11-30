@@ -662,14 +662,7 @@ def test_prepare_environment_offline_role() -> None:
     """Ensure that we can make use of offline roles."""
     with remember_cwd("test/roles/acme.missing_deps"):
         runtime = Runtime(isolated=True)
-        if runtime.version_in_range(lower="2.14"):
-            # starting with 2.14 we can properly fail because this role has
-            # some missing collections in its requirements. We pass the offline
-            # but install will fail because there are not really offline
-            # requirements.
-            with pytest.raises(AnsibleCommandError):
-                runtime.prepare_environment(install_local=True, offline=True)
-        else:
+        with pytest.raises(AnsibleCommandError):
             runtime.prepare_environment(install_local=True, offline=True)
 
 
