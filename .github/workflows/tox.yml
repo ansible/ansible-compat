@@ -29,7 +29,7 @@ jobs:
         env:
           - TOXENV: lint
           - TOXENV: docs
-          - TOXENV: packaging
+          - TOXENV: pkg
     env:
       TOX_PARALLEL_NO_SPINNER: 1
       FORCE_COLOR: 1
@@ -58,7 +58,7 @@ jobs:
           key: ${{ matrix.name }}-pip-${{ hashFiles('setup.cfg', 'tox.ini', 'pyproject.toml', '.pre-commit-config.yaml') }}
 
       - name: Install tox
-        run: python3 -m pip install --upgrade tox
+        run: python3 -m pip install --upgrade 'tox>=4.0.0rc1'
 
       - name: Log installed dists
         run: python -m pip freeze --all
@@ -119,7 +119,7 @@ jobs:
             python-version: "3.10"
           - name: py311
             tox_env: py311,py311-devel
-            python-version: "~3.11.0-0" # see https://github.com/actions/setup-python/issues/213#issuecomment-1146676713
+            python-version: "3.11"
           # macos
           - name: py38@macos
             tox_env: py38,py38-ansible29 # 2.14(devel) does not support 3.8
@@ -162,7 +162,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.name }}-pip-${{ hashFiles('constraints.txt', 'setup.cfg', 'tox.ini', 'pyproject.toml', '.pre-commit-config.yaml', 'pytest.ini') }}
 
       - name: Install tox
-        run: python3 -m pip install --upgrade tox 'coverage[toml]'
+        run: python3 -m pip install --upgrade "tox>=4.0.0rc1"
 
       - name: Log installed dists
         run: python3 -m pip freeze --all
@@ -172,10 +172,6 @@ jobs:
 
       - name: "Test with tox: ${{ matrix.tox_env }}"
         run: python3 -m tox -e ${{ matrix.tox_env }}
-
-      - name: Combine coverage data
-        # produce a single .coverage file at repo root
-        run: coverage combine .tox/.coverage.*
 
       - name: Upload coverage data
         if: "runner.os == 'Linux'"
