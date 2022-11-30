@@ -18,20 +18,17 @@ on:
 jobs:
   linters:
     name: ${{ matrix.env.TOXENV }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     strategy:
       fail-fast: false
       matrix:
         python-version:
           - 3.9
-        os:
-          - ubuntu-20.04
         env:
           - TOXENV: lint
           - TOXENV: docs
           - TOXENV: pkg
     env:
-      TOX_PARALLEL_NO_SPINNER: 1
       FORCE_COLOR: 1
 
     steps:
@@ -68,7 +65,7 @@ jobs:
         env: ${{ matrix.env }}
 
       - name: Test with tox
-        run: python -m tox --parallel auto --parallel-live
+        run: python -m tox
         env: ${{ matrix.env }}
 
       - name: Archive logs
@@ -79,7 +76,7 @@ jobs:
 
   unit:
     name: ${{ matrix.name || matrix.tox_env }}
-    runs-on: ${{ matrix.os || 'ubuntu-20.04' }}
+    runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     strategy:
       fail-fast: false
       matrix:
