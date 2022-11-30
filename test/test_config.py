@@ -38,6 +38,7 @@ def test_config_with_dump() -> None:
     """Tests that config can parse given dumps."""
     config = AnsibleConfig(config_dump="ACTION_WARNINGS(default) = True")
     assert config.ACTION_WARNINGS is True
+    assert False, "bollocks"
 
 
 def test_config_copy() -> None:
