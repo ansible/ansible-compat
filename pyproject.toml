@@ -1,10 +1,69 @@
 [build-system]
 requires = [
-  "setuptools >= 45.0.0", # required by pyproject+setuptools_scm integration
-  "setuptools_scm[toml] >= 7.0.0", # required for "no-local-version" scheme
-
+  "setuptools >= 61.0", # PEP-621
+  "setuptools_scm[toml] >= 7.0.0",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+# https://peps.python.org/pep-0621/#readme
+requires-python = ">=3.8"
+dynamic = ["version"]
+name = "ansible-compat"
+description = "Ansible compatibility goodies"
+readme = "README.md"
+authors = [{ "name" = "Sorin Sbarnea", "email" = "ssbarnea@redhat.com" }]
+maintainers = [{ "name" = "Sorin Sbarnea", "email" = "ssbarnea@redhat.com" }]
+license = { text = "MIT" }
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python",
+  "Topic :: System :: Systems Administration",
+  "Topic :: Software Development :: Bug Tracking",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Utilities",
+]
+keywords = ["ansible"]
+dependencies = [
+  "packaging",
+  "PyYAML",
+  "subprocess-tee>=0.3.5",
+  "jsonschema>=4.6.0",
+]
+
+[project.urls]
+homepage = "https://github.com/ansible/ansible-compat"
+documentation = "https://ansible-compat.readthedocs.io/"
+repository = "https://github.com/ansible/ansible-compat"
+changelog = "https://github.com/ansible/ansible-compat/releases"
+
+[project.optional-dependencies]
+docs = [
+  "sphinx-autobuild>=2021.3.14",
+  "sphinx>=5.3.0",
+  "sphinx_ansible_theme",
+  "myst_parser",
+]
+test = [
+  "coverage",
+  "flaky",
+  "pip-tools",
+  "pytest>=7.2.0",
+  "pytest-mock",
+  "pytest-plus",
+]
 
 [tool.coverage.run]
 source = ["src"]
