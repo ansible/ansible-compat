@@ -273,7 +273,10 @@ class Runtime:
     def install_requirements(
         self, requirement: str, retry: bool = False, offline: bool = False
     ) -> None:
-        """Install dependencies from a requirements.yml."""
+        """Install dependencies from a requirements.yml.
+
+        param: offline: bypass installation, may fail if requirements are not met
+        """
         if not os.path.exists(requirement):
             return
         reqs_yaml = yaml_from_file(requirement)
@@ -295,13 +298,15 @@ class Runtime:
 
             if offline:
                 _logger.warning(
-                    "Offline mode ignored because `ansible-galaxy role install` command does not support it."
+                    "Skipped installing old role dependencies due to running in offline mode."
                 )
-            _logger.info("Running %s", " ".join(cmd))
-            result = self.exec(cmd, retry=retry)
-            if result.returncode != 0:
-                _logger.error(result.stdout)
-                raise AnsibleCommandError(result)
+            else:
+                _logger.info("Running %s", " ".join(cmd))
+
+                result = self.exec(cmd, retry=retry)
+                if result.returncode != 0:
+                    _logger.error(result.stdout)
+                    raise AnsibleCommandError(result)
 
         # Run galaxy collection install works on v2 requirements.yml
         if "collections" in reqs_yaml:
@@ -313,21 +318,19 @@ class Runtime:
                 "-v",
             ]
             if offline:
-                if self.version_in_range(upper="2.14"):
-                    _logger.warning(
-                        "Offline mode ignored because it is not supported by ansible versions before 2.14."
-                    )
-                else:
-                    cmd.append("--offline")
-            cmd.extend(["-r", requirement])
-            if self.cache_dir:
-                cmd.extend(["-p", f"{self.cache_dir}/collections"])
-            _logger.info("Running %s", " ".join(cmd))
-            result = self.exec(cmd, retry=retry)
-            if result.returncode != 0:
-                _logger.error(result.stdout)
-                _logger.error(result.stderr)
-                raise AnsibleCommandError(result)
+                _logger.warning(
+                    "Skipped installing collection dependencies due to running in offline mode."
+                )
+            else:
+                cmd.extend(["-r", requirement])
+                if self.cache_dir:
+                    cmd.extend(["-p", f"{self.cache_dir}/collections"])
+                _logger.info("Running %s", " ".join(cmd))
+                result = self.exec(cmd, retry=retry)
+                if result.returncode != 0:
+                    _logger.error(result.stdout)
+                    _logger.error(result.stderr)
+                    raise AnsibleCommandError(result)
 
     def prepare_environment(  # noqa: C901
         self,
