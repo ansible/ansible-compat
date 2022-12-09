@@ -10,7 +10,6 @@ from typing import Any, Iterator, List, Type, Union
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-from flaky import flaky
 from packaging.version import Version
 from pytest_mock import MockerFixture
 
@@ -213,8 +212,6 @@ def remember_cwd(cwd: str) -> Iterator[None]:
         os.chdir(curdir)
 
 
-# # https://github.com/box/flaky/issues/170
-@flaky(max_runs=3)  # type: ignore
 def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> None:
     """Checks that the linter can auto-install requirements v1 when found."""
     cwd = os.path.realpath(
@@ -234,7 +231,6 @@ def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> N
     )
 
 
-@flaky(max_runs=3)  # type: ignore
 def test_prerun_reqs_v2(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> None:
     """Checks that the linter can auto-install requirements v2 when found."""
     cwd = os.path.realpath(

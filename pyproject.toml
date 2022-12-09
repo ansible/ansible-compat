@@ -56,14 +56,7 @@ docs = [
   "sphinx_ansible_theme",
   "myst_parser",
 ]
-test = [
-  "coverage",
-  "flaky",
-  "pip-tools",
-  "pytest>=7.2.0",
-  "pytest-mock",
-  "pytest-plus",
-]
+test = ["coverage", "pip-tools", "pytest>=7.2.0", "pytest-mock", "pytest-plus"]
 
 [tool.coverage.run]
 source = ["src"]
@@ -73,11 +66,48 @@ branch = true
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 skip_covered = true
 
+[tool.mypy]
+python_version = 3.8
+color_output = true
+error_summary = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+# disallow_any_unimported = True
+#; warn_redundant_casts = True
+# warn_return_any = True
+# warn_unused_configs = True
+exclude = "test/local-content"
+
 [tool.isort]
 profile = "black"
 
+[tool.pylint.BASIC]
+good-names = [
+  "f", # filename
+  "i",
+  "j",
+  "k",
+  "ns", # namespace
+  "ex",
+  "Run",
+  "_"
+]
+
+[tool.pylint.IMPORTS]
+preferred-modules = ["unittest:pytest"]
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+  # On purpose disabled as we rely on black
+  "line-too-long",
+  # local imports do not work well with pre-commit hook
+  "import-error",
+  # Temporary disable duplicate detection we remove old code from prerun
+  "duplicate-code",
+]
+
 [tool.pytest.ini_options]
-addopts = "--no-success-flaky-report"
 # ensure we treat warnings as error
 filterwarnings = ["error"]
 
