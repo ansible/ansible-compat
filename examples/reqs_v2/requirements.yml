@@ -1,5 +1,11 @@
 ---
+# For local install run:
+# ansible-galaxy role install -r requirements.yml -p roles
+# ansible-galaxy collection install -r requirements.yml -p collections
+#
+# Current test file avoids using galaxy server on purpose, for resiliency
 roles:
-  - name: geerlingguy.mysql
+  - src: git+https://github.com/geerlingguy/ansible-role-docker.git
+    name: geerlingguy.mysql
 collections:
-  - name: ssbarnea.molecule
+  - name: community-molecule-0.1.0.tar.gz
