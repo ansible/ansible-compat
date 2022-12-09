@@ -23,7 +23,7 @@ repos:
           - prettier
           - prettier-plugin-toml
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v4.3.0
+    rev: v4.4.0
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
@@ -61,12 +61,12 @@ repos:
           # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
           - --filter-files
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 22.12.0
     hooks:
       - id: black
         language_version: python3
   - repo: https://github.com/pycqa/flake8.git
-    rev: 5.0.4
+    rev: 6.0.0
     hooks:
       - id: flake8
         language_version: python3
@@ -77,7 +77,7 @@ repos:
           - flake8-rst-docstrings>=0.2.3
           - flake8-rst>=0.8.0
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.982
+    rev: v0.991
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -93,7 +93,7 @@ repos:
           - types-pkg_resources
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v2.15.5
+    rev: v2.15.8
     hooks:
       - id: pylint
         additional_dependencies:
@@ -107,7 +107,7 @@ repos:
       - id: pip-compile-upgrade
         # To run it execute: `pre-commit run pip-compile-upgrade --hook-stage manual`
         name: Upgrade constraints files and requirements
-        files: ^(setup\.py|setup\.cfg|requirements\.txt)$
+        files: ^(pyproject\.toml|requirements\.txt)$
         language: python
         entry: python -m piptools compile --upgrade -q --extra docs --extra test --output-file=requirements.txt pyproject.toml
         pass_filenames: false
@@ -117,7 +117,7 @@ repos:
           - pip-tools>=6.10.0
       - id: pip-compile
         name: Check constraints files and requirements
-        files: ^(setup\.py|setup\.cfg|requirements\.txt)$
+        files: ^(pyproject\.toml|requirements\.txt)$
         language: python
         entry: python -m piptools compile -q --extra docs --extra test --output-file=requirements.txt pyproject.toml
         pass_filenames: false
