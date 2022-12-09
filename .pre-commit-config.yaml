@@ -61,7 +61,7 @@ repos:
           # https://github.com/pre-commit/mirrors-isort/issues/9#issuecomment-624404082
           - --filter-files
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 22.12.0
     hooks:
       - id: black
         language_version: python3
@@ -107,7 +107,7 @@ repos:
       - id: pip-compile-upgrade
         # To run it execute: `pre-commit run pip-compile-upgrade --hook-stage manual`
         name: Upgrade constraints files and requirements
-        files: ^(setup\.py|setup\.cfg|requirements\.txt)$
+        files: ^(pyproject\.toml|requirements\.txt)$
         language: python
         entry: python -m piptools compile --upgrade -q --extra docs --extra test --output-file=requirements.txt pyproject.toml
         pass_filenames: false
@@ -117,7 +117,7 @@ repos:
           - pip-tools>=6.10.0
       - id: pip-compile
         name: Check constraints files and requirements
-        files: ^(setup\.py|setup\.cfg|requirements\.txt)$
+        files: ^(pyproject\.toml|requirements\.txt)$
         language: python
         entry: python -m piptools compile -q --extra docs --extra test --output-file=requirements.txt pyproject.toml
         pass_filenames: false
