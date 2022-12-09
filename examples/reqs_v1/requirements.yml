@@ -1,2 +1,4 @@
 # v1 requirements test file
-- src: geerlingguy.mysql
+# ansible-galaxy role install -r requirements.yml -p roles
+- src: git+https://github.com/geerlingguy/ansible-role-docker.git
+  name: geerlingguy.mysql
