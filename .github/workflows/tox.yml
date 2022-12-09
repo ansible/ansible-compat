@@ -95,10 +95,10 @@ jobs:
         run: python3 -m pip install --upgrade 'tox>=4.0.3'
 
       - name: Initialize tox envs
-        run: python -m tox --notest --skip-missing-interpreters false -vv -e tox_env
+        run: python -m tox --notest --skip-missing-interpreters false -vv -e ${{ matrix.tox_env }}
 
       - name: Test with tox
-        run: python -m tox -e tox_env
+        run: python -m tox -e ${{ matrix.tox_env }}
 
       - name: Archive logs
         uses: actions/upload-artifact@v3
