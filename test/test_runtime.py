@@ -440,7 +440,9 @@ def test_install_collection(runtime: Runtime) -> None:
 
 def test_install_collection_dest(runtime: Runtime, tmp_path: pathlib.Path) -> None:
     """Check that valid collection to custom destination passes."""
-    runtime.install_collection("examples/reqs_v2/community-molecule-0.1.0.tar.gz", destination=tmp_path)
+    runtime.install_collection(
+        "examples/reqs_v2/community-molecule-0.1.0.tar.gz", destination=tmp_path
+    )
     expected_file = (
         tmp_path / "ansible_collections" / "community" / "molecule" / "MANIFEST.json"
     )
