@@ -17,7 +17,7 @@ def test_runtime_example() -> None:
     runtime.prepare_environment(install_local=True)  # will retry 3 times if needed
 
     # Install a new collection (will retry 3 times if needed)
-    runtime.install_collection("containers.podman")
+    runtime.install_collection("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
 
     # Execute a command
     result = runtime.exec(["ansible-doc", "--list"])

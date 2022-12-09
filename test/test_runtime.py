@@ -371,13 +371,13 @@ def test_require_collection_wrong_version(runtime: Runtime) -> None:
             "ansible-galaxy",
             "collection",
             "install",
-            "containers.podman",
+            "examples/reqs_v2/community-molecule-0.1.0.tar.gz",
             "-p",
             "~/.ansible/collections",
         ]
     )
     with pytest.raises(InvalidPrerequisiteError) as pytest_wrapped_e:
-        runtime.require_collection("containers.podman", "9999.9.9")
+        runtime.require_collection("community.molecule", "9999.9.9")
     assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 
@@ -435,14 +435,16 @@ def test_require_collection_missing(
 
 def test_install_collection(runtime: Runtime) -> None:
     """Check that valid collection installs do not fail."""
-    runtime.install_collection("containers.podman:>=1.0")
+    runtime.install_collection("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
 
 
 def test_install_collection_dest(runtime: Runtime, tmp_path: pathlib.Path) -> None:
     """Check that valid collection to custom destination passes."""
-    runtime.install_collection("containers.podman:>=1.0", destination=tmp_path)
+    runtime.install_collection(
+        "examples/reqs_v2/community-molecule-0.1.0.tar.gz", destination=tmp_path
+    )
     expected_file = (
-        tmp_path / "ansible_collections" / "containers" / "podman" / "MANIFEST.json"
+        tmp_path / "ansible_collections" / "community" / "molecule" / "MANIFEST.json"
     )
     assert expected_file.is_file()
 
@@ -450,7 +452,7 @@ def test_install_collection_dest(runtime: Runtime, tmp_path: pathlib.Path) -> No
 def test_install_collection_fail(runtime: Runtime) -> None:
     """Check that invalid collection install fails."""
     with pytest.raises(AnsibleCompatError) as pytest_wrapped_e:
-        runtime.install_collection("containers.podman:>=9999.0")
+        runtime.install_collection("community.molecule:>=9999.0")
     assert pytest_wrapped_e.type == InvalidPrerequisiteError
     assert pytest_wrapped_e.value.code == INVALID_PREREQUISITES_RC
 
@@ -560,15 +562,15 @@ def test_upgrade_collection(runtime_tmp: Runtime) -> None:
     runtime_tmp.prepare_environment()
 
     # we install specific oudated version of a collection
-    runtime_tmp.install_collection("containers.podman:==1.6.0")
+    runtime_tmp.install_collection("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
     with pytest.raises(
         InvalidPrerequisiteError,
-        match="Found containers.podman collection 1.6.0 but 1.6.1 or newer is required.",
+        match="Found community.molecule collection 0.1.0 but 9.9.9 or newer is required.",
     ):
         # we check that when install=False, we raise error
-        runtime_tmp.require_collection("containers.podman", "1.6.1", install=False)
-    # now we really perform the upgrade
-    runtime_tmp.require_collection("containers.podman", "1.6.1")
+        runtime_tmp.require_collection("community.molecule", "9.9.9", install=False)
+    # this should not fail, as we have this version
+    runtime_tmp.require_collection("community.molecule", "0.1.0")
 
 
 def test_require_collection_no_cache_dir() -> None:
