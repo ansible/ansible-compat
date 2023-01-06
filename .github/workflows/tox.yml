@@ -22,10 +22,20 @@ jobs:
         id: generate_matrix
         uses: coactions/dynamic-matrix@v1
         with:
+          min_python: "3.9"
+          max_python: "3.11"
           other_names: |
             lint
             docs
             pkg
+            py38-ansible29
+            py38-ansible210
+            py38-ansible211
+            py38-ansible212
+            py38-ansible213
+            py39-ansible214
+          platforms: linux,macos
+          macos: minmax
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
