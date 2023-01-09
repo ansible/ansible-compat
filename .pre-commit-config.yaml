@@ -87,7 +87,7 @@ repos:
           - packaging
           - pytest
           - pytest-mock
-          - subprocess-tee>=0.3.5
+          - subprocess-tee>=0.4.1
           - types-PyYAML
           - types-pkg_resources
           - types-jsonschema>=4.4.9
