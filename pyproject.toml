@@ -39,7 +39,7 @@ keywords = ["ansible"]
 dependencies = [
   "packaging",
   "PyYAML",
-  "subprocess-tee>=0.3.5",
+  "subprocess-tee>=0.4.1",
   "jsonschema>=4.6.0",
 ]
 

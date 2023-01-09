@@ -127,7 +127,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-subprocess-tee==0.4.0
+subprocess-tee==0.4.1
     # via ansible-compat (pyproject.toml)
 tomli==2.0.1
     # via
