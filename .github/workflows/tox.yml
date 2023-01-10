@@ -12,59 +12,36 @@ on:
   workflow_call:
 
 jobs:
+  pre:
+    name: pre
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.generate_matrix.outputs.matrix }}
+    steps:
+      - name: Determine matrix
+        id: generate_matrix
+        uses: coactions/dynamic-matrix@v1
+        with:
+          max_python: "3.11"
+          other_names: |
+            lint
+            docs
+            pkg
+            py38-ansible29
+            py38-ansible210
+            py38-ansible211
+            py38-ansible212
+            py38-ansible213
+            py39-ansible214
+          platforms: linux,macos
+          macos: minmax
   build:
-    name: ${{ matrix.name || matrix.tox_env }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
+    needs: pre
     strategy:
       fail-fast: false
-      matrix:
-        python-version:
-          - 3.9
-        os:
-          - ubuntu-22.04
-        tox_env:
-          - lint
-          - docs
-          - pkg
-        include:
-          # keep list sorted as it determines UI order too
-          # linux (py38 comes from matrix):
-          - name: py38-ansible29
-            tox_env: py38-ansible29
-            python-version: 3.8
-          - name: py38-ansible210
-            tox_env: py38-ansible210
-            python-version: 3.8
-          - name: py38-ansible211
-            tox_env: py38-ansible211
-            python-version: 3.8
-          - name: py38-ansible212
-            tox_env: py38-ansible212
-            python-version: 3.8
-          - name: py38-ansible213
-            tox_env: py38-ansible213
-            python-version: 3.8
-          - name: py39-ansible214
-            tox_env: py39-ansible214
-            python-version: 3.9
-          - name: py39
-            tox_env: py39,py39-devel
-            python-version: 3.9
-          - name: py310
-            tox_env: py310,py310-devel
-            python-version: "3.10"
-          - name: py311
-            tox_env: py311,py311-devel
-            python-version: "3.11"
-          # macos
-          - name: py38@macos
-            tox_env: py38,py38-ansible29 # 2.14(devel) does not support 3.8
-            os: macos-12
-            python-version: 3.8
-          - name: py311@macos
-            tox_env: py311,py311-devel
-            os: macos-12
-            python-version: "3.11"
+      matrix: ${{ fromJson(needs.pre.outputs.matrix) }}
     env:
       FORCE_COLOR: 1
 
@@ -74,10 +51,10 @@ jobs:
         with:
           fetch-depth: 0 # needed by setuptools-scm
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python_version }}
 
       - name: Pre-commit cache
         uses: actions/cache@v3
@@ -95,10 +72,10 @@ jobs:
         run: python3 -m pip install --upgrade 'tox>=4.0.3'
 
       - name: Initialize tox envs
-        run: python -m tox --notest --skip-missing-interpreters false -vv -e ${{ matrix.tox_env }}
+        run: python -m tox --notest --skip-missing-interpreters false -vv -e ${{ matrix.passed_name }}
 
       - name: Test with tox
-        run: python -m tox -e ${{ matrix.tox_env }}
+        run: python -m tox -e ${{ matrix.passed_name }}
 
       - name: Archive logs
         uses: actions/upload-artifact@v3
@@ -107,10 +84,10 @@ jobs:
           path: .tox/**/log/
 
       - name: Upload coverage data
-        if: ${{ startsWith(matrix.tox_env, 'py') }}
+        if: ${{ startsWith(matrix.passed_name, 'py') }}
         uses: codecov/codecov-action@v3
         with:
-          name: ${{ matrix.tox_env }}
+          name: ${{ matrix.passed_name }}
           fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
