@@ -1,18 +1,17 @@
-# ansible-compat
+# Examples
 
-```{include} examples.md
+## Using Ansible runtime
 
+```python title="example.py"
+--8<-- "test/test_runtime_example.py"
 ```
 
-## API
+## Access to Ansible configuration
 
-```{eval-rst}
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+As you may not want to parse `ansible-config dump` yourself, you
+can make use of a simple python class that facilitates access to
+it, using python data types.
 
-.. automodule:: ansible_compat.runtime
-.. autoclass:: Runtime
-   :members:
-   :special-members: __init__
+```python
+--8<-- "test/test_configuration_example.py"
 ```

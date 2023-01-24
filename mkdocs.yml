@@ -1,0 +1,103 @@
+site_name: Ansible Compat Library
+site_url: https://ansible-compat.readthedocs.io/
+repo_url: https://github.com/ansible/ansible-compat
+edit_uri: blob/main/docs/
+copyright: Copyright © 2023 Red Hat, Inc.
+
+strict: true
+watch:
+  - mkdocs.yml
+  - src
+  - docs
+
+theme:
+  name: "material"
+  logo: images/logo.svg
+  favicon: images/favicon.ico
+  features:
+    - content.code.copy
+    - content.action.edit
+    # - navigation.expand
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.indexes
+    - toc.integrate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: teal
+      accent: blue
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/ansible/ansible-compat
+nav:
+  - examples: index.md
+  - api: api.md
+plugins:
+  - autorefs
+  - search
+  - social
+  - mkdocstrings:
+      handlers:
+        python:
+          import:
+            - https://docs.python.org/3/objects.inv
+          options:
+            # heading_level: 2
+            docstring_style: sphinx
+            docstring_options:
+              ignore_init_summary: yes
+            show_submodules: no
+            docstring_section_style: list
+            members_order: alphabetical
+            show_category_heading: no
+            # cannot merge init into class due to parse error...
+            # merge_init_into_class: yes
+            # separate_signature: yes
+            show_root_heading: yes
+            show_signature_annotations: yes
+            separate_signature: yes
+            # show_bases: false
+    # options:
+    #   show_root_heading: true
+    #   docstring_style: sphinx
+
+markdown_extensions:
+  - admonition
+  - def_list
+  - footnotes
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.magiclink:
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      social_url_shorthand: true
+      social_url_shortener: true
+      user: facelessuser
+      repo: pymdown-extensions
+      normalize_issue_symbols: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
