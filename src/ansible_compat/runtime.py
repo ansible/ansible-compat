@@ -68,11 +68,11 @@ class Runtime:
         :param min_required_version: Minimal version of Ansible required. If
                                      not found, a :class:`RuntimeError`
                                      exception is raised.
-        :param: require_module: If set, instantiation will fail if Ansible
-                                Python module is missing or is not matching
-                                the same version as the Ansible command line.
-                                That is useful for consumers that expect to
-                                also perform Python imports from Ansible.
+        :param require_module: If set, instantiation will fail if Ansible
+                               Python module is missing or is not matching
+                               the same version as the Ansible command line.
+                               That is useful for consumers that expect to
+                               also perform Python imports from Ansible.
         :param max_retries: Number of times it should retry network operations.
                             Default is 0, no retries.
         :param environ: Environment dictionary to use, if undefined
@@ -275,7 +275,9 @@ class Runtime:
     ) -> None:
         """Install dependencies from a requirements.yml.
 
-        param: offline: bypass installation, may fail if requirements are not met
+        :param requirement: path to requirements.yml file
+        :param retry: retry network operations on failures
+        :param offline: bypass installation, may fail if requirements are not met.
         """
         if not os.path.exists(requirement):
             return

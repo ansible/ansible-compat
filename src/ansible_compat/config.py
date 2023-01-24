@@ -469,3 +469,11 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
             name = item.lower()
             kind = self.data[item].__class__.__name__
             print(f"{name}: {kind}")
+
+
+__all__ = [
+    "ansible_collections_path",
+    "parse_ansible_version",
+    "ansible_version",
+    "AnsibleConfig",
+]

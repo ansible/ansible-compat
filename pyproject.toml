@@ -51,10 +51,19 @@ changelog = "https://github.com/ansible/ansible-compat/releases"
 
 [project.optional-dependencies]
 docs = [
-  "sphinx-autobuild>=2021.3.14",
-  "sphinx>=5.3.0",
-  "sphinx_ansible_theme",
-  "myst_parser",
+  "argparse-manpage",
+  "black",
+  "cairosvg",
+  "markdown-include",
+  "mkdocs",
+  "mkdocs-exclude",
+  "mkdocs-material",
+  "mkdocs-material-extensions",
+  "mkdocstrings",
+  "mkdocstrings-python",
+  "pillow",
+  "pymdown-extensions",
+  "slugify",
 ]
 test = ["coverage", "pip-tools", "pytest>=7.2.0", "pytest-mock", "pytest-plus"]
 
