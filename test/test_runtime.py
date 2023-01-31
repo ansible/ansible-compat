@@ -66,6 +66,13 @@ def test_runtime_mismatch_ansible_module(monkeypatch: MonkeyPatch) -> None:
 def test_runtime_require_module() -> None:
     """Check that require_module successful pass."""
     Runtime(require_module=True)
+    # Now we try to set the collection path, something to check if that is
+    # causing an exception, as 2.15 introduced new init code.
+    from ansible.utils.collection_loader import (  # pylint: disable=import-outside-toplevel
+        AnsibleCollectionConfig,
+    )
+
+    AnsibleCollectionConfig.playbook_paths = "."
 
 
 def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
