@@ -103,7 +103,7 @@ repos:
         name: Upgrade constraints files and requirements
         files: ^(pyproject\.toml|requirements\.txt)$
         language: python
-        entry: python -m piptools compile --resolver=backtracking --upgrade -q --extra docs --extra test --output-file=requirements.txt pyproject.toml
+        entry: python -m piptools compile --resolver=backtracking --upgrade -q --extra docs --extra test --output-file=requirements.txt pyproject.toml --unsafe-package ansible-core
         pass_filenames: false
         stages:
           - manual
@@ -113,7 +113,7 @@ repos:
         name: Check constraints files and requirements
         files: ^(pyproject\.toml|requirements\.txt)$
         language: python
-        entry: python -m piptools compile --resolver=backtracking -q --extra docs --extra test --output-file=requirements.txt pyproject.toml
+        entry: python -m piptools compile --resolver=backtracking -q --extra docs --extra test --output-file=requirements.txt pyproject.toml --unsafe-package ansible-core
         pass_filenames: false
         additional_dependencies:
           - pip-tools>=6.11.0

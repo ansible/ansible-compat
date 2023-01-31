@@ -37,6 +37,8 @@ classifiers = [
 ]
 keywords = ["ansible"]
 dependencies = [
+  # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
+  "ansible-core>=2.12",
   "packaging",
   "PyYAML",
   "subprocess-tee>=0.4.1",
@@ -73,7 +75,9 @@ branch = true
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+fail_under = 92
 skip_covered = true
+show_missing = true
 
 [tool.mypy]
 python_version = 3.8
