@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Union
 
 from packaging.version import Version
 
+from ansible_compat.constants import ANSIBLE_MIN_VERSION
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
 from ansible_compat.ports import cache
 
@@ -22,15 +23,7 @@ else:
 # do not use lru_cache here, as environment can change between calls
 def ansible_collections_path() -> str:
     """Return collection path variable for current version of Ansible."""
-    # respect Ansible behavior, which is to load old name if present
-    for env_var in ["ANSIBLE_COLLECTIONS_PATHS", "ANSIBLE_COLLECTIONS_PATH"]:
-        if env_var in os.environ:
-            return env_var
-
-    # https://github.com/ansible/ansible/pull/70007
-    if ansible_version() >= ansible_version("2.10.0.dev0"):
-        return "ANSIBLE_COLLECTIONS_PATH"
-    return "ANSIBLE_COLLECTIONS_PATHS"
+    return "ANSIBLE_COLLECTIONS_PATH"
 
 
 def parse_ansible_version(stdout: str) -> Version:
@@ -43,11 +36,9 @@ def parse_ansible_version(stdout: str) -> Version:
     )
     if match:
         return Version(match.group("version"))
-    # ansible-base 2.10 and Ansible 2.9: 'ansible 2.x.y'
-    match = re.search(r"^ansible (?P<version>[^\s]+)", stdout, re.MULTILINE)
-    if match:
-        return Version(match.group("version"))
-    raise InvalidPrerequisiteError(f"Unable to parse ansible cli version: {stdout}")
+    raise InvalidPrerequisiteError(
+        f"Unable to parse ansible cli version: {stdout}\nKeep in mind that only {ANSIBLE_MIN_VERSION } or newer are supported."
+    )
 
 
 @cache

@@ -27,9 +27,6 @@ jobs:
             lint
             docs
             pkg
-            py38-ansible29
-            py38-ansible210
-            py38-ansible211
             py38-ansible212
             py38-ansible213
             py39-ansible214

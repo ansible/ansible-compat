@@ -214,10 +214,7 @@ class Runtime:
             "install",
             "-vvv",  # this is needed to make ansible display important info in case of failures
         ]
-
-        # ansible-galaxy before 2.11 fails to upgrade collection unless --force
-        # is present, newer versions do not need it
-        if force or self.version_in_range(upper="2.11"):
+        if force:
             cmd.append("--force")
 
         # As ansible-galaxy install is not able to automatically determine

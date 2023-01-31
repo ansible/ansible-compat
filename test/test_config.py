@@ -4,14 +4,8 @@ import subprocess
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-from packaging.version import Version
 
-from ansible_compat.config import (
-    AnsibleConfig,
-    ansible_collections_path,
-    ansible_version,
-    parse_ansible_version,
-)
+from ansible_compat.config import AnsibleConfig, ansible_version, parse_ansible_version
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
 
 
@@ -50,30 +44,6 @@ def test_config_copy() -> None:
     new_config = copy.deepcopy(config)
     assert isinstance(new_config, AnsibleConfig)
     assert new_config is not config
-
-
-def test_ansible_collections_path_210(monkeypatch: MonkeyPatch) -> None:
-    """Checks that ansible_collections_path works as expected correctly."""
-    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATHS", "foo")
-    monkeypatch.delenv("ANSIBLE_COLLECTIONS_PATH", False)
-    assert ansible_collections_path() == "ANSIBLE_COLLECTIONS_PATHS"
-    monkeypatch.delenv("ANSIBLE_COLLECTIONS_PATHS", False)
-    monkeypatch.setattr(
-        "ansible_compat.config.ansible_version", lambda x="2.10.0": Version(x)
-    )
-    assert ansible_collections_path() == "ANSIBLE_COLLECTIONS_PATH"
-
-
-def test_ansible_collections_path_29(monkeypatch: MonkeyPatch) -> None:
-    """Checks that ansible_collections_path works as expected correctly."""
-    monkeypatch.delenv("ANSIBLE_COLLECTIONS_PATHS", False)
-    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", "foo")
-    assert ansible_collections_path() == "ANSIBLE_COLLECTIONS_PATH"
-    monkeypatch.delenv("ANSIBLE_COLLECTIONS_PATH", False)
-    monkeypatch.setattr(
-        "ansible_compat.config.ansible_version", lambda x="2.9.0": Version(x)
-    )
-    assert ansible_collections_path() == "ANSIBLE_COLLECTIONS_PATHS"
 
 
 def test_parse_ansible_version_fail() -> None:

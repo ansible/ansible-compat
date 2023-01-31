@@ -2,7 +2,7 @@
 
 
 # Minimal version of Ansible we support for runtime
-ANSIBLE_MIN_VERSION = "2.9"
+ANSIBLE_MIN_VERSION = "2.12"
 
 # Based on https://docs.ansible.com/ansible/latest/reference_appendices/config.html
 ANSIBLE_DEFAULT_ROLES_PATH = (
