@@ -123,6 +123,25 @@ class Runtime:
                 "indicates a broken execution environment."
             )
 
+        # For ansible 2.15+ we need to initialize the plugin loader
+        # https://github.com/ansible/ansible-lint/issues/2945
+        if self.version >= Version("2.15.0.dev0"):
+            # pylint: disable=import-outside-toplevel
+            from ansible.plugins.loader import init_plugin_loader
+
+            init_plugin_loader([])
+        else:
+            # noinspection PyProtectedMember
+            from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
+                _AnsibleCollectionFinder,
+            )
+
+            # noinspection PyProtectedMember
+            # pylint: disable=protected-access
+            _AnsibleCollectionFinder(
+                paths=[os.path.dirname(os.environ.get(ansible_collections_path(), "."))]
+            )._install()  # pylint: disable=protected-access
+
     def clean(self) -> None:
         """Remove content of cache_dir."""
         if self.cache_dir:
