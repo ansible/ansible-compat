@@ -73,6 +73,10 @@ def test_runtime_require_module() -> None:
     )
 
     AnsibleCollectionConfig.playbook_paths = "."
+    # Calling it again in order to see that it does not produce UserWarning: AnsibleCollectionFinder has already been configured
+    # which is done by Ansible core 2.15+. We added special code inside Runtime
+    # that should avoid initializing twice and raise that warning.
+    Runtime(require_module=True)
 
 
 def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
