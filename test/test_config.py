@@ -7,6 +7,7 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from ansible_compat.config import AnsibleConfig, ansible_version, parse_ansible_version
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
+from packaging.version import Version
 
 
 def test_config() -> None:
@@ -66,3 +67,8 @@ def test_ansible_version_missing(monkeypatch: MonkeyPatch) -> None:
     ):
         # bypassing lru cache
         ansible_version.__wrapped__()
+
+
+def test_ansible_version() -> None:
+    """Validate ansible_version behavior."""
+    assert ansible_version() >= Version("1.0")
