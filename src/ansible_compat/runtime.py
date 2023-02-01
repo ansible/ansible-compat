@@ -91,7 +91,7 @@ class Runtime:
         # As CryptographyDeprecationWarning is not a builtin, we cannot use
         # PYTHONWARNINGS to ignore it using category but we can use message.
         # https://stackoverflow.com/q/68251969/99834
-        if "PYTHONWARNINGS" not in self.environ:
+        if "PYTHONWARNINGS" not in self.environ:  # pragma: no cover
             self.environ["PYTHONWARNINGS"] = "ignore:Blowfish has been deprecated"
 
         if isolated:

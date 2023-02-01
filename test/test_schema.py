@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from ansible_compat.schema import JsonSchemaError, validate
+from ansible_compat.schema import JsonSchemaError, json_path, validate
 
 expected_results = [
     JsonSchemaError(
@@ -61,3 +61,8 @@ def test_schema(index: int) -> None:
         assert (
             found_errors_json == expected
         ), f"inconsistent returns: {found_errors_json}"
+
+
+def test_json_path() -> None:
+    """Test json_path function."""
+    assert json_path(["a", 1, "b"]) == "$.a[1].b"
