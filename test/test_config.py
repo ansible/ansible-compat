@@ -4,10 +4,10 @@ import subprocess
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
+from packaging.version import Version
 
 from ansible_compat.config import AnsibleConfig, ansible_version, parse_ansible_version
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
-from packaging.version import Version
 
 
 def test_config() -> None:
