@@ -46,6 +46,9 @@ class Runtime:
 
     _version: Optional[packaging.version.Version] = None
     cache_dir: Optional[str] = None
+    # Used to track if we have already initialized the Ansible runtime as attempts
+    # to do it multiple tilmes will cause runtime warnings from within ansible-core
+    initialized: bool = False
 
     # pylint: disable=too-many-arguments
     def __init__(
@@ -125,22 +128,26 @@ class Runtime:
 
         # For ansible 2.15+ we need to initialize the plugin loader
         # https://github.com/ansible/ansible-lint/issues/2945
-        if self.version >= Version("2.15.0.dev0"):
-            # pylint: disable=import-outside-toplevel
-            from ansible.plugins.loader import init_plugin_loader
+        if not Runtime.initialized:  # noqa: F823
+            if self.version >= Version("2.15.0.dev0"):
+                # pylint: disable=import-outside-toplevel,no-name-in-module
+                from ansible.plugins.loader import init_plugin_loader
 
-            init_plugin_loader([])
-        else:
-            # noinspection PyProtectedMember
-            from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
-                _AnsibleCollectionFinder,
-            )
+                init_plugin_loader([])
+            else:
+                # noinspection PyProtectedMember
+                from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
+                    _AnsibleCollectionFinder,
+                )
 
-            # noinspection PyProtectedMember
-            # pylint: disable=protected-access
-            _AnsibleCollectionFinder(
-                paths=[os.path.dirname(os.environ.get(ansible_collections_path(), "."))]
-            )._install()  # pylint: disable=protected-access
+                # noinspection PyProtectedMember
+                # pylint: disable=protected-access
+                _AnsibleCollectionFinder(
+                    paths=[
+                        os.path.dirname(os.environ.get(ansible_collections_path(), "."))
+                    ]
+                )._install()  # pylint: disable=protected-access
+            Runtime.initialized = True
 
     def clean(self) -> None:
         """Remove content of cache_dir."""
