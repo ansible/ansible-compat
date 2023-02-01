@@ -25,6 +25,9 @@ def test_config() -> None:
     assert isinstance(config.collections_path, list)
     assert config.collections_paths == config.collections_path
 
+    # check if we can access the special data member
+    assert config.ACTION_WARNINGS == config.data["ACTION_WARNINGS"]
+
     with pytest.raises(AttributeError):
         print(config.THIS_DOES_NOT_EXIST)
 
@@ -72,3 +75,8 @@ def test_ansible_version_missing(monkeypatch: MonkeyPatch) -> None:
 def test_ansible_version() -> None:
     """Validate ansible_version behavior."""
     assert ansible_version() >= Version("1.0")
+
+
+def test_ansible_version_arg() -> None:
+    """Validate ansible_version behavior."""
+    assert ansible_version("2.0") >= Version("1.0")

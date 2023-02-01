@@ -431,7 +431,7 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
             return _dict[attr_name]
 
         data = super().__getattribute__("data")
-        if attr_name == "data":
+        if attr_name == "data":  # pragma: no cover
             return data
 
         name = attr_name.upper()
