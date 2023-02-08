@@ -335,7 +335,6 @@ class Runtime:
 
         # Run galaxy collection install works on v2 requirements.yml
         if "collections" in reqs_yaml:
-
             cmd = [
                 "ansible-galaxy",
                 "collection",
