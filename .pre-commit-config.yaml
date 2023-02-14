@@ -13,6 +13,10 @@ ci:
 default_language_version:
   # Needed in order to make pip-compile output predictable.
   python: python3.9
+exclude: |
+  (?x)^(
+    test/assets/.*
+  )$
 repos:
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
@@ -22,6 +26,7 @@ repos:
         additional_dependencies:
           - prettier
           - prettier-plugin-toml
+          - prettier-plugin-sort-json
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
     rev: v4.4.0
     hooks:
