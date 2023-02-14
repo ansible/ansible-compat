@@ -129,11 +129,12 @@ class Runtime:
         # For ansible 2.15+ we need to initialize the plugin loader
         # https://github.com/ansible/ansible-lint/issues/2945
         if not Runtime.initialized:  # noqa: F823
+            col_path = [f"{self.cache_dir}/collections"]
             if self.version >= Version("2.15.0.dev0"):
                 # pylint: disable=import-outside-toplevel,no-name-in-module
                 from ansible.plugins.loader import init_plugin_loader
 
-                init_plugin_loader([])
+                init_plugin_loader(col_path)
             else:
                 # noinspection PyProtectedMember
                 from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
@@ -142,10 +143,12 @@ class Runtime:
 
                 # noinspection PyProtectedMember
                 # pylint: disable=protected-access
+                col_path += self.config.collections_paths
+                col_path += os.path.dirname(
+                    os.environ.get(ansible_collections_path(), ".")
+                ).split(":")
                 _AnsibleCollectionFinder(
-                    paths=[
-                        os.path.dirname(os.environ.get(ansible_collections_path(), "."))
-                    ]
+                    paths=col_path
                 )._install()  # pylint: disable=protected-access
             Runtime.initialized = True
 
