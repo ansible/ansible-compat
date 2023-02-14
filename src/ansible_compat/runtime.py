@@ -144,9 +144,9 @@ class Runtime:
                 # noinspection PyProtectedMember
                 # pylint: disable=protected-access
                 col_path += self.config.collections_paths
-                col_path += [
-                    os.path.dirname(os.environ.get(ansible_collections_path(), "."))
-                ]
+                col_path += os.path.dirname(
+                    os.environ.get(ansible_collections_path(), ".")
+                ).split(":")
                 _AnsibleCollectionFinder(
                     paths=col_path
                 )._install()  # pylint: disable=protected-access
