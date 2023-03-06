@@ -20,7 +20,7 @@ exclude: |
 repos:
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: "v3.0.0-alpha.4"
+    rev: "v3.0.0-alpha.6"
     hooks:
       - id: prettier
         additional_dependencies:
@@ -78,7 +78,7 @@ repos:
           - flake8-rst-docstrings>=0.2.3
           - flake8-rst>=0.8.0
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.991
+    rev: v1.0.1
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -94,7 +94,7 @@ repos:
           - types-pkg_resources
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v2.16.1
+    rev: v2.16.4
     hooks:
       - id: pylint
         additional_dependencies:
