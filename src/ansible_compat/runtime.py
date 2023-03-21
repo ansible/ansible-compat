@@ -1,4 +1,4 @@
-"""Ansible runtime environment maanger."""
+"""Ansible runtime environment manager."""
 import importlib
 import json
 import logging
