@@ -20,7 +20,7 @@ exclude: |
 repos:
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: "v3.0.0-alpha.4"
+    rev: "v3.0.0-alpha.6"
     hooks:
       - id: prettier
         additional_dependencies:
@@ -44,7 +44,7 @@ repos:
       - id: debug-statements
         language_version: python3
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.2
+    rev: v2.2.4
     hooks:
       - id: codespell
   - repo: https://github.com/adrienverge/yamllint.git
@@ -78,7 +78,7 @@ repos:
           - flake8-rst-docstrings>=0.2.3
           - flake8-rst>=0.8.0
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.991
+    rev: v1.1.1
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -94,7 +94,7 @@ repos:
           - types-pkg_resources
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v2.16.1
+    rev: v2.17.0
     hooks:
       - id: pylint
         additional_dependencies:
@@ -109,7 +109,7 @@ repos:
         name: Upgrade constraints files and requirements
         files: ^(pyproject\.toml|requirements\.txt)$
         language: python
-        entry: python -m piptools compile --resolver=backtracking --upgrade -q --extra docs --extra test --output-file=requirements.txt pyproject.toml --unsafe-package ansible-core
+        entry: python -m piptools compile --resolver=backtracking --upgrade -q --strip-extras --extra docs --extra test --output-file=requirements.txt pyproject.toml --unsafe-package ansible-core
         pass_filenames: false
         stages:
           - manual
@@ -119,7 +119,7 @@ repos:
         name: Check constraints files and requirements
         files: ^(pyproject\.toml|requirements\.txt)$
         language: python
-        entry: python -m piptools compile --resolver=backtracking -q --extra docs --extra test --output-file=requirements.txt pyproject.toml --unsafe-package ansible-core
+        entry: python -m piptools compile --resolver=backtracking -q --strip-extras --extra docs --extra test --output-file=requirements.txt pyproject.toml --unsafe-package ansible-core
         pass_filenames: false
         additional_dependencies:
           - pip-tools>=6.11.0
