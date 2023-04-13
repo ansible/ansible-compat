@@ -296,6 +296,7 @@ class Runtime:
                     force=True,
                 )
 
+    # pylint: disable=too-many-branches
     def install_requirements(
         self, requirement: str, retry: bool = False, offline: bool = False
     ) -> None:
@@ -350,10 +351,21 @@ class Runtime:
                 )
             else:
                 cmd.extend(["-r", requirement])
+                cpaths = ansible_collections_path().split(":")
                 if self.cache_dir:
-                    cmd.extend(["-p", f"{self.cache_dir}/collections"])
+                    # we cannot use '-p' because it breaks galaxy ability to ignore already installed collections, so
+                    # we hack ansible_collections_path instead and inject our own path there.
+                    dest_path = f"{self.cache_dir}/collections"
+                    cpaths = ansible_collections_path().split(":")
+                    if dest_path not in cpaths:
+                        cpaths.insert(0, dest_path)
+                    # cmd.extend(["-p", f"{self.cache_dir}/collections"])
                 _logger.info("Running %s", " ".join(cmd))
-                result = self.exec(cmd, retry=retry)
+                result = self.exec(
+                    cmd,
+                    retry=retry,
+                    env={**os.environ, "ANSIBLE_COLLECTIONS_PATH": ":".join(cpaths)},
+                )
                 if result.returncode != 0:
                     _logger.error(result.stdout)
                     _logger.error(result.stderr)
