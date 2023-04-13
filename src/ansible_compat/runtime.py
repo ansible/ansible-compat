@@ -253,14 +253,19 @@ class Runtime:
         if matches and Version(matches[1]).is_prerelease:
             cmd.append("--pre")
 
-        if destination:
-            cmd.extend(["-p", str(destination)])
+        cpaths: List[str] = self.config.collections_paths
+        if destination and str(destination) not in cpaths:
+            # we cannot use '-p' because it breaks galaxy ability to ignore already installed collections, so
+            # we hack ansible_collections_path instead and inject our own path there.
+            # pylint: disable=no-member
+            cpaths.insert(0, str(destination))
         cmd.append(f"{collection}")
 
         _logger.info("Running from %s : %s", os.getcwd(), " ".join(cmd))
         run = self.exec(
             cmd,
             retry=True,
+            env={**self.environ, ansible_collections_path(): ":".join(cpaths)},
         )
         if run.returncode != 0:
             msg = f"Command returned {run.returncode} code:\n{run.stdout}\n{run.stderr}"
@@ -351,15 +356,14 @@ class Runtime:
                 )
             else:
                 cmd.extend(["-r", requirement])
-                cpaths = ansible_collections_path().split(":")
+                cpaths = self.config.collections_paths
                 if self.cache_dir:
                     # we cannot use '-p' because it breaks galaxy ability to ignore already installed collections, so
                     # we hack ansible_collections_path instead and inject our own path there.
                     dest_path = f"{self.cache_dir}/collections"
-                    cpaths = ansible_collections_path().split(":")
                     if dest_path not in cpaths:
+                        # pylint: disable=no-member
                         cpaths.insert(0, dest_path)
-                    # cmd.extend(["-p", f"{self.cache_dir}/collections"])
                 _logger.info("Running %s", " ".join(cmd))
                 result = self.exec(
                     cmd,
