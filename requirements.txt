@@ -6,77 +6,105 @@
 #
 argparse-manpage==4
     # via ansible-compat (pyproject.toml)
-attrs==22.1.0
+attrs==22.2.0
+    # via jsonschema
+beautifulsoup4==4.12.1
     # via
-    #   jsonschema
-    #   pytest
-beautifulsoup4==4.12.0
-    # via mkdocs-htmlproofer-plugin
-black==22.12.0
+    #   mkdocs-ansible
+    #   mkdocs-htmlproofer-plugin
+black==23.3.0
     # via ansible-compat (pyproject.toml)
-build==0.9.0
+build==0.10.0
     # via pip-tools
-cairocffi==1.4.0
-    # via cairosvg
-cairosvg==2.6.0
+cairocffi==1.5.0
+    # via
+    #   cairosvg
+    #   mkdocs-ansible
+cairosvg==2.7.0
     # via mkdocs-ansible
 certifi==2022.12.7
-    # via requests
+    # via
+    #   mkdocs-ansible
+    #   requests
 cffi==1.15.1
     # via
     #   cairocffi
     #   cryptography
-charset-normalizer==2.1.1
-    # via requests
+    #   mkdocs-ansible
+charset-normalizer==3.1.0
+    # via
+    #   mkdocs-ansible
+    #   requests
 click==8.1.3
     # via
     #   black
     #   mkdocs
+    #   mkdocs-ansible
     #   pip-tools
 colorama==0.4.6
     # via
     #   griffe
+    #   mkdocs-ansible
     #   mkdocs-material
-coverage==6.5.0
+coverage==7.2.3
     # via ansible-compat (pyproject.toml)
-cryptography==39.0.0
+cryptography==40.0.1
     # via ansible-core
 csscompressor==0.9.5
-    # via mkdocs-minify-plugin
+    # via
+    #   mkdocs-ansible
+    #   mkdocs-minify-plugin
 cssselect2==0.7.0
-    # via cairosvg
+    # via
+    #   cairosvg
+    #   mkdocs-ansible
 defusedxml==0.7.1
-    # via cairosvg
-exceptiongroup==1.0.4
+    # via
+    #   cairosvg
+    #   mkdocs-ansible
+exceptiongroup==1.1.1
     # via pytest
 ghp-import==2.1.0
-    # via mkdocs
-griffe==0.25.4
-    # via mkdocstrings-python
+    # via
+    #   mkdocs
+    #   mkdocs-ansible
+griffe==0.26.0
+    # via
+    #   mkdocs-ansible
+    #   mkdocstrings-python
 htmlmin2==0.1.13
-    # via mkdocs-minify-plugin
+    # via
+    #   mkdocs-ansible
+    #   mkdocs-minify-plugin
 idna==3.4
-    # via requests
-importlib-metadata==5.1.0
+    # via
+    #   mkdocs-ansible
+    #   requests
+importlib-metadata==6.1.0
     # via
     #   markdown
     #   mkdocs
-iniconfig==1.1.1
+    #   mkdocs-ansible
+iniconfig==2.0.0
     # via pytest
 jinja2==3.1.2
     # via
     #   ansible-core
     #   mkdocs
+    #   mkdocs-ansible
     #   mkdocs-material
     #   mkdocstrings
 jsmin==3.0.1
-    # via mkdocs-minify-plugin
+    # via
+    #   mkdocs-ansible
+    #   mkdocs-minify-plugin
 jsonschema==4.17.3
     # via ansible-compat (pyproject.toml)
 markdown==3.3.7
     # via
     #   markdown-include
     #   mkdocs
+    #   mkdocs-ansible
     #   mkdocs-autorefs
     #   mkdocs-htmlproofer-plugin
     #   mkdocs-material
@@ -86,12 +114,15 @@ markdown-exec==1.4.0
     # via mkdocs-ansible
 markdown-include==0.8.1
     # via mkdocs-ansible
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via
     #   jinja2
+    #   mkdocs-ansible
     #   mkdocstrings
 mergedeep==1.3.4
-    # via mkdocs
+    # via
+    #   mkdocs
+    #   mkdocs-ansible
 mkdocs==1.4.2
     # via
     #   mkdocs-ansible
@@ -102,15 +133,17 @@ mkdocs==1.4.2
     #   mkdocs-minify-plugin
     #   mkdocs-monorepo-plugin
     #   mkdocstrings
-mkdocs-ansible==0.1.2
+mkdocs-ansible==0.1.4
     # via ansible-compat (pyproject.toml)
 mkdocs-autorefs==0.4.1
-    # via mkdocstrings
+    # via
+    #   mkdocs-ansible
+    #   mkdocstrings
 mkdocs-gen-files==0.4.0
     # via mkdocs-ansible
 mkdocs-htmlproofer-plugin==0.11.0
     # via mkdocs-ansible
-mkdocs-material==9.1.3
+mkdocs-material==9.1.5
     # via mkdocs-ansible
 mkdocs-material-extensions==1.1.1
     # via
@@ -120,116 +153,148 @@ mkdocs-minify-plugin==0.6.4
     # via mkdocs-ansible
 mkdocs-monorepo-plugin==1.0.4
     # via mkdocs-ansible
-mkdocstrings==0.20.0
+mkdocstrings==0.21.2
     # via
     #   mkdocs-ansible
     #   mkdocstrings-python
-mkdocstrings-python==0.8.3
+mkdocstrings-python==0.9.0
     # via mkdocs-ansible
-more-itertools==9.0.0
-    # via pytest-plus
-mypy-extensions==0.4.3
+mypy-extensions==1.0.0
     # via black
-packaging==22.0
+packaging==23.0
     # via
     #   ansible-compat (pyproject.toml)
     #   ansible-core
+    #   black
     #   build
     #   mkdocs
+    #   mkdocs-ansible
     #   pytest
-pathspec==0.10.3
+pathspec==0.11.1
     # via black
-pep517==0.13.0
-    # via build
-pillow==9.4.0
+pillow==9.5.0
     # via
     #   cairosvg
     #   mkdocs-ansible
-pip==23.0
+pip==23.0.1
     # via pip-tools
-pip-tools==6.11.0
+pip-tools==6.13.0
     # via ansible-compat (pyproject.toml)
-pipdeptree==2.6.0
+pipdeptree==2.7.0
     # via mkdocs-ansible
-platformdirs==2.6.2
+platformdirs==3.2.0
     # via black
 pluggy==1.0.0
     # via pytest
 pycparser==2.21
-    # via cffi
+    # via
+    #   cffi
+    #   mkdocs-ansible
 pygments==2.14.0
-    # via mkdocs-material
-pymdown-extensions==9.9.2
+    # via
+    #   mkdocs-ansible
+    #   mkdocs-material
+pymdown-extensions==9.10
     # via
     #   markdown-exec
     #   mkdocs-ansible
     #   mkdocs-material
     #   mkdocstrings
-pyrsistent==0.19.2
+pyproject-hooks==1.0.0
+    # via build
+pyrsistent==0.19.3
     # via jsonschema
-pytest==7.2.0
+pytest==7.3.0
     # via
     #   ansible-compat (pyproject.toml)
     #   pytest-mock
     #   pytest-plus
 pytest-mock==3.10.0
     # via ansible-compat (pyproject.toml)
-pytest-plus==0.2
+pytest-plus==0.4.0
     # via ansible-compat (pyproject.toml)
 python-dateutil==2.8.2
-    # via ghp-import
+    # via
+    #   ghp-import
+    #   mkdocs-ansible
 python-slugify==8.0.1
-    # via mkdocs-monorepo-plugin
+    # via
+    #   mkdocs-ansible
+    #   mkdocs-monorepo-plugin
 pyyaml==6.0
     # via
     #   ansible-compat (pyproject.toml)
     #   ansible-core
     #   mkdocs
+    #   mkdocs-ansible
+    #   pymdown-extensions
     #   pyyaml-env-tag
 pyyaml-env-tag==0.1
-    # via mkdocs
-regex==2022.10.31
-    # via mkdocs-material
-requests==2.28.1
     # via
+    #   mkdocs
+    #   mkdocs-ansible
+regex==2023.3.23
+    # via
+    #   mkdocs-ansible
+    #   mkdocs-material
+requests==2.28.2
+    # via
+    #   mkdocs-ansible
     #   mkdocs-htmlproofer-plugin
     #   mkdocs-material
 resolvelib==0.8.1
     # via ansible-core
-setuptools==67.0.0
+setuptools==67.6.1
     # via pip-tools
 six==1.16.0
-    # via python-dateutil
+    # via
+    #   mkdocs-ansible
+    #   python-dateutil
 soupsieve==2.4
-    # via beautifulsoup4
+    # via
+    #   beautifulsoup4
+    #   mkdocs-ansible
 subprocess-tee==0.4.1
     # via ansible-compat (pyproject.toml)
 text-unidecode==1.3
-    # via python-slugify
+    # via
+    #   mkdocs-ansible
+    #   python-slugify
 tinycss2==1.2.1
     # via
     #   cairosvg
     #   cssselect2
+    #   mkdocs-ansible
 tomli==2.0.1
     # via
     #   black
     #   build
-    #   pep517
+    #   pyproject-hooks
     #   pytest
-typing-extensions==4.4.0
-    # via black
-urllib3==1.26.13
-    # via requests
-watchdog==2.2.1
-    # via mkdocs
+typing-extensions==4.5.0
+    # via
+    #   black
+    #   mkdocs-ansible
+    #   mkdocstrings
+urllib3==1.26.15
+    # via
+    #   mkdocs-ansible
+    #   requests
+watchdog==3.0.0
+    # via
+    #   mkdocs
+    #   mkdocs-ansible
 webencodings==0.5.1
     # via
     #   cssselect2
+    #   mkdocs-ansible
     #   tinycss2
-wheel==0.38.4
+wheel==0.40.0
     # via pip-tools
-zipp==3.11.0
-    # via importlib-metadata
+zipp==3.15.0
+    # via
+    #   importlib-metadata
+    #   mkdocs-ansible
 
 # The following packages are considered to be unsafe in a requirements file:
 # ansible-core
