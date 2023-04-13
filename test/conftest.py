@@ -7,7 +7,7 @@ import pytest
 from ansible_compat.runtime import Runtime
 
 
-@pytest.fixture
+@pytest.fixture()
 # pylint: disable=unused-argument
 def runtime(scope: str = "session") -> Generator[Runtime, None, None]:
     """Isolated runtime fixture."""
@@ -16,7 +16,7 @@ def runtime(scope: str = "session") -> Generator[Runtime, None, None]:
     instance.clean()
 
 
-@pytest.fixture
+@pytest.fixture()
 # pylint: disable=unused-argument
 def runtime_tmp(
     tmp_path: pathlib.Path, scope: str = "session"

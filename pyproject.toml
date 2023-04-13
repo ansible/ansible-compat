@@ -114,5 +114,16 @@ disable = [
 # ensure we treat warnings as error
 filterwarnings = ["error"]
 
+[tool.ruff]
+select = ["PT"]
+ignore = [
+  "E501", # we use black
+
+]
+target-version = "py39"
+
+[tool.ruff.flake8-pytest-style]
+parametrize-values-type = "tuple"
+
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
