@@ -57,8 +57,6 @@ ignore =
 # per-file-ignores =
 
 # flake8-pytest-style
-# PT001:
-pytest-fixture-no-parentheses = true
 # PT006:
 pytest-parametrize-names-type = tuple
 # PT007:
