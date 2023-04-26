@@ -8,6 +8,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import warnings
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 import packaging
@@ -39,6 +40,10 @@ else:
 _logger = logging.getLogger(__name__)
 # regex to extract the first version from a collection range specifier
 version_re = re.compile(":[>=<]*([^,]*)")
+
+
+class AnsibleWarning(Warning):
+    """Warnings related to Ansible runtime."""
 
 
 class Runtime:
@@ -104,6 +109,17 @@ class Runtime:
             )
         if require_module:
             self._ensure_module_available()
+
+        # pylint: disable=import-outside-toplevel
+        from ansible.utils.display import Display
+
+        # pylint: disable=unused-argument
+        def warning(self: Display, msg: str, formatted: bool = False) -> None:
+            """Override ansible.utils.display.Display.warning to avoid printing warnings."""
+            warnings.warn(msg, category=AnsibleWarning, stacklevel=2)
+
+        # Monkey patch ansible warning in order to use warnings module.
+        Display.warning = warning
 
     def _ensure_module_available(self) -> None:
         """Assure that Ansible Python module is installed and matching CLI version."""
