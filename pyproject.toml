@@ -114,15 +114,39 @@ disable = [
 filterwarnings = ["error"]
 
 [tool.ruff]
-select = ["PT", "PTH"]
+select = ["ALL"]
 ignore = [
+  # Disabled on purpose:
   "E501", # we use black
-
+  "RET504", # Unnecessary variable assignment before `return` statement
+  "D203", # incompatible with D211
+  "D213", # incompatible with D212
+  # Temporary disabled during adoption:
+  "A003", # Class attribute `exec` is shadowing a python builtin
+  "ANN101",
+  "ANN401",
+  "ARG",
+  "B018", # Found useless expression. Either assign it to a variable or remove it.
+  "C901",
+  "EM",
+  "FBT001",
+  "FBT002", # Boolean default value in function definition
+  "PGH003",
+  "PLR",
+  "S101",
+  "S506", # Probable use of unsafe loader `FullLoader`
+  "SIM108",
+  "SLF001",
+  "T201",
+  "TRY",
 ]
 target-version = "py39"
 
 [tool.ruff.flake8-pytest-style]
 parametrize-values-type = "tuple"
+
+[tool.ruff.isort]
+known-first-party = ["ansible_compat"]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"

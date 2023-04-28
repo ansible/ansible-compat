@@ -438,7 +438,7 @@ class Runtime:
             if destination:
                 # while function can return None, that would not break the logic
                 colpath = Path(
-                    f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}"
+                    f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}",
                 )
                 if colpath.is_symlink():
                     if os.path.realpath(colpath) == Path.cwd():

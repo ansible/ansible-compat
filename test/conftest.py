@@ -1,6 +1,6 @@
 """Pytest fixtures."""
 import pathlib
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 
@@ -19,7 +19,8 @@ def runtime(scope: str = "session") -> Generator[Runtime, None, None]:
 @pytest.fixture()
 # pylint: disable=unused-argument
 def runtime_tmp(
-    tmp_path: pathlib.Path, scope: str = "session"
+    tmp_path: pathlib.Path,
+    scope: str = "session",
 ) -> Generator[Runtime, None, None]:
     """Isolated runtime fixture using a temp directory."""
     instance = Runtime(project_dir=tmp_path, isolated=True)
