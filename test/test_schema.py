@@ -1,6 +1,6 @@
 """Tests for schema utilities."""
 import json
-import os
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -33,8 +33,8 @@ expected_results = [
 
 def json_from_asset(file_name: str) -> Any:
     """Load a json file from disk."""
-    file_name = os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name)
-    with open(file_name, encoding="utf-8") as f:
+    file = Path(__file__).parent / file_name
+    with file.open(encoding="utf-8") as f:
         return json.load(f)
 
 
