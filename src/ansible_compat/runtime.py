@@ -87,7 +87,7 @@ class Runtime:
         :param environ: Environment dictionary to use, if undefined
                         ``os.environ`` will be copied and used.
         """
-        self.project_dir = project_dir or str(Path.cwd())
+        self.project_dir = project_dir or Path.cwd()
         self.isolated = isolated
         self.max_retries = max_retries
         self.environ = environ or os.environ.copy()
@@ -101,7 +101,7 @@ class Runtime:
             self.environ["PYTHONWARNINGS"] = "ignore:Blowfish has been deprecated"
 
         if isolated:
-            self.cache_dir = get_cache_dir(str(self.project_dir))
+            self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig()
 
         if not self.version_in_range(lower=min_required_version):
@@ -178,7 +178,7 @@ class Runtime:
         retry: bool = False,
         tee: bool = False,
         env: Optional[dict[str, str]] = None,
-        cwd: Optional[str] = None,
+        cwd: Optional[Path] = None,
     ) -> CompletedProcess:
         """Execute a command inside an Ansible environment.
 
@@ -198,7 +198,7 @@ class Runtime:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 env=env or self.environ,
-                cwd=cwd,
+                cwd=str(cwd) if cwd else None,
             )
             if result.returncode == 0:
                 break
@@ -246,8 +246,8 @@ class Runtime:
 
     def install_collection(
         self,
-        collection: str,
-        destination: Optional[Union[str, Path]] = None,
+        collection: Union[str, Path],
+        destination: Optional[Path] = None,
         force: bool = False,
     ) -> None:
         """Install an Ansible collection.
@@ -266,7 +266,7 @@ class Runtime:
         # As ansible-galaxy install is not able to automatically determine
         # if the range requires a pre-release, we need to manuall add the --pre
         # flag when needed.
-        matches = version_re.search(collection)
+        matches = version_re.search(str(collection))
         if matches and Version(matches[1]).is_prerelease:
             cmd.append("--pre")
 
@@ -291,8 +291,8 @@ class Runtime:
 
     def install_collection_from_disk(
         self,
-        path: str,
-        destination: Optional[Union[str, Path]] = None,
+        path: Path,
+        destination: Optional[Path] = None,
     ) -> None:
         """Build and install collection from a given disk path."""
         if not self.version_in_range(upper="2.11"):
@@ -305,8 +305,8 @@ class Runtime:
                 "collection",
                 "build",
                 "--output-path",
-                tmp_dir,
-                path,
+                str(tmp_dir),
+                str(path),
             ]
             _logger.info("Running %s", " ".join(cmd))
             run = self.exec(cmd, retry=False)
@@ -323,7 +323,7 @@ class Runtime:
     # pylint: disable=too-many-branches
     def install_requirements(
         self,
-        requirement: str,
+        requirement: Path,
         retry: bool = False,
         offline: bool = False,
     ) -> None:
@@ -377,7 +377,7 @@ class Runtime:
                     "Skipped installing collection dependencies due to running in offline mode.",
                 )
             else:
-                cmd.extend(["-r", requirement])
+                cmd.extend(["-r", str(requirement)])
                 cpaths = self.config.collections_paths
                 if self.cache_dir:
                     # we cannot use '-p' because it breaks galaxy ability to ignore already installed collections, so
@@ -406,6 +406,7 @@ class Runtime:
         role_name_check: int = 0,
     ) -> None:
         """Make dependencies available if needed."""
+        destination: Optional[Path] = None
         if required_collections is None:
             required_collections = {}
 
@@ -418,9 +419,10 @@ class Runtime:
             "roles/requirements.yml",
             "collections/requirements.yml",
         ]:
-            self.install_requirements(req_file, retry=retry, offline=offline)
+            self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
-        destination = f"{self.cache_dir}/collections" if self.cache_dir else None
+        if self.cache_dir:
+            destination = self.cache_dir / "collections"
         for name, min_version in required_collections.items():
             self.install_collection(
                 f"{name}:>={min_version}",
@@ -451,18 +453,18 @@ class Runtime:
                     colpath.unlink()
 
             # molecule scenario within a collection
-            self.install_collection_from_disk(".", destination=destination)
+            self.install_collection_from_disk(Path("."), destination=destination)
         elif (
             Path().resolve().parent.name == "roles"
             and Path("../../galaxy.yml").exists()
         ):
             # molecule scenario located within roles/<role-name>/molecule inside
             # a collection
-            self.install_collection_from_disk("../..", destination=destination)
+            self.install_collection_from_disk(Path("../.."), destination=destination)
         else:
             # no collection, try to recognize and install a standalone role
             self._install_galaxy_role(
-                str(self.project_dir),
+                self.project_dir,
                 role_name_check=role_name_check,
                 ignore_errors=True,
             )
@@ -585,7 +587,7 @@ class Runtime:
 
     def _install_galaxy_role(
         self,
-        project_dir: str,
+        project_dir: Path,
         role_name_check: int = 0,
         ignore_errors: bool = False,
     ) -> None:
@@ -669,7 +671,7 @@ class Runtime:
             _logger.info("Set %s=%s", varname, value_str)
 
 
-def _get_role_fqrn(galaxy_infos: dict[str, Any], project_dir: str) -> str:
+def _get_role_fqrn(galaxy_infos: dict[str, Any], project_dir: Path) -> str:
     """Compute role fqrn."""
     role_namespace = _get_galaxy_role_ns(galaxy_infos)
     role_name = _get_galaxy_role_name(galaxy_infos)

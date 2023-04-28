@@ -169,7 +169,7 @@ def test_runtime_install_requirements_missing_file() -> None:
     """Check that missing requirements file is ignored."""
     # Do not rely on this behavior, it may be removed in the future
     runtime = Runtime()
-    runtime.install_requirements("/that/does/not/exist")
+    runtime.install_requirements(Path("/that/does/not/exist"))
 
 
 @pytest.mark.parametrize(
@@ -202,7 +202,7 @@ def test_runtime_install_requirements_invalid_file(
         exc,
         match=msg,
     ):
-        runtime.install_requirements(str(file))
+        runtime.install_requirements(file)
 
 
 @contextmanager
@@ -459,16 +459,14 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
     pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").touch()
     # this should only raise a warning
-    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=1)
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
     # this should test the bypass role name check path
-    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=2)
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
     # this should raise an error
     with pytest.raises(
         InvalidPrerequisiteError, match="does not follow current galaxy requirements"
     ):
-        runtime_tmp._install_galaxy_role(
-            str(runtime_tmp.project_dir), role_name_check=0
-        )
+        runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=0)
 
 
 def test_install_galaxy_role_unlink(
@@ -487,7 +485,7 @@ def test_install_galaxy_role_unlink(
 """,
         encoding="utf-8",
     )
-    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir))
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir)
     assert "symlink to current repository" in caplog.text
 
 
@@ -504,9 +502,7 @@ def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
     )
     # this should raise an error regardless the role_name_check value
     with pytest.raises(AnsibleCompatError, match="Role namespace must be string, not"):
-        runtime_tmp._install_galaxy_role(
-            str(runtime_tmp.project_dir), role_name_check=1
-        )
+        runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
 
 
 @pytest.mark.parametrize(
@@ -535,7 +531,7 @@ def test_install_galaxy_role_name_role_name_check_equals_to_1(
         encoding="utf-8",
     )
 
-    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=1)
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
     assert "Computed fully qualified role name of " in caplog.text
 
 
@@ -550,7 +546,7 @@ def test_install_galaxy_role_no_checks(runtime_tmp: Runtime) -> None:
   namespace: acme
 """
     )
-    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=2)
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
     result = runtime_tmp.exec(["ansible-galaxy", "list"])
     assert "- acme.foo," in result.stdout
     assert result.returncode == 0, result
@@ -676,10 +672,10 @@ def test_runtime_run(runtime: Runtime) -> None:
 
 def test_runtime_exec_cwd(runtime: Runtime) -> None:
     """Check if passing cwd works as expected."""
-    path = "/"
+    path = Path("/")
     result1 = runtime.exec(["pwd"], cwd=path)
     result2 = runtime.exec(["pwd"])
-    assert result1.stdout.rstrip() == path
+    assert result1.stdout.rstrip() == str(path)
     assert result1.stdout != result2.stdout
 
 
