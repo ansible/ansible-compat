@@ -1,9 +1,10 @@
 """Utilities for configuring ansible runtime environment."""
 import hashlib
 import os
+from pathlib import Path
 
 
-def get_cache_dir(project_dir: str) -> str:
+def get_cache_dir(project_dir: str) -> Path:
     """Compute cache directory to be used based on project path."""
     # we only use the basename instead of the full path in order to ensure that
     # we would use the same key regardless the location of the user home
@@ -17,4 +18,4 @@ def get_cache_dir(project_dir: str) -> str:
         + "/ansible-compat/"
         + cache_key
     )
-    return cache_dir
+    return Path(cache_dir)

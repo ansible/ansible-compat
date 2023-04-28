@@ -1,4 +1,5 @@
 """Ansible runtime environment manager."""
+import contextlib
 import importlib
 import json
 import logging
@@ -9,7 +10,7 @@ import shutil
 import subprocess
 import tempfile
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
 import packaging
 import subprocess_tee
@@ -50,7 +51,7 @@ class Runtime:
     """Ansible Runtime manager."""
 
     _version: Optional[packaging.version.Version] = None
-    cache_dir: Optional[str] = None
+    cache_dir: Optional[pathlib.Path] = None
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
@@ -63,7 +64,7 @@ class Runtime:
         min_required_version: Optional[str] = None,
         require_module: bool = False,
         max_retries: int = 0,
-        environ: Optional[Dict[str, str]] = None,
+        environ: Optional[dict[str, str]] = None,
     ) -> None:
         """Initialize Ansible runtime environment.
 
@@ -105,7 +106,7 @@ class Runtime:
 
         if not self.version_in_range(lower=min_required_version):
             raise RuntimeError(
-                f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
+                f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer.",
             )
         if require_module:
             self._ensure_module_available()
@@ -124,27 +125,25 @@ class Runtime:
     def _ensure_module_available(self) -> None:
         """Assure that Ansible Python module is installed and matching CLI version."""
         ansible_release_module = None
-        try:
+        with contextlib.suppress(ModuleNotFoundError, ImportError):
             ansible_release_module = importlib.import_module("ansible.release")
-        except (ModuleNotFoundError, ImportError):
-            pass
 
         if ansible_release_module is None:
             raise RuntimeError("Unable to find Ansible python module.")
 
         ansible_module_version = packaging.version.parse(
-            ansible_release_module.__version__
+            ansible_release_module.__version__,
         )
         if ansible_module_version != self.version:
             raise RuntimeError(
                 f"Ansible CLI ({self.version}) and python module"
                 f" ({ansible_module_version}) versions do not match. This "
-                "indicates a broken execution environment."
+                "indicates a broken execution environment.",
             )
 
         # For ansible 2.15+ we need to initialize the plugin loader
         # https://github.com/ansible/ansible-lint/issues/2945
-        if not Runtime.initialized:  # noqa: F823
+        if not Runtime.initialized:
             col_path = [f"{self.cache_dir}/collections"]
             if self.version >= Version("2.15.0.dev0"):
                 # pylint: disable=import-outside-toplevel,no-name-in-module
@@ -161,10 +160,10 @@ class Runtime:
                 # pylint: disable=protected-access
                 col_path += self.config.collections_paths
                 col_path += os.path.dirname(
-                    os.environ.get(ansible_collections_path(), ".")
+                    os.environ.get(ansible_collections_path(), "."),
                 ).split(":")
                 _AnsibleCollectionFinder(
-                    paths=col_path
+                    paths=col_path,
                 )._install()  # pylint: disable=protected-access
             Runtime.initialized = True
 
@@ -175,10 +174,10 @@ class Runtime:
 
     def exec(
         self,
-        args: Union[str, List[str]],
+        args: Union[str, list[str]],
         retry: bool = False,
         tee: bool = False,
-        env: Optional[Dict[str, str]] = None,
+        env: Optional[dict[str, str]] = None,
         cwd: Optional[str] = None,
     ) -> CompletedProcess:
         """Execute a command inside an Ansible environment.
@@ -231,7 +230,9 @@ class Runtime:
         raise MissingAnsibleError(msg, proc=proc)
 
     def version_in_range(
-        self, lower: Optional[str] = None, upper: Optional[str] = None
+        self,
+        lower: Optional[str] = None,
+        upper: Optional[str] = None,
     ) -> bool:
         """Check if Ansible version is inside a required range.
 
@@ -269,7 +270,7 @@ class Runtime:
         if matches and Version(matches[1]).is_prerelease:
             cmd.append("--pre")
 
-        cpaths: List[str] = self.config.collections_paths
+        cpaths: list[str] = self.config.collections_paths
         if destination and str(destination) not in cpaths:
             # we cannot use '-p' because it breaks galaxy ability to ignore already installed collections, so
             # we hack ansible_collections_path instead and inject our own path there.
@@ -289,7 +290,9 @@ class Runtime:
             raise InvalidPrerequisiteError(msg)
 
     def install_collection_from_disk(
-        self, path: str, destination: Optional[Union[str, pathlib.Path]] = None
+        self,
+        path: str,
+        destination: Optional[Union[str, pathlib.Path]] = None,
     ) -> None:
         """Build and install collection from a given disk path."""
         if not self.version_in_range(upper="2.11"):
@@ -319,7 +322,10 @@ class Runtime:
 
     # pylint: disable=too-many-branches
     def install_requirements(
-        self, requirement: str, retry: bool = False, offline: bool = False
+        self,
+        requirement: str,
+        retry: bool = False,
+        offline: bool = False,
     ) -> None:
         """Install dependencies from a requirements.yml.
 
@@ -332,7 +338,7 @@ class Runtime:
         reqs_yaml = yaml_from_file(requirement)
         if not isinstance(reqs_yaml, (dict, list)):
             raise InvalidPrerequisiteError(
-                f"{requirement} file is not a valid Ansible requirements file."
+                f"{requirement} file is not a valid Ansible requirements file.",
             )
 
         if isinstance(reqs_yaml, list) or "roles" in reqs_yaml:
@@ -348,7 +354,7 @@ class Runtime:
 
             if offline:
                 _logger.warning(
-                    "Skipped installing old role dependencies due to running in offline mode."
+                    "Skipped installing old role dependencies due to running in offline mode.",
                 )
             else:
                 _logger.info("Running %s", " ".join(cmd))
@@ -368,7 +374,7 @@ class Runtime:
             ]
             if offline:
                 _logger.warning(
-                    "Skipped installing collection dependencies due to running in offline mode."
+                    "Skipped installing collection dependencies due to running in offline mode.",
                 )
             else:
                 cmd.extend(["-r", requirement])
@@ -391,9 +397,9 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-    def prepare_environment(  # noqa: C901
+    def prepare_environment(
         self,
-        required_collections: Optional[Dict[str, str]] = None,
+        required_collections: Optional[dict[str, str]] = None,
         retry: bool = False,
         install_local: bool = False,
         offline: bool = False,
@@ -433,7 +439,7 @@ class Runtime:
                 if os.path.islink(colpath):
                     if os.path.realpath(colpath) == os.getcwd():
                         _logger.warning(
-                            "Found symlinked collection, skipping its installation."
+                            "Found symlinked collection, skipping its installation.",
                         )
                         return
                     _logger.warning(
@@ -445,7 +451,7 @@ class Runtime:
             # molecule scenario within a collection
             self.install_collection_from_disk(".", destination=destination)
         elif pathlib.Path().resolve().parent.name == "roles" and os.path.exists(
-            "../../galaxy.yml"
+            "../../galaxy.yml",
         ):
             # molecule scenario located within roles/<role-name>/molecule inside
             # a collection
@@ -453,10 +459,12 @@ class Runtime:
         else:
             # no collection, try to recognize and install a standalone role
             self._install_galaxy_role(
-                self.project_dir, role_name_check=role_name_check, ignore_errors=True
+                self.project_dir,
+                role_name_check=role_name_check,
+                ignore_errors=True,
             )
 
-    def require_collection(  # noqa: C901
+    def require_collection(
         self,
         name: str,
         version: Optional[str] = None,
@@ -471,13 +479,13 @@ class Runtime:
             ns, coll = name.split(".", 1)
         except ValueError as exc:
             raise InvalidPrerequisiteError(
-                f"Invalid collection name supplied: {name}%s"
+                f"Invalid collection name supplied: {name}%s",
             ) from exc
 
-        paths: List[str] = self.config.collections_paths
+        paths: list[str] = self.config.collections_paths
         if not paths or not isinstance(paths, list):
             raise InvalidPrerequisiteError(
-                f"Unable to determine ansible collection paths. ({paths})"
+                f"Unable to determine ansible collection paths. ({paths})",
             )
 
         if self.cache_dir:
@@ -488,7 +496,7 @@ class Runtime:
 
         for path in paths:
             collpath = os.path.expanduser(
-                os.path.join(path, "ansible_collections", ns, coll)
+                os.path.join(path, "ansible_collections", ns, coll),
             )
             if os.path.exists(collpath):
                 mpath = os.path.join(collpath, "MANIFEST.json")
@@ -497,10 +505,10 @@ class Runtime:
                     _logger.fatal(msg)
                     raise InvalidPrerequisiteError(msg)
 
-                with open(mpath, "r", encoding="utf-8") as f:
+                with open(mpath, encoding="utf-8") as f:
                     manifest = json.loads(f.read())
                     found_version = packaging.version.parse(
-                        manifest["collection_info"]["version"]
+                        manifest["collection_info"]["version"],
                     )
                     if version and found_version < packaging.version.parse(version):
                         if install:
@@ -523,9 +531,9 @@ class Runtime:
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""
         try:
-            library_paths: List[str] = self.config.default_module_path.copy()
-            roles_path: List[str] = self.config.default_roles_path.copy()
-            collections_path: List[str] = self.config.collections_paths.copy()
+            library_paths: list[str] = self.config.default_module_path.copy()
+            roles_path: list[str] = self.config.default_roles_path.copy()
+            collections_path: list[str] = self.config.collections_paths.copy()
         except AttributeError as exc:
             raise RuntimeError("Unexpected ansible configuration") from exc
 
@@ -541,7 +549,7 @@ class Runtime:
                 (collections_path, f"{self.cache_dir}/collections", False),
             ]
             if self.isolated
-            else []
+            else [],
         )
 
         for path_list, path, must_be_present in alterations_list:
@@ -574,7 +582,10 @@ class Runtime:
         return path
 
     def _install_galaxy_role(
-        self, project_dir: str, role_name_check: int = 0, ignore_errors: bool = False
+        self,
+        project_dir: str,
+        role_name_check: int = 0,
+        ignore_errors: bool = False,
     ) -> None:
         """Detect standalone galaxy role and installs it.
 
@@ -640,7 +651,7 @@ class Runtime:
             link_path,
         )
 
-    def _update_env(self, varname: str, value: List[str], default: str = "") -> None:
+    def _update_env(self, varname: str, value: list[str], default: str = "") -> None:
         """Update colon based environment variable if needed.
 
         New values are prepended to make sure they take precedence.
@@ -656,7 +667,7 @@ class Runtime:
             _logger.info("Set %s=%s", varname, value_str)
 
 
-def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
+def _get_role_fqrn(galaxy_infos: dict[str, Any], project_dir: str) -> str:
     """Compute role fqrn."""
     role_namespace = _get_galaxy_role_ns(galaxy_infos)
     role_name = _get_galaxy_role_name(galaxy_infos)
@@ -664,13 +675,14 @@ def _get_role_fqrn(galaxy_infos: Dict[str, Any], project_dir: str) -> str:
     if len(role_name) == 0:
         role_name = pathlib.Path(project_dir).absolute().name
         role_name = re.sub(r"(ansible-|ansible-role-)", "", role_name).split(
-            ".", maxsplit=2
+            ".",
+            maxsplit=2,
         )[-1]
 
     return f"{role_namespace}{role_name}"
 
 
-def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
+def _get_galaxy_role_ns(galaxy_infos: dict[str, Any]) -> str:
     """Compute role namespace from meta/main.yml, including trailing dot."""
     role_namespace = galaxy_infos.get("namespace", "")
     if len(role_namespace) == 0:
@@ -686,6 +698,6 @@ def _get_galaxy_role_ns(galaxy_infos: Dict[str, Any]) -> str:
     return role_namespace
 
 
-def _get_galaxy_role_name(galaxy_infos: Dict[str, Any]) -> str:
+def _get_galaxy_role_name(galaxy_infos: dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
     return galaxy_infos.get("role_name", "")
