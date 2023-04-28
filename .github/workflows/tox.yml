@@ -22,13 +22,14 @@ jobs:
         id: generate_matrix
         uses: coactions/dynamic-matrix@v1
         with:
+          min_python: "3.9"
           max_python: "3.11"
           other_names: |
             lint
             docs
             pkg
-            py38-ansible212
-            py38-ansible213
+            py39-ansible212
+            py39-ansible213
             py39-ansible214
             py311-devel
           platforms: linux,macos
