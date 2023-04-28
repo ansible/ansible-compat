@@ -335,7 +335,7 @@ class Runtime:
         """
         if not Path(requirement).exists():
             return
-        reqs_yaml = yaml_from_file(requirement)
+        reqs_yaml = yaml_from_file(Path(requirement))
         if not isinstance(reqs_yaml, (dict, list)):
             raise InvalidPrerequisiteError(
                 f"{requirement} file is not a valid Ansible requirements file.",
@@ -436,7 +436,7 @@ class Runtime:
             if destination:
                 # while function can return None, that would not break the logic
                 colpath = Path(
-                    f"{destination}/ansible_collections/{colpath_from_path(str(Path.cwd()))}"
+                    f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}"
                 )
                 if colpath.is_symlink():
                     if os.path.realpath(colpath) == Path.cwd():
@@ -611,7 +611,7 @@ class Runtime:
             if ignore_errors:
                 return
         else:
-            yaml = yaml_from_file(str(meta_filename))
+            yaml = yaml_from_file(meta_filename)
 
         if yaml and "galaxy_info" in yaml:
             galaxy_info = yaml["galaxy_info"]
