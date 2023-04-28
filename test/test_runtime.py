@@ -5,6 +5,7 @@ import os
 import pathlib
 import subprocess
 from contextlib import contextmanager
+from pathlib import Path
 from shutil import rmtree
 from typing import Any, Iterator, List, Type, Union
 
@@ -137,8 +138,8 @@ def test_runtime_install_role(
 ) -> None:
     """Checks that we can install roles."""
     caplog.set_level(logging.INFO)
-    project_dir = os.path.join(os.path.dirname(__file__), "roles", folder)
-    runtime = Runtime(isolated=isolated, project_dir=project_dir)
+    project_dir = Path(__file__).parent / "roles" / folder
+    runtime = Runtime(isolated=isolated, project_dir=str(project_dir))
     runtime.prepare_environment(install_local=True)
     # check that role appears as installed now
     result = runtime.exec(["ansible-galaxy", "list"])
@@ -148,7 +149,7 @@ def test_runtime_install_role(
         assert pathlib.Path(f"{runtime.cache_dir}/roles/{role_name}").is_symlink()
     else:
         assert pathlib.Path(
-            f"{os.path.expanduser(runtime.config.default_roles_path[0])}/{role_name}"
+            f"{Path(runtime.config.default_roles_path[0]).expanduser()}/{role_name}"
         ).is_symlink()
     runtime.clean()
     # also test that clean does not break when cache_dir is missing
@@ -175,25 +176,17 @@ def test_runtime_install_requirements_missing_file() -> None:
     ("file", "exc", "msg"),
     (
         (
-            "/dev/null",
+            Path("/dev/null"),
             InvalidPrerequisiteError,
             "file is not a valid Ansible requirements file",
         ),
         (
-            os.path.join(
-                os.path.dirname(__file__),
-                "assets",
-                "requirements-invalid-collection.yml",
-            ),
+            Path(__file__).parent / "assets" / "requirements-invalid-collection.yml",
             AnsibleCommandError,
             "Got 1 exit code while running: ansible-galaxy",
         ),
         (
-            os.path.join(
-                os.path.dirname(__file__),
-                "assets",
-                "requirements-invalid-role.yml",
-            ),
+            Path(__file__).parent / "assets" / "requirements-invalid-role.yml",
             AnsibleCommandError,
             "Got 1 exit code while running: ansible-galaxy",
         ),
@@ -201,7 +194,7 @@ def test_runtime_install_requirements_missing_file() -> None:
     ids=("empty", "invalid-collection", "invalid-role"),
 )
 def test_runtime_install_requirements_invalid_file(
-    file: str, exc: Type[Any], msg: str
+    file: Path, exc: Type[Any], msg: str
 ) -> None:
     """Check that invalid requirements file is raising."""
     runtime = Runtime()
@@ -209,28 +202,24 @@ def test_runtime_install_requirements_invalid_file(
         exc,
         match=msg,
     ):
-        runtime.install_requirements(file)
+        runtime.install_requirements(str(file))
 
 
 @contextmanager
-def remember_cwd(cwd: str) -> Iterator[None]:
-    """Context manager for chdir."""
-    curdir = os.getcwd()
+def cwd(path: Path) -> Iterator[None]:
+    """Context manager for temporary changing current working directory."""
+    old_pwd = Path.cwd()
+    os.chdir(path)
     try:
-        os.chdir(cwd)
         yield
     finally:
-        os.chdir(curdir)
+        os.chdir(old_pwd)
 
 
 def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> None:
     """Checks that the linter can auto-install requirements v1 when found."""
-    cwd = os.path.realpath(
-        os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "..", "examples", "reqs_v1"
-        )
-    )
-    with remember_cwd(cwd):
+    path = Path(__file__).parent.parent / "examples" / "reqs_v1"
+    with cwd(path):
         with caplog.at_level(logging.INFO):
             runtime.prepare_environment()
     assert any(
@@ -244,12 +233,8 @@ def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> N
 
 def test_prerun_reqs_v2(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> None:
     """Checks that the linter can auto-install requirements v2 when found."""
-    cwd = os.path.realpath(
-        os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "..", "examples", "reqs_v2"
-        )
-    )
-    with remember_cwd(cwd):
+    path = (Path(__file__).parent.parent / "examples" / "reqs_v2").resolve()
+    with cwd(path):
         with caplog.at_level(logging.INFO):
             runtime.prepare_environment()
         assert any(
@@ -414,8 +399,8 @@ def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
     """Check that require_collection raise with broken pre-existing collection."""
     runtime = Runtime(isolated=True, project_dir=str(tmp_path))
     dest_path: str = runtime.config.collections_paths[0]
-    dest = os.path.join(dest_path, "ansible_collections", "foo", "bar")
-    os.makedirs(dest, exist_ok=True)
+    dest = pathlib.Path(dest_path) / "ansible_collections" / "foo" / "bar"
+    dest.mkdir(parents=True, exist_ok=True)
     with pytest.raises(InvalidPrerequisiteError, match="missing MANIFEST.json"):
         runtime.require_collection("foo.bar")
 
@@ -634,10 +619,12 @@ def test_install_collection_from_disk(path: str, scenario: str) -> None:
     # ensure we do not have acme.google installed in user directory as it may
     # produce false positives
     rmtree(
-        os.path.expanduser("~/.ansible/collections/ansible_collections/acme/goodies"),
+        pathlib.Path(
+            "~/.ansible/collections/ansible_collections/acme/goodies"
+        ).expanduser(),
         ignore_errors=True,
     )
-    with remember_cwd(path):
+    with cwd(Path(path)):
         runtime = Runtime(isolated=True)
         # this should call install_collection_from_disk(".")
         runtime.prepare_environment(install_local=True)
@@ -650,7 +637,7 @@ def test_install_collection_from_disk(path: str, scenario: str) -> None:
 
 def test_install_collection_from_disk_fail() -> None:
     """Tests that we fail to install a broken collection."""
-    with remember_cwd("test/collections/acme.broken"):
+    with cwd(Path("test/collections/acme.broken")):
         runtime = Runtime(isolated=True)
         with pytest.raises(RuntimeError) as exc_info:
             runtime.prepare_environment(install_local=True)
@@ -669,7 +656,7 @@ def test_install_collection_from_disk_fail() -> None:
 
 def test_prepare_environment_offline_role() -> None:
     """Ensure that we can make use of offline roles."""
-    with remember_cwd("test/roles/acme.missing_deps"):
+    with cwd(Path("test/roles/acme.missing_deps")):
         runtime = Runtime(isolated=True)
         runtime.prepare_environment(install_local=True, offline=True)
 
@@ -685,10 +672,10 @@ def test_runtime_run(runtime: Runtime) -> None:
 
 def test_runtime_exec_cwd(runtime: Runtime) -> None:
     """Check if passing cwd works as expected."""
-    cwd = "/"
-    result1 = runtime.exec(["pwd"], cwd=cwd)
+    path = "/"
+    result1 = runtime.exec(["pwd"], cwd=path)
     result2 = runtime.exec(["pwd"])
-    assert result1.stdout.rstrip() == cwd
+    assert result1.stdout.rstrip() == path
     assert result1.stdout != result2.stdout
 
 
