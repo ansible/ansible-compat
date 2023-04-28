@@ -59,7 +59,7 @@ class Runtime:
     # pylint: disable=too-many-arguments
     def __init__(
         self,
-        project_dir: Optional[str] = None,
+        project_dir: Optional[Path] = None,
         isolated: bool = False,
         min_required_version: Optional[str] = None,
         require_module: bool = False,
@@ -101,7 +101,7 @@ class Runtime:
             self.environ["PYTHONWARNINGS"] = "ignore:Blowfish has been deprecated"
 
         if isolated:
-            self.cache_dir = get_cache_dir(self.project_dir)
+            self.cache_dir = get_cache_dir(str(self.project_dir))
         self.config = AnsibleConfig()
 
         if not self.version_in_range(lower=min_required_version):
@@ -462,7 +462,7 @@ class Runtime:
         else:
             # no collection, try to recognize and install a standalone role
             self._install_galaxy_role(
-                self.project_dir,
+                str(self.project_dir),
                 role_name_check=role_name_check,
                 ignore_errors=True,
             )

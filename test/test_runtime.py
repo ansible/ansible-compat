@@ -139,7 +139,7 @@ def test_runtime_install_role(
     """Checks that we can install roles."""
     caplog.set_level(logging.INFO)
     project_dir = Path(__file__).parent / "roles" / folder
-    runtime = Runtime(isolated=isolated, project_dir=str(project_dir))
+    runtime = Runtime(isolated=isolated, project_dir=project_dir)
     runtime.prepare_environment(install_local=True)
     # check that role appears as installed now
     result = runtime.exec(["ansible-galaxy", "list"])
@@ -161,7 +161,7 @@ def test_runtime_install_role(
 
 def test_prepare_environment_with_collections(tmp_path: pathlib.Path) -> None:
     """Check that collections are correctly installed."""
-    runtime = Runtime(isolated=True, project_dir=str(tmp_path))
+    runtime = Runtime(isolated=True, project_dir=tmp_path)
     runtime.prepare_environment(required_collections={"community.molecule": "0.1.0"})
 
 
@@ -397,7 +397,7 @@ def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
 
 def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
     """Check that require_collection raise with broken pre-existing collection."""
-    runtime = Runtime(isolated=True, project_dir=str(tmp_path))
+    runtime = Runtime(isolated=True, project_dir=tmp_path)
     dest_path: str = runtime.config.collections_paths[0]
     dest = pathlib.Path(dest_path) / "ansible_collections" / "foo" / "bar"
     dest.mkdir(parents=True, exist_ok=True)
@@ -459,14 +459,14 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
     pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").touch()
     # this should only raise a warning
-    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=1)
     # this should test the bypass role name check path
-    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
+    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=2)
     # this should raise an error
     with pytest.raises(
         InvalidPrerequisiteError, match="does not follow current galaxy requirements"
     ):
-        runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=0)
+        runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=0)
 
 
 def test_install_galaxy_role_unlink(
@@ -485,7 +485,7 @@ def test_install_galaxy_role_unlink(
 """,
         encoding="utf-8",
     )
-    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir)
+    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir))
     assert "symlink to current repository" in caplog.text
 
 
@@ -502,7 +502,7 @@ def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
     )
     # this should raise an error regardless the role_name_check value
     with pytest.raises(AnsibleCompatError, match="Role namespace must be string, not"):
-        runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+        runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=1)
 
 
 @pytest.mark.parametrize(
@@ -531,7 +531,7 @@ def test_install_galaxy_role_name_role_name_check_equals_to_1(
         encoding="utf-8",
     )
 
-    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=1)
     assert "Computed fully qualified role name of " in caplog.text
 
 
@@ -546,7 +546,7 @@ def test_install_galaxy_role_no_checks(runtime_tmp: Runtime) -> None:
   namespace: acme
 """
     )
-    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
+    runtime_tmp._install_galaxy_role(str(runtime_tmp.project_dir), role_name_check=2)
     result = runtime_tmp.exec(["ansible-galaxy", "list"])
     assert "- acme.foo," in result.stdout
     assert result.returncode == 0, result
