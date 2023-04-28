@@ -4,12 +4,12 @@ import importlib
 import json
 import logging
 import os
-import pathlib
 import re
 import shutil
 import subprocess
 import tempfile
 import warnings
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
 import packaging
@@ -51,7 +51,7 @@ class Runtime:
     """Ansible Runtime manager."""
 
     _version: Optional[packaging.version.Version] = None
-    cache_dir: Optional[pathlib.Path] = None
+    cache_dir: Optional[Path] = None
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
@@ -87,7 +87,7 @@ class Runtime:
         :param environ: Environment dictionary to use, if undefined
                         ``os.environ`` will be copied and used.
         """
-        self.project_dir = project_dir or os.getcwd()
+        self.project_dir = project_dir or str(Path.cwd())
         self.isolated = isolated
         self.max_retries = max_retries
         self.environ = environ or os.environ.copy()
@@ -159,7 +159,7 @@ class Runtime:
                 # noinspection PyProtectedMember
                 # pylint: disable=protected-access
                 col_path += self.config.collections_paths
-                col_path += os.path.dirname(
+                col_path += os.path.dirname(  # noqa: PTH120
                     os.environ.get(ansible_collections_path(), "."),
                 ).split(":")
                 _AnsibleCollectionFinder(
@@ -247,7 +247,7 @@ class Runtime:
     def install_collection(
         self,
         collection: str,
-        destination: Optional[Union[str, pathlib.Path]] = None,
+        destination: Optional[Union[str, Path]] = None,
         force: bool = False,
     ) -> None:
         """Install an Ansible collection.
@@ -278,7 +278,7 @@ class Runtime:
             cpaths.insert(0, str(destination))
         cmd.append(f"{collection}")
 
-        _logger.info("Running from %s : %s", os.getcwd(), " ".join(cmd))
+        _logger.info("Running from %s : %s", Path.cwd(), " ".join(cmd))
         run = self.exec(
             cmd,
             retry=True,
@@ -292,7 +292,7 @@ class Runtime:
     def install_collection_from_disk(
         self,
         path: str,
-        destination: Optional[Union[str, pathlib.Path]] = None,
+        destination: Optional[Union[str, Path]] = None,
     ) -> None:
         """Build and install collection from a given disk path."""
         if not self.version_in_range(upper="2.11"):
@@ -315,7 +315,7 @@ class Runtime:
                 raise AnsibleCommandError(run)
             for archive_file in os.listdir(tmp_dir):
                 self.install_collection(
-                    os.path.join(tmp_dir, archive_file),
+                    str(Path(tmp_dir) / archive_file),
                     destination=destination,
                     force=True,
                 )
@@ -333,7 +333,7 @@ class Runtime:
         :param retry: retry network operations on failures
         :param offline: bypass installation, may fail if requirements are not met.
         """
-        if not os.path.exists(requirement):
+        if not Path(requirement).exists():
             return
         reqs_yaml = yaml_from_file(requirement)
         if not isinstance(reqs_yaml, (dict, list)):
@@ -432,26 +432,29 @@ class Runtime:
         if not install_local:
             return
 
-        if os.path.exists("galaxy.yml"):
+        if Path("galaxy.yml").exists():
             if destination:
                 # while function can return None, that would not break the logic
-                colpath = f"{destination}/ansible_collections/{colpath_from_path(os.getcwd())}"
-                if os.path.islink(colpath):
-                    if os.path.realpath(colpath) == os.getcwd():
+                colpath = Path(
+                    f"{destination}/ansible_collections/{colpath_from_path(str(Path.cwd()))}"
+                )
+                if colpath.is_symlink():
+                    if os.path.realpath(colpath) == Path.cwd():
                         _logger.warning(
                             "Found symlinked collection, skipping its installation.",
                         )
                         return
                     _logger.warning(
                         "Collection is symlinked, but not pointing to %s directory, so we will remove it.",
-                        os.getcwd(),
+                        Path.cwd(),
                     )
-                    os.unlink(colpath)
+                    colpath.unlink()
 
             # molecule scenario within a collection
             self.install_collection_from_disk(".", destination=destination)
-        elif pathlib.Path().resolve().parent.name == "roles" and os.path.exists(
-            "../../galaxy.yml",
+        elif (
+            Path().resolve().parent.name == "roles"
+            and Path("../../galaxy.yml").exists()
         ):
             # molecule scenario located within roles/<role-name>/molecule inside
             # a collection
@@ -495,17 +498,15 @@ class Runtime:
             paths.insert(0, f"{self.cache_dir}/collections")  # pylint: disable=E1101
 
         for path in paths:
-            collpath = os.path.expanduser(
-                os.path.join(path, "ansible_collections", ns, coll),
-            )
-            if os.path.exists(collpath):
-                mpath = os.path.join(collpath, "MANIFEST.json")
-                if not os.path.exists(mpath):
+            collpath = Path(path) / "ansible_collections" / ns / coll
+            if collpath.exists():
+                mpath = collpath / "MANIFEST.json"
+                if not mpath.exists():
                     msg = f"Found collection at '{collpath}' but missing MANIFEST.json, cannot get info."
                     _logger.fatal(msg)
                     raise InvalidPrerequisiteError(msg)
 
-                with open(mpath, encoding="utf-8") as f:
+                with mpath.open(encoding="utf-8") as f:
                     manifest = json.loads(f.read())
                     found_version = packaging.version.parse(
                         manifest["collection_info"]["version"],
@@ -552,13 +553,14 @@ class Runtime:
             else [],
         )
 
-        for path_list, path, must_be_present in alterations_list:
-            if not os.path.exists(path):
+        for path_list, path_, must_be_present in alterations_list:
+            path = Path(path_)
+            if not path.exists():
                 if must_be_present:
                     continue
-                os.makedirs(path, exist_ok=True)
+                path.mkdir(parents=True, exist_ok=True)
             if path not in path_list:
-                path_list.insert(0, path)
+                path_list.insert(0, str(path))
 
         if library_paths != self.config.DEFAULT_MODULE_PATH:
             self._update_env("ANSIBLE_LIBRARY", library_paths)
@@ -567,7 +569,7 @@ class Runtime:
         if roles_path != self.config.default_roles_path:
             self._update_env("ANSIBLE_ROLES_PATH", roles_path)
 
-    def _get_roles_path(self) -> pathlib.Path:
+    def _get_roles_path(self) -> Path:
         """Return roles installation path.
 
         If `self.isolated` is set to `True`, `self.cache_dir` would be
@@ -576,9 +578,9 @@ class Runtime:
         `default_roles_path`.
         """
         if self.cache_dir:
-            path = pathlib.Path(f"{self.cache_dir}/roles")
+            path = Path(f"{self.cache_dir}/roles")
         else:
-            path = pathlib.Path(os.path.expanduser(self.config.default_roles_path[0]))
+            path = Path(self.config.default_roles_path[0]).expanduser()
         return path
 
     def _install_galaxy_role(
@@ -603,13 +605,13 @@ class Runtime:
         """
         yaml = None
         galaxy_info = {}
-        meta_filename = os.path.join(project_dir, "meta", "main.yml")
+        meta_filename = Path(project_dir) / "meta" / "main.yml"
 
-        if not os.path.exists(meta_filename):
+        if not meta_filename.exists():
             if ignore_errors:
                 return
         else:
-            yaml = yaml_from_file(meta_filename)
+            yaml = yaml_from_file(str(meta_filename))
 
         if yaml and "galaxy_info" in yaml:
             galaxy_info = yaml["galaxy_info"]
@@ -631,15 +633,15 @@ class Runtime:
                 role_name = _get_galaxy_role_name(galaxy_info)
                 fqrn = f"{role_namespace}{role_name}"
             else:
-                fqrn = pathlib.Path(project_dir).absolute().name
+                fqrn = Path(project_dir).absolute().name
         path = self._get_roles_path()
         path.mkdir(parents=True, exist_ok=True)
         link_path = path / fqrn
         # despite documentation stating that is_file() reports true for symlinks,
         # it appears that is_dir() reports true instead, so we rely on exists().
-        target = pathlib.Path(project_dir).absolute()
+        target = Path(project_dir).absolute()
         if not link_path.exists() or (
-            link_path.is_symlink() and os.readlink(link_path) != str(target)
+            link_path.is_symlink() and link_path.readlink() != target
         ):
             # must call unlink before checking exists because a broken
             # link reports as not existing and we want to repair it
@@ -673,7 +675,7 @@ def _get_role_fqrn(galaxy_infos: dict[str, Any], project_dir: str) -> str:
     role_name = _get_galaxy_role_name(galaxy_infos)
 
     if len(role_name) == 0:
-        role_name = pathlib.Path(project_dir).absolute().name
+        role_name = Path(project_dir).absolute().name
         role_name = re.sub(r"(ansible-|ansible-role-)", "", role_name).split(
             ".",
             maxsplit=2,

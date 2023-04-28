@@ -114,7 +114,7 @@ disable = [
 filterwarnings = ["error"]
 
 [tool.ruff]
-select = ["PT"]
+select = ["PT", "PTH"]
 ignore = [
   "E501", # we use black
 
