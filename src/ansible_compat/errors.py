@@ -41,7 +41,7 @@ class MissingAnsibleError(AnsibleCompatError):
 
     def __init__(
         self,
-        message: Optional[str] = None,
+        message: Optional[str] = "Unable to find a working copy of ansible executable.",
         proc: Optional[Any] = None,
     ) -> None:
         """."""

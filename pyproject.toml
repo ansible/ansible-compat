@@ -128,7 +128,6 @@ ignore = [
   "ARG",
   "B018", # Found useless expression. Either assign it to a variable or remove it.
   "C901",
-  "EM",
   "FBT001",
   "FBT002", # Boolean default value in function definition
   "PGH003",
@@ -141,6 +140,9 @@ ignore = [
   "TRY",
 ]
 target-version = "py39"
+
+[tool.ruff.pydocstyle]
+convention = "pep257"
 
 [tool.ruff.flake8-pytest-style]
 parametrize-values-type = "tuple"

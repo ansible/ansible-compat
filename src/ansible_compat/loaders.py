@@ -24,8 +24,7 @@ def colpath_from_path(path: Path) -> str | None:
         galaxy = yaml_from_file(galaxy_file)
         for k in ("namespace", "name"):
             if k not in galaxy:
-                raise InvalidPrerequisiteError(
-                    f"{galaxy_file} is missing the following mandatory field {k}",
-                )
+                msg = f"{galaxy_file} is missing the following mandatory field {k}"
+                raise InvalidPrerequisiteError(msg)
         return f"{galaxy['namespace']}/{galaxy['name']}"
     return None

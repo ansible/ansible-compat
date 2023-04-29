@@ -105,9 +105,8 @@ class Runtime:
         self.config = AnsibleConfig()
 
         if not self.version_in_range(lower=min_required_version):
-            raise RuntimeError(
-                f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer.",
-            )
+            msg = f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
+            raise RuntimeError(msg)
         if require_module:
             self._ensure_module_available()
 
@@ -129,17 +128,15 @@ class Runtime:
             ansible_release_module = importlib.import_module("ansible.release")
 
         if ansible_release_module is None:
-            raise RuntimeError("Unable to find Ansible python module.")
+            msg = "Unable to find Ansible python module."
+            raise RuntimeError(msg)
 
         ansible_module_version = packaging.version.parse(
             ansible_release_module.__version__,
         )
         if ansible_module_version != self.version:
-            raise RuntimeError(
-                f"Ansible CLI ({self.version}) and python module"
-                f" ({ansible_module_version}) versions do not match. This "
-                "indicates a broken execution environment.",
-            )
+            msg = f"Ansible CLI ({self.version}) and python module ({ansible_module_version}) versions do not match. This indicates a broken execution environment."
+            raise RuntimeError(msg)
 
         # For ansible 2.15+ we need to initialize the plugin loader
         # https://github.com/ansible/ansible-lint/issues/2945
@@ -337,9 +334,8 @@ class Runtime:
             return
         reqs_yaml = yaml_from_file(Path(requirement))
         if not isinstance(reqs_yaml, (dict, list)):
-            raise InvalidPrerequisiteError(
-                f"{requirement} file is not a valid Ansible requirements file.",
-            )
+            msg = f"{requirement} file is not a valid Ansible requirements file."
+            raise InvalidPrerequisiteError(msg)
 
         if isinstance(reqs_yaml, list) or "roles" in reqs_yaml:
             cmd = [
@@ -483,14 +479,16 @@ class Runtime:
         try:
             ns, coll = name.split(".", 1)
         except ValueError as exc:
+            msg = f"Invalid collection name supplied: {name}%s"
             raise InvalidPrerequisiteError(
-                f"Invalid collection name supplied: {name}%s",
+                msg,
             ) from exc
 
         paths: list[str] = self.config.collections_paths
         if not paths or not isinstance(paths, list):
+            msg = f"Unable to determine ansible collection paths. ({paths})"
             raise InvalidPrerequisiteError(
-                f"Unable to determine ansible collection paths. ({paths})",
+                msg,
             )
 
         if self.cache_dir:
@@ -538,7 +536,8 @@ class Runtime:
             roles_path: list[str] = self.config.default_roles_path.copy()
             collections_path: list[str] = self.config.collections_paths.copy()
         except AttributeError as exc:
-            raise RuntimeError("Unexpected ansible configuration") from exc
+            msg = "Unexpected ansible configuration"
+            raise RuntimeError(msg) from exc
 
         alterations_list = [
             (library_paths, "plugins/modules", True),
@@ -692,7 +691,8 @@ def _get_galaxy_role_ns(galaxy_infos: dict[str, Any]) -> str:
     if len(role_namespace) == 0:
         role_namespace = galaxy_infos.get("author", "")
     if not isinstance(role_namespace, str):
-        raise AnsibleCompatError(f"Role namespace must be string, not {role_namespace}")
+        msg = f"Role namespace must be string, not {role_namespace}"
+        raise AnsibleCompatError(msg)
     # if there's a space in the name space, it's likely author name
     # and not the galaxy login, so act as if there was no namespace
     if not role_namespace or re.match(r"^\w+ \w+", role_namespace):
