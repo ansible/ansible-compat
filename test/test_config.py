@@ -29,7 +29,7 @@ def test_config() -> None:
     assert config.data["ACTION_WARNINGS"] == config.ACTION_WARNINGS
 
     with pytest.raises(AttributeError):
-        print(config.THIS_DOES_NOT_EXIST)
+        _ = config.THIS_DOES_NOT_EXIST
 
 
 def test_config_with_dump() -> None:
