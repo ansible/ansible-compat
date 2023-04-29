@@ -136,8 +136,6 @@ ignore = [
   "S506", # Probable use of unsafe loader `FullLoader`
   "SIM108",
   "SLF001",
-  "T201",
-  "TRY",
 ]
 target-version = "py39"
 

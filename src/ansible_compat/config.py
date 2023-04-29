@@ -469,13 +469,6 @@ class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
         """Allow users to run deeepcopy on Config."""
         return AnsibleConfig(data=self.data)
 
-    def _dump_config_attrs(self) -> None:  # pragma: no cover
-        """Dump config attributes using pytest typed format."""
-        for item in sorted(self.data):
-            name = item.lower()
-            kind = self.data[item].__class__.__name__
-            print(f"{name}: {kind}")
-
 
 __all__ = [
     "ansible_collections_path",

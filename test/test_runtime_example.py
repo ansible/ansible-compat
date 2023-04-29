@@ -9,9 +9,9 @@ def test_runtime_example() -> None:
     runtime = Runtime(isolated=True, max_retries=3)
 
     # Print Ansible core version
-    print(runtime.version)  # 2.9.10 (Version object)
+    _ = runtime.version  # 2.9.10 (Version object)
     # Get configuration info from runtime
-    print(runtime.config.collections_path)
+    _ = runtime.config.collections_path
 
     # Detect if current project is a collection and install its requirements
     runtime.prepare_environment(install_local=True)  # will retry 3 times if needed
