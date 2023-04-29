@@ -1,7 +1,8 @@
 """Utils for JSON Schema validation."""
 import json
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping, Sequence, Union
+from typing import Any, Union
 
 import jsonschema
 from jsonschema.validators import validator_for
@@ -81,15 +82,16 @@ class JsonSchemaError:
 
 
 def validate(
-    schema: Union[str, Mapping[str, Any]], data: Dict[str, Any]
-) -> List[JsonSchemaError]:
+    schema: Union[str, Mapping[str, Any]],
+    data: dict[str, Any],
+) -> list[JsonSchemaError]:
     """Validate some data against a JSON schema.
 
     :param schema: the JSON schema to use for validation
     :param data: The data to validate
     :returns: Any errors encountered
     """
-    errors: List[JsonSchemaError] = []
+    errors: list[JsonSchemaError] = []
 
     if isinstance(schema, str):
         schema = json.loads(schema)

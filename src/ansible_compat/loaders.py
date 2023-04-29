@@ -1,12 +1,14 @@
 """Utilities for loading various files."""
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
 from ansible_compat.errors import InvalidPrerequisiteError
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def yaml_from_file(path: Path) -> Any:
@@ -23,7 +25,7 @@ def colpath_from_path(path: Path) -> str | None:
         for k in ("namespace", "name"):
             if k not in galaxy:
                 raise InvalidPrerequisiteError(
-                    f"{galaxy_file} is missing the following mandatory field {k}"
+                    f"{galaxy_file} is missing the following mandatory field {k}",
                 )
         return f"{galaxy['namespace']}/{galaxy['name']}"
     return None

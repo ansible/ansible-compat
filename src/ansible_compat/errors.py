@@ -13,7 +13,9 @@ class AnsibleCompatError(RuntimeError):
     code = 1  # generic error
 
     def __init__(
-        self, message: Optional[str] = None, proc: Optional[Any] = None
+        self,
+        message: Optional[str] = None,
+        proc: Optional[Any] = None,
     ) -> None:
         """Construct generic library exception."""
         super().__init__(message)
@@ -38,7 +40,9 @@ class MissingAnsibleError(AnsibleCompatError):
     code = ANSIBLE_MISSING_RC
 
     def __init__(
-        self, message: Optional[str] = None, proc: Optional[Any] = None
+        self,
+        message: Optional[str] = None,
+        proc: Optional[Any] = None,
     ) -> None:
         """."""
         super().__init__(message)

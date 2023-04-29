@@ -4,10 +4,11 @@ import logging
 import os
 import pathlib
 import subprocess
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Iterator, List, Type, Union
+from typing import Any, Union
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -49,7 +50,7 @@ def test_runtime_missing_ansible_module(monkeypatch: MonkeyPatch) -> None:
         """Class to raise an exception."""
 
         def __init__(self, *args: Any, **kwargs: Any) -> None:
-            raise ModuleNotFoundError()
+            raise ModuleNotFoundError
 
     monkeypatch.setattr("importlib.import_module", RaiseException)
 
@@ -87,11 +88,12 @@ def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
         autospec=True,
     )
     patched.side_effect = InvalidPrerequisiteError(
-        "Unable to parse ansible cli version"
+        "Unable to parse ansible cli version",
     )
     runtime = Runtime()
     with pytest.raises(
-        InvalidPrerequisiteError, match="Unable to parse ansible cli version"
+        InvalidPrerequisiteError,
+        match="Unable to parse ansible cli version",
     ):
         runtime.version  # pylint: disable=pointless-statement
 
@@ -101,13 +103,17 @@ def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
     mocker.patch(
         "ansible_compat.runtime.Runtime.exec",
         return_value=CompletedProcess(
-            ["x"], returncode=123, stdout="oops", stderr="some error"
+            ["x"],
+            returncode=123,
+            stdout="oops",
+            stderr="some error",
         ),
         autospec=True,
     )
     runtime = Runtime()
     with pytest.raises(
-        RuntimeError, match="Unable to find a working copy of ansible executable."
+        RuntimeError,
+        match="Unable to find a working copy of ansible executable.",
     ):
         runtime.version  # pylint: disable=pointless-statement
 
@@ -149,7 +155,7 @@ def test_runtime_install_role(
         assert pathlib.Path(f"{runtime.cache_dir}/roles/{role_name}").is_symlink()
     else:
         assert pathlib.Path(
-            f"{Path(runtime.config.default_roles_path[0]).expanduser()}/{role_name}"
+            f"{Path(runtime.config.default_roles_path[0]).expanduser()}/{role_name}",
         ).is_symlink()
     runtime.clean()
     # also test that clean does not break when cache_dir is missing
@@ -194,7 +200,9 @@ def test_runtime_install_requirements_missing_file() -> None:
     ids=("empty", "invalid-collection", "invalid-role"),
 )
 def test_runtime_install_requirements_invalid_file(
-    file: Path, exc: Type[Any], msg: str
+    file: Path,
+    exc: type[Any],
+    msg: str,
 ) -> None:
     """Check that invalid requirements file is raising."""
     runtime = Runtime()
@@ -219,9 +227,8 @@ def cwd(path: Path) -> Iterator[None]:
 def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> None:
     """Checks that the linter can auto-install requirements v1 when found."""
     path = Path(__file__).parent.parent / "examples" / "reqs_v1"
-    with cwd(path):
-        with caplog.at_level(logging.INFO):
-            runtime.prepare_environment()
+    with cwd(path), caplog.at_level(logging.INFO):
+        runtime.prepare_environment()
     assert any(
         msg.startswith("Running ansible-galaxy role install") for msg in caplog.messages
     )
@@ -286,7 +293,9 @@ def test__update_env_no_default_no_value(monkeypatch: MonkeyPatch) -> None:
     ),
 )
 def test__update_env_no_old_value_no_default(
-    monkeypatch: MonkeyPatch, value: List[str], result: str
+    monkeypatch: MonkeyPatch,
+    value: list[str],
+    result: str,
 ) -> None:
     """Values are concatenated using : as the separator."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
@@ -305,7 +314,10 @@ def test__update_env_no_old_value_no_default(
     ),
 )
 def test__update_env_no_old_value(
-    monkeypatch: MonkeyPatch, default: str, value: List[str], result: str
+    monkeypatch: MonkeyPatch,
+    default: str,
+    value: list[str],
+    result: str,
 ) -> None:
     """Values are appended to default value."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
@@ -324,7 +336,10 @@ def test__update_env_no_old_value(
     ),
 )
 def test__update_env_no_default(
-    monkeypatch: MonkeyPatch, old_value: str, value: List[str], result: str
+    monkeypatch: MonkeyPatch,
+    old_value: str,
+    value: list[str],
+    result: str,
 ) -> None:
     """Values are appended to preexisting value."""
     monkeypatch.setenv("DUMMY_VAR", old_value)
@@ -348,7 +363,7 @@ def test__update_env(
     monkeypatch: MonkeyPatch,
     old_value: str,
     default: str,  # pylint: disable=unused-argument
-    value: List[str],
+    value: list[str],
     result: str,
 ) -> None:
     """Defaults are ignored when preexisting value is present."""
@@ -370,7 +385,7 @@ def test_require_collection_wrong_version(runtime: Runtime) -> None:
             "examples/reqs_v2/community-molecule-0.1.0.tar.gz",
             "-p",
             "~/.ansible/collections",
-        ]
+        ],
     )
     with pytest.raises(InvalidPrerequisiteError) as pytest_wrapped_e:
         runtime.require_collection("community.molecule", "9999.9.9")
@@ -381,7 +396,8 @@ def test_require_collection_wrong_version(runtime: Runtime) -> None:
 def test_require_collection_invalid_name(runtime: Runtime) -> None:
     """Check that require_collection raise with invalid collection name."""
     with pytest.raises(
-        InvalidPrerequisiteError, match="Invalid collection name supplied:"
+        InvalidPrerequisiteError,
+        match="Invalid collection name supplied:",
     ):
         runtime.require_collection("that-is-invalid")
 
@@ -390,7 +406,8 @@ def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
     """Check that require_collection raise with invalid collections path."""
     runtime.config.collections_paths = "/that/is/invalid"  # type: ignore
     with pytest.raises(
-        InvalidPrerequisiteError, match="Unable to determine ansible collection paths"
+        InvalidPrerequisiteError,
+        match="Unable to determine ansible collection paths",
     ):
         runtime.require_collection("community.molecule")
 
@@ -420,7 +437,10 @@ def test_require_collection(runtime_tmp: Runtime) -> None:
     ids=("a", "b", "c"),
 )
 def test_require_collection_missing(
-    name: str, version: str, install: bool, runtime: Runtime
+    name: str,
+    version: str,
+    install: bool,
+    runtime: Runtime,
 ) -> None:
     """Tests behaviour of require_collection, missing case."""
     with pytest.raises(AnsibleCompatError) as pytest_wrapped_e:
@@ -437,7 +457,8 @@ def test_install_collection(runtime: Runtime) -> None:
 def test_install_collection_dest(runtime: Runtime, tmp_path: pathlib.Path) -> None:
     """Check that valid collection to custom destination passes."""
     runtime.install_collection(
-        "examples/reqs_v2/community-molecule-0.1.0.tar.gz", destination=tmp_path
+        "examples/reqs_v2/community-molecule-0.1.0.tar.gz",
+        destination=tmp_path,
     )
     expected_file = (
         tmp_path / "ansible_collections" / "community" / "molecule" / "MANIFEST.json"
@@ -464,13 +485,15 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
     # this should raise an error
     with pytest.raises(
-        InvalidPrerequisiteError, match="does not follow current galaxy requirements"
+        InvalidPrerequisiteError,
+        match="does not follow current galaxy requirements",
     ):
         runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=0)
 
 
 def test_install_galaxy_role_unlink(
-    runtime_tmp: Runtime, caplog: pytest.LogCaptureFixture
+    runtime_tmp: Runtime,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test ability to unlink incorrect symlinked roles."""
     caplog.set_level(logging.INFO)
@@ -491,14 +514,13 @@ def test_install_galaxy_role_unlink(
 
 def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
     """Check install role with bad namespace in galaxy info."""
-    # pathlib.Path(f'{runtime_tmp.project_dir}/galaxy.yml').touch()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").write_text(
         """galaxy_info:
   role_name: foo
   author: bar
   namespace: ["xxx"]
-"""
+""",
     )
     # this should raise an error regardless the role_name_check value
     with pytest.raises(AnsibleCompatError, match="Role namespace must be string, not"):
@@ -544,7 +566,7 @@ def test_install_galaxy_role_no_checks(runtime_tmp: Runtime) -> None:
   role_name: foo
   author: bar
   namespace: acme
-"""
+""",
     )
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
     result = runtime_tmp.exec(["ansible-galaxy", "list"])
@@ -599,7 +621,9 @@ def test_runtime_env_ansible_library(monkeypatch: MonkeyPatch) -> None:
     ids=("1", "2", "3", "4", "5"),
 )
 def test_runtime_version_in_range(
-    lower: Union[str, None], upper: Union[str, None], expected: bool
+    lower: Union[str, None],
+    upper: Union[str, None],
+    expected: bool,
 ) -> None:
     """Validate functioning of version_in_range."""
     runtime = Runtime()
@@ -620,7 +644,7 @@ def test_install_collection_from_disk(path: str, scenario: str) -> None:
     # produce false positives
     rmtree(
         pathlib.Path(
-            "~/.ansible/collections/ansible_collections/acme/goodies"
+            "~/.ansible/collections/ansible_collections/acme/goodies",
         ).expanduser(),
         ignore_errors=True,
     )
@@ -650,7 +674,7 @@ def test_install_collection_from_disk_fail() -> None:
             InvalidPrerequisiteError,
         )
         assert exc_info.match(
-            "(is missing the following mandatory|Got 1 exit code while running: ansible-galaxy collection build)"
+            "(is missing the following mandatory|Got 1 exit code while running: ansible-galaxy collection build)",
         )
 
 

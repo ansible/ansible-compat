@@ -26,7 +26,7 @@ def test_config() -> None:
     assert config.collections_paths == config.collections_path
 
     # check if we can access the special data member
-    assert config.ACTION_WARNINGS == config.data["ACTION_WARNINGS"]
+    assert config.data["ACTION_WARNINGS"] == config.ACTION_WARNINGS
 
     with pytest.raises(AttributeError):
         print(config.THIS_DOES_NOT_EXIST)
@@ -53,7 +53,8 @@ def test_config_copy() -> None:
 def test_parse_ansible_version_fail() -> None:
     """Checks that parse_ansible_version raises an error on invalid input."""
     with pytest.raises(
-        InvalidPrerequisiteError, match="Unable to parse ansible cli version"
+        InvalidPrerequisiteError,
+        match="Unable to parse ansible cli version",
     ):
         parse_ansible_version("foo")
 
