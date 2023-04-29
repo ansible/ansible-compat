@@ -71,7 +71,7 @@ class JsonSchemaError:
         """Return whether the current object is less than the other."""
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return bool(self._hash_key < other._hash_key)
+        return bool(self._hash_key < other._hash_key)  # noqa: SLF001
 
     def to_friendly(self) -> str:
         """Provide a friendly explanation of the error.
