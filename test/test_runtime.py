@@ -121,7 +121,7 @@ def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
 def test_runtime_prepare_ansible_paths_validation() -> None:
     """Check that we validate collection_path."""
     runtime = Runtime()
-    runtime.config.collections_paths = "invalid-value"  # type: ignore
+    runtime.config.collections_paths = "invalid-value"  # type: ignore[assignment]
     with pytest.raises(RuntimeError, match="Unexpected ansible configuration"):
         runtime._prepare_ansible_paths()
 
@@ -404,7 +404,7 @@ def test_require_collection_invalid_name(runtime: Runtime) -> None:
 
 def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
     """Check that require_collection raise with invalid collections path."""
-    runtime.config.collections_paths = "/that/is/invalid"  # type: ignore
+    runtime.config.collections_paths = "/that/is/invalid"  # type: ignore[assignment]
     with pytest.raises(
         InvalidPrerequisiteError,
         match="Unable to determine ansible collection paths",

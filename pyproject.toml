@@ -128,7 +128,6 @@ ignore = [
   "ARG",
   "FBT001",
   "FBT002", # Boolean default value in function definition
-  "PGH003",
   "S101",
   "S506", # Probable use of unsafe loader `FullLoader`
 
