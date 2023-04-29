@@ -57,7 +57,7 @@ class Runtime:
     initialized: bool = False
 
     # pylint: disable=too-many-arguments
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         project_dir: Optional[Path] = None,
         isolated: bool = False,
@@ -159,7 +159,7 @@ class Runtime:
                 col_path += os.path.dirname(  # noqa: PTH120
                     os.environ.get(ansible_collections_path(), "."),
                 ).split(":")
-                _AnsibleCollectionFinder(
+                _AnsibleCollectionFinder(  # noqa: SLF001
                     paths=col_path,
                 )._install()  # pylint: disable=protected-access
             Runtime.initialized = True
@@ -169,7 +169,7 @@ class Runtime:
         if self.cache_dir:
             shutil.rmtree(self.cache_dir, ignore_errors=True)
 
-    def exec(
+    def exec(  # noqa: PLR0913
         self,
         args: Union[str, list[str]],
         retry: bool = False,
@@ -318,7 +318,7 @@ class Runtime:
                 )
 
     # pylint: disable=too-many-branches
-    def install_requirements(
+    def install_requirements(  # noqa: C901,PLR0912
         self,
         requirement: Path,
         retry: bool = False,
@@ -393,7 +393,7 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-    def prepare_environment(
+    def prepare_environment(  # noqa: C901,PLR0913
         self,
         required_collections: Optional[dict[str, str]] = None,
         retry: bool = False,
@@ -627,14 +627,13 @@ class Runtime:
                 else:
                     _logger.error(msg)
                     raise InvalidPrerequisiteError(msg)
-        else:
+        elif "role_name" in galaxy_info:
             # when 'role-name' is in skip_list, we stick to plain role names
-            if "role_name" in galaxy_info:
-                role_namespace = _get_galaxy_role_ns(galaxy_info)
-                role_name = _get_galaxy_role_name(galaxy_info)
-                fqrn = f"{role_namespace}{role_name}"
-            else:
-                fqrn = Path(project_dir).absolute().name
+            role_namespace = _get_galaxy_role_ns(galaxy_info)
+            role_name = _get_galaxy_role_name(galaxy_info)
+            fqrn = f"{role_namespace}{role_name}"
+        else:
+            fqrn = Path(project_dir).absolute().name
         path = self._get_roles_path()
         path.mkdir(parents=True, exist_ok=True)
         link_path = path / fqrn

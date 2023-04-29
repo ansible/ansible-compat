@@ -5,19 +5,13 @@ import os
 import re
 import subprocess
 from collections import UserDict
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from packaging.version import Version
 
 from ansible_compat.constants import ANSIBLE_MIN_VERSION
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
 from ansible_compat.ports import cache
-
-if TYPE_CHECKING:
-    # https://github.com/PyCQA/pylint/issues/3285
-    _UserDict = UserDict[str, object]  # pylint: disable=unsubscriptable-object
-else:
-    _UserDict = UserDict
 
 
 # do not use lru_cache here, as environment can change between calls
@@ -65,7 +59,7 @@ def ansible_version(version: str = "") -> Version:
     return parse_ansible_version(proc.stdout)
 
 
-class AnsibleConfig(_UserDict):  # pylint: disable=too-many-ancestors
+class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestors
     """Interface to query Ansible configuration.
 
     This should allow user to access everything provided by `ansible-config dump` without having to parse the data himself.

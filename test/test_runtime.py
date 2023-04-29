@@ -95,7 +95,7 @@ def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
         InvalidPrerequisiteError,
         match="Unable to parse ansible cli version",
     ):
-        runtime.version  # pylint: disable=pointless-statement
+        _ = runtime.version  # pylint: disable=pointless-statement
 
 
 def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
@@ -115,7 +115,7 @@ def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
         RuntimeError,
         match="Unable to find a working copy of ansible executable.",
     ):
-        runtime.version  # pylint: disable=pointless-statement
+        _ = runtime.version  # pylint: disable=pointless-statement
 
 
 def test_runtime_prepare_ansible_paths_validation() -> None:

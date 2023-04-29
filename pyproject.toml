@@ -93,7 +93,7 @@ good-names = [
   "ns", # namespace
   "ex",
   "Run",
-  "_"
+  "_",
 ]
 
 [tool.pylint.IMPORTS]
@@ -126,16 +126,12 @@ ignore = [
   "ANN101",
   "ANN401",
   "ARG",
-  "B018", # Found useless expression. Either assign it to a variable or remove it.
-  "C901",
   "FBT001",
   "FBT002", # Boolean default value in function definition
   "PGH003",
-  "PLR",
   "S101",
   "S506", # Probable use of unsafe loader `FullLoader`
-  "SIM108",
-  "SLF001",
+
 ]
 target-version = "py39"
 
@@ -147,6 +143,9 @@ parametrize-values-type = "tuple"
 
 [tool.ruff.isort]
 known-first-party = ["ansible_compat"]
+
+[tool.ruff.per-file-ignores]
+"test/**/*.py" = ["SLF001"]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
