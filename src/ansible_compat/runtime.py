@@ -57,9 +57,10 @@ class Runtime:
     initialized: bool = False
 
     # pylint: disable=too-many-arguments
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         project_dir: Optional[Path] = None,
+        *,
         isolated: bool = False,
         min_required_version: Optional[str] = None,
         require_module: bool = False,
@@ -114,7 +115,7 @@ class Runtime:
         from ansible.utils.display import Display
 
         # pylint: disable=unused-argument
-        def warning(self: Display, msg: str, formatted: bool = False) -> None:
+        def warning(self: Display, msg: str, *, formatted: bool = False) -> None:
             """Override ansible.utils.display.Display.warning to avoid printing warnings."""
             warnings.warn(msg, category=AnsibleWarning, stacklevel=2)
 
@@ -169,9 +170,10 @@ class Runtime:
         if self.cache_dir:
             shutil.rmtree(self.cache_dir, ignore_errors=True)
 
-    def exec(  # noqa: PLR0913
+    def exec(
         self,
         args: Union[str, list[str]],
+        *,
         retry: bool = False,
         tee: bool = False,
         env: Optional[dict[str, str]] = None,
@@ -244,6 +246,7 @@ class Runtime:
     def install_collection(
         self,
         collection: Union[str, Path],
+        *,
         destination: Optional[Path] = None,
         force: bool = False,
     ) -> None:
@@ -321,6 +324,7 @@ class Runtime:
     def install_requirements(  # noqa: C901,PLR0912
         self,
         requirement: Path,
+        *,
         retry: bool = False,
         offline: bool = False,
     ) -> None:
@@ -393,9 +397,10 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-    def prepare_environment(  # noqa: C901,PLR0913
+    def prepare_environment(  # noqa: C901
         self,
         required_collections: Optional[dict[str, str]] = None,
+        *,
         retry: bool = False,
         install_local: bool = False,
         offline: bool = False,
@@ -469,6 +474,7 @@ class Runtime:
         self,
         name: str,
         version: Optional[str] = None,
+        *,
         install: bool = True,
     ) -> None:
         """Check if a minimal collection version is present or exits.
@@ -588,6 +594,7 @@ class Runtime:
         self,
         project_dir: Path,
         role_name_check: int = 0,
+        *,
         ignore_errors: bool = False,
     ) -> None:
         """Detect standalone galaxy role and installs it.
