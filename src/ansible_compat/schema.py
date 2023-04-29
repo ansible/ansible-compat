@@ -97,7 +97,8 @@ def validate(
         schema = json.loads(schema)
     try:
         if not isinstance(schema, Mapping):
-            raise jsonschema.SchemaError("Invalid schema, must be a mapping")
+            msg = "Invalid schema, must be a mapping"
+            raise jsonschema.SchemaError(msg)
         validator = validator_for(schema)
         validator.check_schema(schema)
     except jsonschema.SchemaError as exc:
