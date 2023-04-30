@@ -49,7 +49,11 @@ def test_runtime_missing_ansible_module(monkeypatch: MonkeyPatch) -> None:
     class RaiseException:
         """Class to raise an exception."""
 
-        def __init__(self, *args: Any, **kwargs: Any) -> None:
+        def __init__(
+            self,
+            *args: Any,  # noqa: ARG002,ANN401
+            **kwargs: Any,  # noqa: ARG002,ANN401
+        ) -> None:
             raise ModuleNotFoundError
 
     monkeypatch.setattr("importlib.import_module", RaiseException)
@@ -362,7 +366,7 @@ def test__update_env_no_default(
 def test__update_env(
     monkeypatch: MonkeyPatch,
     old_value: str,
-    default: str,  # pylint: disable=unused-argument
+    default: str,  # pylint: disable=unused-argument # noqa: ARG001
     value: list[str],
     result: str,
 ) -> None:
