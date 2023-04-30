@@ -42,6 +42,7 @@ dependencies = [
   "PyYAML",
   "subprocess-tee>=0.4.1",
   "jsonschema>=4.6.0",
+  "typing-extensions>=4.5.0;python_version<'3.10'",
 ]
 
 [project.urls]
@@ -117,15 +118,13 @@ filterwarnings = ["error"]
 select = ["ALL"]
 ignore = [
   # Disabled on purpose:
-  "E501", # we use black
-  "RET504", # Unnecessary variable assignment before `return` statement
+  "ANN101", # Missing type annotation for `self` in method
   "D203", # incompatible with D211
   "D213", # incompatible with D212
+  "E501", # we use black
+  "RET504", # Unnecessary variable assignment before `return` statement
   # Temporary disabled during adoption:
   "A003", # Class attribute `exec` is shadowing a python builtin
-  "ANN101",
-  "ANN401",
-  "ARG",
   "S506", # Probable use of unsafe loader `FullLoader`
   "S607", # Starting a process with a partial executable path
 

@@ -2,10 +2,12 @@
 import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Union
 
 import jsonschema
 from jsonschema.validators import validator_for
+
+from ansible_compat.types import JSON
 
 
 def to_path(schema_path: Sequence[Union[str, int]]) -> str:
@@ -56,8 +58,8 @@ class JsonSchemaError:
 
 
 def validate(
-    schema: Union[str, Mapping[str, Any]],
-    data: dict[str, Any],
+    schema: JSON,
+    data: JSON,
 ) -> list[JsonSchemaError]:
     """Validate some data against a JSON schema.
 

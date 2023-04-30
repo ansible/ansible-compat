@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def yaml_from_file(path: Path) -> Any:
+def yaml_from_file(path: Path) -> Any:  # noqa: ANN401
     """Return a loaded YAML file."""
     with path.open(encoding="utf-8") as content:
         return yaml.load(content, Loader=yaml.FullLoader)

@@ -1,11 +1,16 @@
 """Tests for schema utilities."""
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
 from ansible_compat.schema import JsonSchemaError, json_path, validate
+
+if TYPE_CHECKING:
+    from ansible_compat.types import JSON
 
 expected_results = [
     JsonSchemaError(
@@ -31,16 +36,16 @@ expected_results = [
 ]
 
 
-def json_from_asset(file_name: str) -> Any:
+def json_from_asset(file_name: str) -> JSON:
     """Load a json file from disk."""
     file = Path(__file__).parent / file_name
     with file.open(encoding="utf-8") as f:
-        return json.load(f)
+        return json.load(f)  # type: ignore[no-any-return]
 
 
-def jsonify(data: Any) -> Any:
+def jsonify(data: Any) -> JSON:  # noqa: ANN401
     """Convert object in JSON data structure."""
-    return json.loads(json.dumps(data, default=vars, sort_keys=True))
+    return json.loads(json.dumps(data, default=vars, sort_keys=True))  # type: ignore[no-any-return]
 
 
 @pytest.mark.parametrize("index", range(1))
