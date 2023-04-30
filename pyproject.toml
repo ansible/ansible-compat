@@ -127,6 +127,7 @@ ignore = [
   "ANN401",
   "ARG",
   "S506", # Probable use of unsafe loader `FullLoader`
+  "S607", # Starting a process with a partial executable path
 
 ]
 target-version = "py39"
