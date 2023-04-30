@@ -40,7 +40,7 @@ def json_from_asset(file_name: str) -> Any:
 
 def jsonify(data: Any) -> Any:
     """Convert object in JSON data structure."""
-    return json.loads(json.dumps(data, default=vars))
+    return json.loads(json.dumps(data, default=vars, sort_keys=True))
 
 
 @pytest.mark.parametrize("index", range(1))
