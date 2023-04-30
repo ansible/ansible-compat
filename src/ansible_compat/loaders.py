@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def yaml_from_file(path: Path) -> Any:  # noqa: ANN401
     """Return a loaded YAML file."""
     with path.open(encoding="utf-8") as content:
-        return yaml.load(content, Loader=yaml.FullLoader)
+        return yaml.load(content, Loader=yaml.SafeLoader)
 
 
 def colpath_from_path(path: Path) -> str | None:

@@ -125,7 +125,6 @@ ignore = [
   "RET504", # Unnecessary variable assignment before `return` statement
   # Temporary disabled during adoption:
   "A003", # Class attribute `exec` is shadowing a python builtin
-  "S506", # Probable use of unsafe loader `FullLoader`
   "S607", # Starting a process with a partial executable path
 
 ]
