@@ -105,7 +105,7 @@ def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
 def test_runtime_version_fail_cli(mocker: MockerFixture) -> None:
     """Tests for failure to detect Ansible version."""
     mocker.patch(
-        "ansible_compat.runtime.Runtime.exec",
+        "ansible_compat.runtime.Runtime.run",
         return_value=CompletedProcess(
             ["x"],
             returncode=123,
@@ -152,7 +152,7 @@ def test_runtime_install_role(
     runtime = Runtime(isolated=isolated, project_dir=project_dir)
     runtime.prepare_environment(install_local=True)
     # check that role appears as installed now
-    result = runtime.exec(["ansible-galaxy", "list"])
+    result = runtime.run(["ansible-galaxy", "list"])
     assert result.returncode == 0, result
     assert role_name in result.stdout
     if isolated:
@@ -573,7 +573,7 @@ def test_install_galaxy_role_no_checks(runtime_tmp: Runtime) -> None:
 """,
     )
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
-    result = runtime_tmp.exec(["ansible-galaxy", "list"])
+    result = runtime_tmp.run(["ansible-galaxy", "list"])
     assert "- acme.foo," in result.stdout
     assert result.returncode == 0, result
 
@@ -658,7 +658,7 @@ def test_install_collection_from_disk(path: str, scenario: str) -> None:
         runtime.prepare_environment(install_local=True)
         # that molecule converge playbook can be used without molecule and
         # should validate that the installed collection is available.
-        result = runtime.exec(["ansible-playbook", f"molecule/{scenario}/converge.yml"])
+        result = runtime.run(["ansible-playbook", f"molecule/{scenario}/converge.yml"])
         assert result.returncode == 0, result.stdout
         runtime.clean()
 
@@ -691,8 +691,8 @@ def test_prepare_environment_offline_role() -> None:
 
 def test_runtime_run(runtime: Runtime) -> None:
     """Check if tee and non tee mode return same kind of results."""
-    result1 = runtime.exec(["seq", "10"])
-    result2 = runtime.exec(["seq", "10"], tee=True)
+    result1 = runtime.run(["seq", "10"])
+    result2 = runtime.run(["seq", "10"], tee=True)
     assert result1.returncode == result2.returncode
     assert result1.stderr == result2.stderr
     assert result1.stdout == result2.stdout
@@ -701,20 +701,20 @@ def test_runtime_run(runtime: Runtime) -> None:
 def test_runtime_exec_cwd(runtime: Runtime) -> None:
     """Check if passing cwd works as expected."""
     path = Path("/")
-    result1 = runtime.exec(["pwd"], cwd=path)
-    result2 = runtime.exec(["pwd"])
+    result1 = runtime.run(["pwd"], cwd=path)
+    result2 = runtime.run(["pwd"])
     assert result1.stdout.rstrip() == str(path)
     assert result1.stdout != result2.stdout
 
 
 def test_runtime_exec_env(runtime: Runtime) -> None:
     """Check if passing env works."""
-    result = runtime.exec(["printenv", "FOO"])
+    result = runtime.run(["printenv", "FOO"])
     assert not result.stdout
 
-    result = runtime.exec(["printenv", "FOO"], env={"FOO": "bar"})
+    result = runtime.run(["printenv", "FOO"], env={"FOO": "bar"})
     assert result.stdout.rstrip() == "bar"
 
     runtime.environ["FOO"] = "bar"
-    result = runtime.exec(["printenv", "FOO"])
+    result = runtime.run(["printenv", "FOO"])
     assert result.stdout.rstrip() == "bar"

@@ -175,7 +175,7 @@ class Runtime:
         if self.cache_dir:
             shutil.rmtree(self.cache_dir, ignore_errors=True)
 
-    def exec(
+    def run(
         self,
         args: Union[str, list[str]],
         *,
@@ -225,7 +225,7 @@ class Runtime:
         if self._version:
             return self._version
 
-        proc = self.exec(["ansible", "--version"])
+        proc = self.run(["ansible", "--version"])
         if proc.returncode == 0:
             self._version = parse_ansible_version(proc.stdout)
             return self._version
@@ -284,7 +284,7 @@ class Runtime:
         cmd.append(f"{collection}")
 
         _logger.info("Running from %s : %s", Path.cwd(), " ".join(cmd))
-        run = self.exec(
+        run = self.run(
             cmd,
             retry=True,
             env={**self.environ, ansible_collections_path(): ":".join(cpaths)},
@@ -314,7 +314,7 @@ class Runtime:
                 str(path),
             ]
             _logger.info("Running %s", " ".join(cmd))
-            run = self.exec(cmd, retry=False)
+            run = self.run(cmd, retry=False)
             if run.returncode != 0:
                 _logger.error(run.stdout)
                 raise AnsibleCommandError(run)
@@ -364,7 +364,7 @@ class Runtime:
             else:
                 _logger.info("Running %s", " ".join(cmd))
 
-                result = self.exec(cmd, retry=retry)
+                result = self.run(cmd, retry=retry)
                 if result.returncode != 0:
                     _logger.error(result.stdout)
                     raise AnsibleCommandError(result)
@@ -392,7 +392,7 @@ class Runtime:
                         # pylint: disable=no-member
                         cpaths.insert(0, dest_path)
                 _logger.info("Running %s", " ".join(cmd))
-                result = self.exec(
+                result = self.run(
                     cmd,
                     retry=retry,
                     env={**os.environ, "ANSIBLE_COLLECTIONS_PATH": ":".join(cpaths)},
