@@ -48,7 +48,7 @@ def ansible_version(version: str = "") -> Version:
         return Version(version)
 
     proc = subprocess.run(
-        ["ansible", "--version"],
+        ["ansible", "--version"],  # noqa: S603
         text=True,
         check=False,
         capture_output=True,
@@ -416,7 +416,7 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
             # Avoid possible ANSI garbage
             env["ANSIBLE_FORCE_COLOR"] = "0"
             config_dump = subprocess.check_output(
-                ["ansible-config", "dump"],
+                ["ansible-config", "dump"],  # noqa: S603
                 universal_newlines=True,
                 env=env,
             )
