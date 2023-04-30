@@ -32,46 +32,20 @@ def json_path(absolute_path: Sequence[Union[str, int]]) -> str:
     return path
 
 
-@dataclass
+@dataclass(order=True)
 class JsonSchemaError:
     # pylint: disable=too-many-instance-attributes
     """Data structure to hold a json schema validation error."""
 
-    message: str
+    # order of attributes below is important for sorting
+    schema_path: str
     data_path: str
     json_path: str
-    schema_path: str
-    relative_schema: str
+    message: str
     expected: Union[bool, int, str]
+    relative_schema: str
     validator: str
     found: str
-
-    @property
-    def _hash_key(self) -> Any:
-        # line attr is knowingly excluded, as dict is not hashable
-        return (
-            self.schema_path,
-            self.data_path,
-            self.json_path,
-            self.message,
-            self.expected,
-        )
-
-    def __hash__(self) -> int:
-        """Return a hash value of the instance."""
-        return hash(self._hash_key)
-
-    def __eq__(self, other: object) -> bool:
-        """Identify whether the other object represents the same rule match."""
-        if not isinstance(other, self.__class__):
-            return NotImplemented
-        return self.__hash__() == other.__hash__()
-
-    def __lt__(self, other: object) -> bool:
-        """Return whether the current object is less than the other."""
-        if not isinstance(other, self.__class__):
-            return NotImplemented
-        return bool(self._hash_key < other._hash_key)  # noqa: SLF001
 
     def to_friendly(self) -> str:
         """Provide a friendly explanation of the error.
