@@ -20,5 +20,5 @@ def test_runtime_example() -> None:
     runtime.install_collection("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
 
     # Execute a command
-    result = runtime.exec(["ansible-doc", "--list"])
+    result = runtime.run(["ansible-doc", "--list"])
     assert result.returncode == 0
