@@ -402,7 +402,7 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-    def prepare_environment(  # noqa: C901
+    def prepare_environment(
         self,
         required_collections: Optional[dict[str, str]] = None,
         *,

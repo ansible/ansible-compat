@@ -493,7 +493,8 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
         match="does not follow current galaxy requirements",
     ):
         runtime_tmp._install_galaxy_role(
-            str(runtime_tmp.project_dir), role_name_check=0
+            str(runtime_tmp.project_dir),
+            role_name_check=0,
         )
 
 
@@ -531,7 +532,8 @@ def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
     # this should raise an error regardless the role_name_check value
     with pytest.raises(AnsibleCompatError, match="Role namespace must be string, not"):
         runtime_tmp._install_galaxy_role(
-            str(runtime_tmp.project_dir), role_name_check=1
+            str(runtime_tmp.project_dir),
+            role_name_check=1,
         )
 
 
