@@ -17,6 +17,12 @@ from ansible_compat.ports import cache
 # do not use lru_cache here, as environment can change between calls
 def ansible_collections_path() -> str:
     """Return collection path variable for current version of Ansible."""
+    for env_var in [
+        "ANSIBLE_COLLECTIONS_PATH",
+        "ANSIBLE_COLLECTIONS_PATHS",
+    ]:
+        if env_var in os.environ:
+            return env_var
     return "ANSIBLE_COLLECTIONS_PATH"
 
 
