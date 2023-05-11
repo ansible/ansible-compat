@@ -122,7 +122,12 @@ class Runtime:
             formatted: bool = False,  # noqa: ARG001
         ) -> None:
             """Override ansible.utils.display.Display.warning to avoid printing warnings."""
-            warnings.warn(msg, category=AnsibleWarning, stacklevel=2)
+            warnings.warn(
+                message=msg,
+                category=AnsibleWarning,
+                stacklevel=2,
+                source={"msg": msg},
+            )
 
         # Monkey patch ansible warning in order to use warnings module.
         Display.warning = warning
