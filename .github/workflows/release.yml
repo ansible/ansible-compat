@@ -14,6 +14,8 @@ jobs:
     # unable to use environment with uses/with, basically cannot reuse release pipelines
     environment: release
     runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
 
     env:
       FORCE_COLOR: 1
@@ -35,5 +37,3 @@ jobs:
         run: python -m tox -e pkg
       - name: Publish to pypi.org
         uses: pypa/gh-action-pypi-publish@unstable/v1
-        with:
-          password: ${{ secrets.pypi_password }}
