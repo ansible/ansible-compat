@@ -637,7 +637,12 @@ def test_runtime_version_in_range(
 @pytest.mark.parametrize(
     ("path", "scenario", "expected_collections"),
     (
-        pytest.param("test/collections/acme.goodies", "default", [], id="normal"),
+        pytest.param(
+            "test/collections/acme.goodies",
+            "default",
+            ["ansible.posix"],
+            id="normal",
+        ),
         pytest.param(
             "test/collections/acme.goodies/roles/baz",
             "deep_scenario",
