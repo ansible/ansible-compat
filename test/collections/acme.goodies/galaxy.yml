@@ -6,7 +6,8 @@ authors:
   - Red Hat
 description: Sample collection to use with molecule
 dependencies:
-  community.molecule: ">=0.1.0"
+  community.molecule: ">=0.1.0" # used to also test '=>' condition
+  ansible.utils: "*" # used to also test '*'
 build_ignore:
   - "*.egg-info"
   - .DS_Store

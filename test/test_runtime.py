@@ -640,7 +640,11 @@ def test_runtime_version_in_range(
         pytest.param(
             "test/collections/acme.goodies",
             "default",
-            ["ansible.posix"],
+            [
+                "ansible.posix",  # from tests/requirements.yml
+                "ansible.utils",  # from galaxy.yml
+                "community.molecule",  # from galaxy.yml
+            ],
             id="normal",
         ),
         pytest.param(
