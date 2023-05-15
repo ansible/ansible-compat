@@ -635,14 +635,22 @@ def test_runtime_version_in_range(
 
 
 @pytest.mark.parametrize(
-    ("path", "scenario"),
+    ("path", "scenario", "expected_collections"),
     (
-        ("test/collections/acme.goodies", "default"),
-        ("test/collections/acme.goodies/roles/baz", "deep_scenario"),
+        pytest.param("test/collections/acme.goodies", "default", [], id="normal"),
+        pytest.param(
+            "test/collections/acme.goodies/roles/baz",
+            "deep_scenario",
+            ["community.molecule"],
+            id="deep",
+        ),
     ),
-    ids=("normal", "deep"),
 )
-def test_install_collection_from_disk(path: str, scenario: str) -> None:
+def test_install_collection_from_disk(
+    path: str,
+    scenario: str,
+    expected_collections: list[str],
+) -> None:
     """Tests ability to install a local collection."""
     # ensure we do not have acme.google installed in user directory as it may
     # produce false positives
@@ -660,6 +668,11 @@ def test_install_collection_from_disk(path: str, scenario: str) -> None:
         # should validate that the installed collection is available.
         result = runtime.run(["ansible-playbook", f"molecule/{scenario}/converge.yml"])
         assert result.returncode == 0, result.stdout
+        runtime.load_collections()
+        for collection_name in expected_collections:
+            assert (
+                collection_name in runtime.collections
+            ), f"{collection_name} not found in {runtime.collections.keys()}"
         runtime.clean()
 
 

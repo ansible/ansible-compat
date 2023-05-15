@@ -26,3 +26,5 @@ Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
 
 As an alternative, you can add 'role-name' to either skip_list or warn_list.
 """
+
+RC_ANSIBLE_OPTIONS_ERROR = 5

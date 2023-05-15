@@ -5,6 +5,8 @@ readme: README.md
 authors:
   - Red Hat
 description: Sample collection to use with molecule
+dependencies:
+  community.molecule: ">=0.1.0"
 build_ignore:
   - "*.egg-info"
   - .DS_Store
