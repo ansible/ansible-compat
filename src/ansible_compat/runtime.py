@@ -9,19 +9,21 @@ import shutil
 import subprocess
 import tempfile
 import warnings
+from collections import OrderedDict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
-import packaging
 import subprocess_tee
 from packaging.version import Version
+from packaging.version import parse as parse_version
 
 from ansible_compat.config import (
     AnsibleConfig,
     ansible_collections_path,
     parse_ansible_version,
 )
-from ansible_compat.constants import MSG_INVALID_FQRL
+from ansible_compat.constants import MSG_INVALID_FQRL, RC_ANSIBLE_OPTIONS_ERROR
 from ansible_compat.errors import (
     AnsibleCommandError,
     AnsibleCompatError,
@@ -47,16 +49,26 @@ class AnsibleWarning(Warning):
     """Warnings related to Ansible runtime."""
 
 
+@dataclass
+class Collection:
+    """Container for Ansible collection information."""
+
+    name: str
+    version: str
+    path: Path
+
+
+# pylint: disable=too-many-instance-attributes
 class Runtime:
     """Ansible Runtime manager."""
 
-    _version: Optional[packaging.version.Version] = None
+    _version: Optional[Version] = None
+    collections: OrderedDict[str, Collection] = OrderedDict()
     cache_dir: Optional[Path] = None
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         project_dir: Optional[Path] = None,
@@ -132,6 +144,43 @@ class Runtime:
         # Monkey patch ansible warning in order to use warnings module.
         Display.warning = warning
 
+    def load_collections(self) -> None:
+        """Load collection data."""
+        self.collections = OrderedDict()
+        no_collections_msg = "None of the provided paths were usable"
+
+        # Workaround for https://github.com/ansible/ansible/issues/73127
+        Path("~/.ansible/collections").expanduser().mkdir(exist_ok=True, parents=True)
+
+        proc = self.run(["ansible-galaxy", "collection", "list", "--format=json"])
+        if proc.returncode == RC_ANSIBLE_OPTIONS_ERROR and (
+            no_collections_msg in proc.stdout or no_collections_msg in proc.stderr
+        ):
+            _logger.debug("Ansible reported no installed collections at all.")
+            return
+        if proc.returncode != 0:
+            _logger.error(proc)
+            msg = f"Unable to list collections: {proc}"
+            raise RuntimeError(msg)
+        data = json.loads(proc.stdout)
+        if not isinstance(data, dict):
+            msg = f"Unexpected collection data, {data}"
+            raise TypeError(msg)
+        for path in data:
+            for collection, collection_info in data[path].items():
+                if not isinstance(collection, str):
+                    msg = f"Unexpected collection data, {collection}"
+                    raise TypeError(msg)
+                if not isinstance(collection_info, dict):
+                    msg = f"Unexpected collection data, {collection_info}"
+                    raise TypeError(msg)
+
+                self.collections[collection] = Collection(
+                    name=collection,
+                    version=collection_info["version"],
+                    path=path,
+                )
+
     def _ensure_module_available(self) -> None:
         """Assure that Ansible Python module is installed and matching CLI version."""
         ansible_release_module = None
@@ -142,7 +191,7 @@ class Runtime:
             msg = "Unable to find Ansible python module."
             raise RuntimeError(msg)
 
-        ansible_module_version = packaging.version.parse(
+        ansible_module_version = parse_version(
             ansible_release_module.__version__,
         )
         if ansible_module_version != self.version:
@@ -180,7 +229,7 @@ class Runtime:
         if self.cache_dir:
             shutil.rmtree(self.cache_dir, ignore_errors=True)
 
-    def run(
+    def run(  # ruff: disable=PLR0913
         self,
         args: Union[str, list[str]],
         *,
@@ -220,7 +269,7 @@ class Runtime:
         return result
 
     @property
-    def version(self) -> packaging.version.Version:
+    def version(self) -> Version:
         """Return current Version object for Ansible.
 
         If version is not mentioned, it returns current version as detected.
@@ -247,9 +296,9 @@ class Runtime:
 
         The lower limit is inclusive and the upper one exclusive.
         """
-        if lower and self.version < packaging.version.Version(lower):
+        if lower and self.version < Version(lower):
             return False
-        if upper and self.version >= packaging.version.Version(upper):
+        if upper and self.version >= Version(upper):
             return False
         return True
 
@@ -331,7 +380,7 @@ class Runtime:
                 )
 
     # pylint: disable=too-many-branches
-    def install_requirements(  # noqa: C901,PLR0912
+    def install_requirements(  # noqa: C901
         self,
         requirement: Path,
         *,
@@ -432,6 +481,21 @@ class Runtime:
         ]:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
+        galaxy_path = Path("galaxy.yml")
+        if galaxy_path.exists():
+            data = yaml_from_file(galaxy_path)
+            if isinstance(data, dict) and "dependencies" in data:
+                for name, required_version in data["dependencies"].items():
+                    _logger.info(
+                        "Provisioning collection %s:%s from galaxy.yml",
+                        name,
+                        required_version,
+                    )
+                    self.install_collection(
+                        f"{name}:{required_version}",
+                        destination=destination,
+                    )
+
         if self.cache_dir:
             destination = self.cache_dir / "collections"
         for name, min_version in required_collections.items():
@@ -479,6 +543,8 @@ class Runtime:
                 role_name_check=role_name_check,
                 ignore_errors=True,
             )
+        # reload collections
+        self.load_collections()
 
     def require_collection(
         self,
@@ -524,10 +590,10 @@ class Runtime:
 
                 with mpath.open(encoding="utf-8") as f:
                     manifest = json.loads(f.read())
-                    found_version = packaging.version.parse(
+                    found_version = parse_version(
                         manifest["collection_info"]["version"],
                     )
-                    if version and found_version < packaging.version.parse(version):
+                    if version and found_version < parse_version(version):
                         if install:
                             self.install_collection(f"{name}:>={version}")
                             self.require_collection(name, version, install=False)
