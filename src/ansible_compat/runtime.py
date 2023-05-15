@@ -16,7 +16,6 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
 import subprocess_tee
 from packaging.version import Version
-from packaging.version import parse as parse_version
 
 from ansible_compat.config import (
     AnsibleConfig,
@@ -56,6 +55,18 @@ class Collection:
     name: str
     version: str
     path: Path
+
+
+class CollectionVersion(Version):
+    """Collection version."""
+
+    def __init__(self, version: str) -> None:
+        """Initialize collection version."""
+        # As packaging Version class does not support wildcard, we convert it
+        # to "0", as this being the smallest version possible.
+        if version == "*":
+            version = "0"
+        super().__init__(version)
 
 
 # pylint: disable=too-many-instance-attributes
@@ -191,7 +202,7 @@ class Runtime:
             msg = "Unable to find Ansible python module."
             raise RuntimeError(msg)
 
-        ansible_module_version = parse_version(
+        ansible_module_version = Version(
             ansible_release_module.__version__,
         )
         if ansible_module_version != self.version:
@@ -326,7 +337,7 @@ class Runtime:
         # if the range requires a pre-release, we need to manuall add the --pre
         # flag when needed.
         matches = version_re.search(str(collection))
-        if matches and Version(matches[1]).is_prerelease:
+        if matches and CollectionVersion(matches[1]).is_prerelease:
             cmd.append("--pre")
 
         cpaths: list[str] = self.config.collections_paths
@@ -592,10 +603,10 @@ class Runtime:
 
                 with mpath.open(encoding="utf-8") as f:
                     manifest = json.loads(f.read())
-                    found_version = parse_version(
+                    found_version = CollectionVersion(
                         manifest["collection_info"]["version"],
                     )
-                    if version and found_version < parse_version(version):
+                    if version and found_version < CollectionVersion(version):
                         if install:
                             self.install_collection(f"{name}:>={version}")
                             self.require_collection(name, version, install=False)
