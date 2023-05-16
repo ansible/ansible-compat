@@ -740,3 +740,29 @@ def test_runtime_exec_env(runtime: Runtime) -> None:
     runtime.environ["FOO"] = "bar"
     result = runtime.run(["printenv", "FOO"])
     assert result.stdout.rstrip() == "bar"
+
+
+@pytest.mark.parametrize(
+    ("path", "expected_rc"),
+    (
+        pytest.param(
+            Path("test/assets/layouts/legacy_fail"),
+            2,
+            id="legacy_fail",
+        ),
+        pytest.param(
+            Path("test/assets/layouts/legacy_pass"),
+            0,
+            id="legacy_pass",
+        ),
+    ),
+)
+def test_bootstrap(path: Path, expected_rc: int) -> None:
+    """Tests bootrapping feature."""
+    with cwd(path):
+        result = subprocess.run(
+            ["ansible-bootstrap", "--isolated"],  # noqa: S603
+            check=False,
+            text=True,
+        )
+        assert result.returncode == expected_rc

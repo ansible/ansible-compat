@@ -55,6 +55,9 @@ changelog = "https://github.com/ansible/ansible-compat/releases"
 docs = ["argparse-manpage", "black", "mkdocs-ansible[lock]>=0.1.2"]
 test = ["coverage", "pip-tools", "pytest>=7.2.0", "pytest-mock", "pytest-plus"]
 
+[project.scripts]
+ansible-bootstrap = "ansible_compat.runtime:bootstrap"
+
 [tool.coverage.run]
 source = ["src"]
 branch = true
@@ -125,6 +128,7 @@ ignore = [
   "D211",
   "D213", # incompatible with D212
   "E501", # we use black
+  "ERA001", # affects code commenting during development
   "RET504", # Unnecessary variable assignment before `return` statement
   # Temporary disabled during adoption:
   "S607", # Starting a process with a partial executable path

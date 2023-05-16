@@ -1,4 +1,5 @@
 """Ansible runtime environment manager."""
+import argparse
 import contextlib
 import importlib
 import json
@@ -7,7 +8,9 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+import time
 import warnings
 from collections import OrderedDict
 from dataclasses import dataclass
@@ -800,3 +803,43 @@ def _get_galaxy_role_ns(galaxy_infos: dict[str, Any]) -> str:
 def _get_galaxy_role_name(galaxy_infos: dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
     return galaxy_infos.get("role_name", "")
+
+
+def bootstrap() -> None:
+    """Detect and install requirements for current project."""
+    parser = argparse.ArgumentParser()
+
+    listing_group = parser.add_mutually_exclusive_group()
+    listing_group.add_argument(
+        "--isolated",
+        dest="isolated",
+        default=False,
+        action="store_true",
+        help="Bootstrap dependencies in an isolated location.",
+    )
+    parser.add_argument(
+        "-v",
+        dest="verbosity",
+        action="count",
+        help="Increase verbosity level (-vv for more)",
+        default=0,
+    )
+    options = parser.parse_args(sys.argv[1:])
+
+    start = time.time()
+    try:
+        runtime = Runtime(isolated=options.isolated)
+        runtime.prepare_environment()
+        duration = time.time() - start
+        if options.verbosity > 0:
+            print(  # noqa: T201
+                f"Bootstrap finished in {duration:.2f} seconds",
+                file=sys.stderr,
+            )
+    except AnsibleCommandError as exc:
+        print(exc, file=sys.stderr)  # noqa: T201
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    bootstrap()
