@@ -31,6 +31,7 @@ jobs:
             py39-ansible212
             py39-ansible213
             py39-ansible214
+            py39-ansible215
             py311-devel
           platforms: linux,macos
           macos: minmax

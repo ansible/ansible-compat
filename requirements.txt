@@ -4,7 +4,7 @@
 #
 #    pip-compile --extra=docs --extra=test --output-file=requirements.txt --resolver=backtracking --strip-extras --unsafe-package=ansible-core --unsafe-package=resolvelib --unsafe-package=typing_extensions pyproject.toml
 #
-argparse-manpage==4.1
+argparse-manpage==4.2
     # via ansible-compat (pyproject.toml)
 attrs==23.1.0
     # via jsonschema
@@ -46,7 +46,7 @@ colorama==0.4.6
     #   griffe
     #   mkdocs-ansible
     #   mkdocs-material
-coverage==7.2.4
+coverage==7.2.5
     # via ansible-compat (pyproject.toml)
 cryptography==40.0.2
     # via ansible-core
@@ -85,6 +85,8 @@ importlib-metadata==6.1.0
     #   markdown
     #   mkdocs
     #   mkdocs-ansible
+importlib-resources==5.0.7
+    # via ansible-core
 iniconfig==2.0.0
     # via pytest
 jinja2==3.1.2
@@ -182,7 +184,7 @@ pip-tools==6.13.0
     # via ansible-compat (pyproject.toml)
 pipdeptree==2.7.0
     # via mkdocs-ansible
-platformdirs==3.5.0
+platformdirs==3.5.1
     # via black
 pluggy==1.0.0
     # via pytest
@@ -263,6 +265,8 @@ tinycss2==1.2.1
     #   cairosvg
     #   cssselect2
     #   mkdocs-ansible
+toml==0.10.2
+    # via argparse-manpage
 tomli==2.0.1
     # via
     #   black
