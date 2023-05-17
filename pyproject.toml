@@ -57,7 +57,11 @@ test = ["coverage", "pip-tools", "pytest>=7.2.0", "pytest-mock", "pytest-plus"]
 
 [tool.coverage.run]
 source = ["src"]
-branch = true
+# Do not use branch until bug is fixes:
+# https://github.com/nedbat/coveragepy/issues/605
+branch = false
+parallel = true
+concurrency = ["multiprocessing", "thread"]
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
