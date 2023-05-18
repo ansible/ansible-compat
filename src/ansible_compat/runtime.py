@@ -489,8 +489,6 @@ class Runtime:
             "requirements.yml",
             "roles/requirements.yml",
             "collections/requirements.yml",
-            # These is more of less the official way to store test requirements in collections so far:
-            "tests/requirements.yml",
         ]:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
