@@ -1,6 +1,16 @@
 """Constants used by ansible_compat."""
 
 
+REQUIREMENT_LOCATIONS = [
+    "requirements.yml",
+    "roles/requirements.yml",
+    "collections/requirements.yml",
+    # These is more of less the official way to store test requirements in collections so far, comments shows number of repos using this reported by https://sourcegraph.com/ at the time of writing
+    "tests/requirements.yml",  # 170
+    "tests/integration/requirements.yml",  # 3
+    "tests/unit/requirements.yml",  # 1
+]
+
 # Minimal version of Ansible we support for runtime
 ANSIBLE_MIN_VERSION = "2.12"
 
