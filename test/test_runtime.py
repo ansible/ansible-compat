@@ -258,6 +258,13 @@ def test_prerun_reqs_v2(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> N
         )
 
 
+def test_prerun_reqs_broken(runtime: Runtime) -> None:
+    """Checks that the we report invalid requirements.yml file."""
+    path = (Path(__file__).parent.parent / "examples" / "reqs_broken").resolve()
+    with cwd(path), pytest.raises(InvalidPrerequisiteError):
+        runtime.prepare_environment()
+
+
 def test__update_env_no_old_value_no_default_no_value(monkeypatch: MonkeyPatch) -> None:
     """Make sure empty value does not touch environment."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)

@@ -22,7 +22,11 @@ from ansible_compat.config import (
     ansible_collections_path,
     parse_ansible_version,
 )
-from ansible_compat.constants import MSG_INVALID_FQRL, RC_ANSIBLE_OPTIONS_ERROR
+from ansible_compat.constants import (
+    MSG_INVALID_FQRL,
+    RC_ANSIBLE_OPTIONS_ERROR,
+    REQUIREMENT_LOCATIONS,
+)
 from ansible_compat.errors import (
     AnsibleCommandError,
     AnsibleCompatError,
@@ -411,6 +415,12 @@ class Runtime:
             msg = f"{requirement} file is not a valid Ansible requirements file."
             raise InvalidPrerequisiteError(msg)
 
+        if isinstance(reqs_yaml, dict):
+            for key in reqs_yaml:
+                if key not in ("roles", "collections"):
+                    msg = f"{requirement} file is not a valid Ansible requirements file. Only 'roles' and 'collections' keys are allowed at root level. Recognized valid locations are: {', '.join(REQUIREMENT_LOCATIONS)}"
+                    raise InvalidPrerequisiteError(msg)
+
         if isinstance(reqs_yaml, list) or "roles" in reqs_yaml:
             cmd = [
                 "ansible-galaxy",
@@ -485,13 +495,7 @@ class Runtime:
         # are part of Tower specification
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
-        for req_file in [
-            "requirements.yml",
-            "roles/requirements.yml",
-            "collections/requirements.yml",
-            # These is more of less the official way to store test requirements in collections so far:
-            "tests/requirements.yml",
-        ]:
+        for req_file in REQUIREMENT_LOCATIONS:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
         galaxy_path = Path("galaxy.yml")
