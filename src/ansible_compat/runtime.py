@@ -502,7 +502,7 @@ class Runtime:
                 "ansible-galaxy",
                 "role",
                 "install",
-                "-vr",
+                "-vvvr",
                 f"{requirement}",
             ]
             if self.cache_dir:
@@ -516,8 +516,9 @@ class Runtime:
                 _logger.info("Running %s", " ".join(cmd))
 
                 result = self.run(cmd, retry=retry)
+                _logger.info(result.stdout)
                 if result.returncode != 0:
-                    _logger.error(result.stdout)
+                    _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
         # Run galaxy collection install works on v2 requirements.yml
@@ -526,7 +527,7 @@ class Runtime:
                 "ansible-galaxy",
                 "collection",
                 "install",
-                "-v",
+                "-vvv",
             ]
             if offline:
                 _logger.warning(
@@ -548,8 +549,8 @@ class Runtime:
                     retry=retry,
                     env={**os.environ, "ANSIBLE_COLLECTIONS_PATH": ":".join(cpaths)},
                 )
+                _logger.info(result.stdout)
                 if result.returncode != 0:
-                    _logger.error(result.stdout)
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
