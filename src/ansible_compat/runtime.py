@@ -10,9 +10,9 @@ import subprocess
 import tempfile
 import warnings
 from collections import OrderedDict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union, no_type_check
 
 import subprocess_tee
 from packaging.version import Version
@@ -20,6 +20,7 @@ from packaging.version import Version
 from ansible_compat.config import (
     AnsibleConfig,
     ansible_collections_path,
+    ansible_version,
     parse_ansible_version,
 )
 from ansible_compat.constants import (
@@ -73,6 +74,71 @@ class CollectionVersion(Version):
         super().__init__(version)
 
 
+@dataclass
+class Plugins:  # pylint: disable=too-many-instance-attributes
+    """Dataclass to access installed Ansible plugins, uses ansible-doc to retrieve them."""
+
+    runtime: "Runtime"
+    become: dict[str, str] = field(init=False)
+    cache: dict[str, str] = field(init=False)
+    callback: dict[str, str] = field(init=False)
+    cliconf: dict[str, str] = field(init=False)
+    connection: dict[str, str] = field(init=False)
+    httpapi: dict[str, str] = field(init=False)
+    inventory: dict[str, str] = field(init=False)
+    lookup: dict[str, str] = field(init=False)
+    netconf: dict[str, str] = field(init=False)
+    shell: dict[str, str] = field(init=False)
+    vars: dict[str, str] = field(init=False)  # noqa: A003
+    module: dict[str, str] = field(init=False)
+    strategy: dict[str, str] = field(init=False)
+    test: dict[str, str] = field(init=False)
+    filter: dict[str, str] = field(init=False)  # noqa: A003
+    role: dict[str, str] = field(init=False)
+    keyword: dict[str, str] = field(init=False)
+
+    @no_type_check
+    def __getattribute__(self, attr: str):  # noqa: ANN204
+        """Get attribute."""
+        if attr in {
+            "become",
+            "cache",
+            "callback",
+            "cliconf",
+            "connection",
+            "httpapi",
+            "inventory",
+            "lookup",
+            "netconf",
+            "shell",
+            "vars",
+            "module",
+            "strategy",
+            "test",
+            "filter",
+            "role",
+            "keyword",
+        }:
+            try:
+                result = super().__getattribute__(attr)
+            except AttributeError as exc:
+                if ansible_version() < Version("2.14") and attr in {"filter", "test"}:
+                    msg = "Ansible version below 2.14 does not support retrieving filter and test plugins."
+                    raise RuntimeError(msg) from exc
+                proc = self.runtime.run(
+                    ["ansible-doc", "--json", "-l", "-t", attr],
+                )
+                data = json.loads(proc.stdout)
+                if not isinstance(data, dict):  # pragma: no cover
+                    msg = "Unexpected output from ansible-doc"
+                    raise AnsibleCompatError(msg) from exc
+                result = data
+        else:
+            result = super().__getattribute__(attr)
+
+        return result
+
+
 # pylint: disable=too-many-instance-attributes
 class Runtime:
     """Ansible Runtime manager."""
@@ -83,6 +149,7 @@ class Runtime:
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
+    plugins: Plugins
 
     def __init__(
         self,
@@ -119,6 +186,7 @@ class Runtime:
         self.isolated = isolated
         self.max_retries = max_retries
         self.environ = environ or os.environ.copy()
+        self.plugins = Plugins(runtime=self)
         # Reduce noise from paramiko, unless user already defined PYTHONWARNINGS
         # paramiko/transport.py:236: CryptographyDeprecationWarning: Blowfish has been deprecated
         # https://github.com/paramiko/paramiko/issues/2038
