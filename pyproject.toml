@@ -112,6 +112,7 @@ disable = [
   "import-error",
   # already covered by ruff which is faster
   "too-many-arguments", # PLR0913
+  "raise-missing-from",
   # Temporary disable duplicate detection we remove old code from prerun
   "duplicate-code",
 ]

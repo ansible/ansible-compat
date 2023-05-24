@@ -15,6 +15,7 @@ from _pytest.monkeypatch import MonkeyPatch
 from packaging.version import Version
 from pytest_mock import MockerFixture
 
+from ansible_compat.config import ansible_version
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
 from ansible_compat.errors import (
     AnsibleCommandError,
@@ -747,3 +748,44 @@ def test_runtime_exec_env(runtime: Runtime) -> None:
     runtime.environ["FOO"] = "bar"
     result = runtime.run(["printenv", "FOO"])
     assert result.stdout.rstrip() == "bar"
+
+
+def test_runtime_plugins(runtime: Runtime) -> None:
+    """Tests ability to access detected plugins."""
+    assert len(runtime.plugins.cliconf) == 0
+    # ansible.netcommon.restconf might be in httpapi
+    assert isinstance(runtime.plugins.httpapi, dict)
+    # "ansible.netcommon.default" might be in runtime.plugins.netconf
+    assert isinstance(runtime.plugins.netconf, dict)
+    assert isinstance(runtime.plugins.role, dict)
+    assert "become" in runtime.plugins.keyword
+
+    if ansible_version() < Version("2.14.0"):
+        assert "sudo" in runtime.plugins.become
+        assert "memory" in runtime.plugins.cache
+        assert "default" in runtime.plugins.callback
+        assert "local" in runtime.plugins.connection
+        assert "ini" in runtime.plugins.inventory
+        assert "env" in runtime.plugins.lookup
+        assert "sh" in runtime.plugins.shell
+        assert "host_group_vars" in runtime.plugins.vars
+        assert "file" in runtime.plugins.module
+        assert "free" in runtime.plugins.strategy
+        # ansible-doc below 2.14 does not support listing 'test' and 'filter' types:
+        with pytest.raises(RuntimeError):
+            assert "is_abs" in runtime.plugins.test
+        with pytest.raises(RuntimeError):
+            assert "bool" in runtime.plugins.filter
+    else:
+        assert "ansible.builtin.sudo" in runtime.plugins.become
+        assert "ansible.builtin.memory" in runtime.plugins.cache
+        assert "ansible.builtin.default" in runtime.plugins.callback
+        assert "ansible.builtin.local" in runtime.plugins.connection
+        assert "ansible.builtin.ini" in runtime.plugins.inventory
+        assert "ansible.builtin.env" in runtime.plugins.lookup
+        assert "ansible.builtin.sh" in runtime.plugins.shell
+        assert "ansible.builtin.host_group_vars" in runtime.plugins.vars
+        assert "ansible.builtin.file" in runtime.plugins.module
+        assert "ansible.builtin.free" in runtime.plugins.strategy
+        assert "ansible.builtin.is_abs" in runtime.plugins.test
+        assert "ansible.builtin.bool" in runtime.plugins.filter
