@@ -232,9 +232,6 @@ class Runtime:
         self.collections = OrderedDict()
         no_collections_msg = "None of the provided paths were usable"
 
-        # Workaround for https://github.com/ansible/ansible/issues/73127
-        Path("~/.ansible/collections").expanduser().mkdir(exist_ok=True, parents=True)
-
         proc = self.run(["ansible-galaxy", "collection", "list", "--format=json"])
         if proc.returncode == RC_ANSIBLE_OPTIONS_ERROR and (
             no_collections_msg in proc.stdout or no_collections_msg in proc.stderr
