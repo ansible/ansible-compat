@@ -341,11 +341,12 @@ class Runtime:
             if result.returncode == 0:
                 break
             _logger.debug("Environment: %s", env or self.environ)
-            _logger.warning(
-                "Retrying execution failure %s of: %s",
-                result.returncode,
-                " ".join(args),
-            )
+            if retry:
+                _logger.warning(
+                    "Retrying execution failure %s of: %s",
+                    result.returncode,
+                    " ".join(args),
+                )
         return result
 
     @property
