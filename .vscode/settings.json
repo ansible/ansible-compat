@@ -5,8 +5,8 @@
   "[python]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": true,
-      "source.organizeImports": false,
-      "source.fixAll.ruff": false
+      "source.fixAll.ruff": false,
+      "source.organizeImports": false
     }
   },
   "editor.formatOnSave": true,
