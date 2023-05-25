@@ -327,6 +327,10 @@ class Runtime:
             run_func: Callable[..., CompletedProcess] = subprocess_tee.run
         else:
             run_func = subprocess.run
+        env = self.environ if env is None else env.copy()
+        # Presence of ansible debug variable or config option will prevent us
+        # from parsing its JSON output due to extra debug messages on stdout.
+        env["ANSIBLE_DEBUG"] = "0"
 
         for _ in range(self.max_retries + 1 if retry else 1):
             result = run_func(
@@ -335,12 +339,12 @@ class Runtime:
                 check=False,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                env=env or self.environ,
+                env=env,
                 cwd=str(cwd) if cwd else None,
             )
             if result.returncode == 0:
                 break
-            _logger.debug("Environment: %s", env or self.environ)
+            _logger.debug("Environment: %s", env)
             if retry:
                 _logger.warning(
                     "Retrying execution failure %s of: %s",
