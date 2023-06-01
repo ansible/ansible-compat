@@ -333,7 +333,7 @@ class Runtime:
         env["ANSIBLE_DEBUG"] = "0"
 
         # https://github.com/ansible/ansible-lint/issues/3522
-        env["ANSIBLE_VERBOSE_TO_STDERR"] = "1"
+        env["ANSIBLE_VERBOSE_TO_STDERR"] = "True"
 
         for _ in range(self.max_retries + 1 if retry else 1):
             result = run_func(
