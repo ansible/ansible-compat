@@ -6,7 +6,12 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from packaging.version import Version
 
-from ansible_compat.config import AnsibleConfig, ansible_version, parse_ansible_version
+from ansible_compat.config import (
+    AnsibleConfig,
+    ansible_collections_path,
+    ansible_version,
+    parse_ansible_version,
+)
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
 
 
@@ -84,3 +89,12 @@ def test_ansible_version() -> None:
 def test_ansible_version_arg() -> None:
     """Validate ansible_version behavior."""
     assert ansible_version("2.0") >= Version("1.0")
+
+
+def test_ansible_collections_path() -> None:
+    """Check collections path"""
+    coll_path = ansible_collections_path()
+    assert (
+        "ANSIBLE_COLLECTIONS_PATH" in coll_path
+        or "ANSIBLE_COLLECTIONS_PATHS" in coll_path
+    )

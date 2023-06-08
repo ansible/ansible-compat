@@ -22,7 +22,7 @@ def ansible_collections_path() -> str:
         "ANSIBLE_COLLECTIONS_PATHS",
     ]:
         if env_var in os.environ:
-            return env_var
+            return env_var  # pragma: no cover
     return "ANSIBLE_COLLECTIONS_PATH"
 
 
