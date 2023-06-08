@@ -92,7 +92,7 @@ def test_ansible_version_arg() -> None:
 
 
 def test_ansible_collections_path() -> None:
-    """Check collections path"""
+    """Check collections path."""
     coll_path = ansible_collections_path()
     assert (
         "ANSIBLE_COLLECTIONS_PATH" in coll_path
