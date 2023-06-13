@@ -1,4 +1,6 @@
 """Ansible runtime environment manager."""
+from __future__ import annotations
+
 import contextlib
 import importlib
 import json
@@ -12,7 +14,7 @@ import warnings
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union, no_type_check
+from typing import TYPE_CHECKING, Any, Callable, no_type_check
 
 import subprocess_tee
 from packaging.version import Version
@@ -78,7 +80,7 @@ class CollectionVersion(Version):
 class Plugins:  # pylint: disable=too-many-instance-attributes
     """Dataclass to access installed Ansible plugins, uses ansible-doc to retrieve them."""
 
-    runtime: "Runtime"
+    runtime: Runtime
     become: dict[str, str] = field(init=False)
     cache: dict[str, str] = field(init=False)
     callback: dict[str, str] = field(init=False)
@@ -143,9 +145,9 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
 class Runtime:
     """Ansible Runtime manager."""
 
-    _version: Optional[Version] = None
+    _version: Version | None = None
     collections: OrderedDict[str, Collection] = OrderedDict()
-    cache_dir: Optional[Path] = None
+    cache_dir: Path | None = None
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
@@ -153,13 +155,13 @@ class Runtime:
 
     def __init__(
         self,
-        project_dir: Optional[Path] = None,
+        project_dir: Path | None = None,
         *,
         isolated: bool = False,
-        min_required_version: Optional[str] = None,
+        min_required_version: str | None = None,
         require_module: bool = False,
         max_retries: int = 0,
-        environ: Optional[dict[str, str]] = None,
+        environ: dict[str, str] | None = None,
     ) -> None:
         """Initialize Ansible runtime environment.
 
@@ -311,12 +313,12 @@ class Runtime:
 
     def run(  # ruff: disable=PLR0913
         self,
-        args: Union[str, list[str]],
+        args: str | list[str],
         *,
         retry: bool = False,
         tee: bool = False,
-        env: Optional[dict[str, str]] = None,
-        cwd: Optional[Path] = None,
+        env: dict[str, str] | None = None,
+        cwd: Path | None = None,
     ) -> CompletedProcess:
         """Execute a command inside an Ansible environment.
 
@@ -377,8 +379,8 @@ class Runtime:
 
     def version_in_range(
         self,
-        lower: Optional[str] = None,
-        upper: Optional[str] = None,
+        lower: str | None = None,
+        upper: str | None = None,
     ) -> bool:
         """Check if Ansible version is inside a required range.
 
@@ -392,9 +394,9 @@ class Runtime:
 
     def install_collection(
         self,
-        collection: Union[str, Path],
+        collection: str | Path,
         *,
-        destination: Optional[Path] = None,
+        destination: Path | None = None,
         force: bool = False,
     ) -> None:
         """Install an Ansible collection.
@@ -439,7 +441,7 @@ class Runtime:
     def install_collection_from_disk(
         self,
         path: Path,
-        destination: Optional[Path] = None,
+        destination: Path | None = None,
     ) -> None:
         """Build and install collection from a given disk path."""
         if not self.version_in_range(upper="2.11"):
@@ -552,7 +554,7 @@ class Runtime:
 
     def prepare_environment(  # noqa: C901
         self,
-        required_collections: Optional[dict[str, str]] = None,
+        required_collections: dict[str, str] | None = None,
         *,
         retry: bool = False,
         install_local: bool = False,
@@ -560,7 +562,7 @@ class Runtime:
         role_name_check: int = 0,
     ) -> None:
         """Make dependencies available if needed."""
-        destination: Optional[Path] = None
+        destination: Path | None = None
         if required_collections is None:
             required_collections = {}
 
@@ -639,7 +641,7 @@ class Runtime:
     def require_collection(
         self,
         name: str,
-        version: Optional[str] = None,
+        version: str | None = None,
         *,
         install: bool = True,
     ) -> None:
