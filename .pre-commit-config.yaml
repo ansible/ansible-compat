@@ -10,6 +10,8 @@ ci:
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - pip-compile
+    # No docker on pre-commit.ci
+    - validate-config-in-container
 default_language_version:
   # Needed in order to make pip-compile output predictable.
   python: python3.9
@@ -111,3 +113,8 @@ repos:
         pass_filenames: false
         additional_dependencies:
           - pip-tools>=6.11.0
+  - repo: https://github.com/packit/pre-commit-hooks
+    rev: v1.2.0
+    hooks:
+      - id: validate-config-in-container
+        alias: packit
