@@ -1,0 +1,4 @@
+SRPMS/
+*.tar.gz
+*-buildrequires
+ansible-compat-*/

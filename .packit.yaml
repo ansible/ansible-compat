@@ -1,0 +1,42 @@
+---
+# https://packit.dev/docs/configuration/
+# Test locally running: packit build locally
+# spell-checker:ignore packit specfile copr epel
+specfile_path: dist/python-ansible-compat.spec
+actions:
+  create-archive:
+    # packit.dev service does have these module pre-installed:
+    - python3 -m build --sdist --outdir dist
+    - sh -c "ls dist/ansible-compat-*.tar.gz"
+  get-current-version:
+    - ./tools/get-version.sh
+  post-upstream-clone:
+    - rm -f dist/*.tar.gz || true
+    - ./tools/update-version.sh
+srpm_build_deps:
+  - python3-build
+  - python3-setuptools_scm
+  - python3-pytest
+  - python3-pytest-mock
+jobs:
+  - job: copr_build
+    trigger: commit
+    branch: main
+    targets:
+      - fedora-rawhide-x86_64
+      - fedora-rawhide-aarch64
+      - fedora-latest-x86_64
+      - fedora-latest-aarch64
+      # Missing python3-build see https://bugzilla.redhat.com/show_bug.cgi?id=2129071
+      # - centos-stream-9-aarch64
+      # - centos-stream-9-x86_64
+  - job: tests
+    trigger: pull_request
+    branch: main
+    targets:
+      - fedora-latest
+      - fedora-rawhide
+  # - job: propose_downstream
+  #   trigger: release
+  #   metadata:
+  #     dist-git-branch: master
