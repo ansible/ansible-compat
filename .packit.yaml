@@ -11,7 +11,7 @@ actions:
   get-current-version:
     - ./tools/get-version.sh
   post-upstream-clone:
-    - ./tools/update-version.sh
+    - ./tools/update-spec.sh
 srpm_build_deps:
   - python3-build
   - python3-setuptools_scm
@@ -39,3 +39,6 @@ jobs:
   #   trigger: release
   #   metadata:
   #     dist-git-branch: master
+notifications:
+  pull_request:
+    successful_build: false
