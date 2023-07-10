@@ -427,17 +427,17 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
                 env=env,
             )
 
-        try:
-            for match in re.finditer(
-                r"^(?P<key>[A-Za-z0-9_]+).* = (?P<value>.*)$",
-                config_dump,
-                re.MULTILINE,
-            ):
-                key = match.groupdict()["key"]
-                value = match.groupdict()["value"]
+        for match in re.finditer(
+            r"^(?P<key>[A-Za-z0-9_]+).* = (?P<value>.*)$",
+            config_dump,
+            re.MULTILINE,
+        ):
+            key = match.groupdict()["key"]
+            value = match.groupdict()["value"]
+            try:
                 self[key] = ast.literal_eval(value)
-        except (NameError, SyntaxError, ValueError):
-            self[key] = value
+            except (NameError, SyntaxError, ValueError):
+                self[key] = value
 
     def __getattribute__(self, attr_name: str) -> object:
         """Allow access of config options as attributes."""

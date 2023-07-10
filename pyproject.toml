@@ -136,6 +136,7 @@ ignore = [
   "PLR0912", # Bug https://github.com/charliermarsh/ruff/issues/4244
   "PLR0913", # Bug https://github.com/charliermarsh/ruff/issues/4244
   "RUF012",
+  "PERF203",
 ]
 target-version = "py39"
 
