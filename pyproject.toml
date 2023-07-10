@@ -135,7 +135,8 @@ ignore = [
   "S607", # Starting a process with a partial executable path
   "PLR0912", # Bug https://github.com/charliermarsh/ruff/issues/4244
   "PLR0913", # Bug https://github.com/charliermarsh/ruff/issues/4244
-
+  "RUF012",
+  "PERF203",
 ]
 target-version = "py39"
 
