@@ -575,7 +575,11 @@ class Runtime:
         for req_file in REQUIREMENT_LOCATIONS:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
-        galaxy_paths = glob.glob("**/galaxy.yml", recursive=True)
+        galaxy_paths = glob.glob(
+            "**/galaxy.yml", root_dir=self.project_dir, recursive=True
+        )
+        if not galaxy_paths:
+            galaxy_paths = ["galaxy.yml"]
         if len(galaxy_paths) > 1 and galaxy_paths[0] == "galaxy.yml":
             _logger.error(
                 "Invalid collection structure. Found multiple galaxy.yml in this namespace.",
