@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import contextlib
-import glob
+import fnmatch
 import importlib
 import json
 import logging
@@ -553,6 +553,17 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
+    def search_galaxy_paths(self, search_dir: Path) -> list[str]:
+        """Search for galaxy paths recursively."""
+        galaxy_paths: list[str] = []
+        for file in os.listdir(search_dir):
+            file_path = Path(file)
+            if file_path.is_dir():
+                galaxy_paths.extend(self.search_galaxy_paths(file_path))
+            elif fnmatch.fnmatch(file, "galaxy.yml"):
+                galaxy_paths.append(str(search_dir / file))
+        return galaxy_paths
+
     # pylint: disable=too-many-locals
     def prepare_environment(  # noqa: C901
         self,
@@ -575,9 +586,7 @@ class Runtime:
         for req_file in REQUIREMENT_LOCATIONS:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
-        galaxy_paths = glob.glob(
-            "**/galaxy.yml", root_dir=self.project_dir, recursive=True
-        )
+        galaxy_paths = self.search_galaxy_paths(self.project_dir)
         if not galaxy_paths:
             galaxy_paths = ["galaxy.yml"]
         if len(galaxy_paths) > 1 and galaxy_paths[0] == "galaxy.yml":
