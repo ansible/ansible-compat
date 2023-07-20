@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import fnmatch
 import importlib
 import json
 import logging
@@ -552,6 +553,19 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
+    def search_galaxy_paths(self, search_dir: Path, depth: int = 0) -> list[str]:
+        """Search for galaxy paths (only one level deep)."""
+        galaxy_paths: list[str] = []
+        for file in os.listdir(search_dir):
+            file_path = Path(file)
+            if file_path.is_dir() and depth < 1:
+                galaxy_paths.extend(self.search_galaxy_paths(file_path, 1))
+            elif fnmatch.fnmatch(file, "galaxy.yml"):
+                galaxy_paths.append(str(search_dir / file))
+        if depth == 0 and not galaxy_paths:
+            return ["galaxy.yml"]
+        return galaxy_paths
+
     def prepare_environment(  # noqa: C901
         self,
         required_collections: dict[str, str] | None = None,
@@ -573,68 +587,75 @@ class Runtime:
         for req_file in REQUIREMENT_LOCATIONS:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
-        galaxy_path = Path("galaxy.yml")
-        if galaxy_path.exists():
-            data = yaml_from_file(galaxy_path)
-            if isinstance(data, dict) and "dependencies" in data:
-                for name, required_version in data["dependencies"].items():
-                    _logger.info(
-                        "Provisioning collection %s:%s from galaxy.yml",
-                        name,
-                        required_version,
-                    )
-                    self.install_collection(
-                        f"{name}:{required_version}",
-                        destination=destination,
-                    )
-
-        if self.cache_dir:
-            destination = self.cache_dir / "collections"
-        for name, min_version in required_collections.items():
-            self.install_collection(
-                f"{name}:>={min_version}",
-                destination=destination,
-            )
-
-        self._prepare_ansible_paths()
-
-        if not install_local:
-            return
-
-        if Path("galaxy.yml").exists():
-            if destination:
-                # while function can return None, that would not break the logic
-                colpath = Path(
-                    f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}",
-                )
-                if colpath.is_symlink():
-                    if os.path.realpath(colpath) == Path.cwd():
-                        _logger.warning(
-                            "Found symlinked collection, skipping its installation.",
+        for gpath in self.search_galaxy_paths(self.project_dir):
+            galaxy_path = Path(gpath)
+            if galaxy_path.exists():
+                data = yaml_from_file(galaxy_path)
+                if isinstance(data, dict) and "dependencies" in data:
+                    for name, required_version in data["dependencies"].items():
+                        _logger.info(
+                            "Provisioning collection %s:%s from galaxy.yml",
+                            name,
+                            required_version,
                         )
-                        return
-                    _logger.warning(
-                        "Collection is symlinked, but not pointing to %s directory, so we will remove it.",
-                        Path.cwd(),
-                    )
-                    colpath.unlink()
+                        self.install_collection(
+                            f"{name}:{required_version}",
+                            destination=destination,
+                        )
 
-            # molecule scenario within a collection
-            self.install_collection_from_disk(Path("."), destination=destination)
-        elif (
-            Path().resolve().parent.name == "roles"
-            and Path("../../galaxy.yml").exists()
-        ):
-            # molecule scenario located within roles/<role-name>/molecule inside
-            # a collection
-            self.install_collection_from_disk(Path("../.."), destination=destination)
-        else:
-            # no collection, try to recognize and install a standalone role
-            self._install_galaxy_role(
-                self.project_dir,
-                role_name_check=role_name_check,
-                ignore_errors=True,
-            )
+            if self.cache_dir:
+                destination = self.cache_dir / "collections"
+            for name, min_version in required_collections.items():
+                self.install_collection(
+                    f"{name}:>={min_version}",
+                    destination=destination,
+                )
+
+            self._prepare_ansible_paths()
+
+            if not install_local:
+                return
+
+            if galaxy_path.exists():
+                if destination:
+                    # while function can return None, that would not break the logic
+                    colpath = Path(
+                        f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}",
+                    )
+                    if colpath.is_symlink():
+                        if os.path.realpath(colpath) == Path.cwd():
+                            _logger.warning(
+                                "Found symlinked collection, skipping its installation.",
+                            )
+                            return
+                        _logger.warning(
+                            "Collection is symlinked, but not pointing to %s directory, so we will remove it.",
+                            Path.cwd(),
+                        )
+                        colpath.unlink()
+
+                # molecule scenario within a collection
+                self.install_collection_from_disk(
+                    galaxy_path.parent,
+                    destination=destination,
+                )
+            elif (
+                Path().resolve().parent.name == "roles"
+                and Path("../../galaxy.yml").exists()
+            ):
+                # molecule scenario located within roles/<role-name>/molecule inside
+                # a collection
+                self.install_collection_from_disk(
+                    Path("../.."),
+                    destination=destination,
+                )
+            else:
+                # no collection, try to recognize and install a standalone role
+                self._install_galaxy_role(
+                    self.project_dir,
+                    role_name_check=role_name_check,
+                    ignore_errors=True,
+                )
         # reload collections
         self.load_collections()
 
