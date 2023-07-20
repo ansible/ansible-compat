@@ -553,18 +553,19 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-    def search_galaxy_paths(self, search_dir: Path) -> list[str]:
-        """Search for galaxy paths recursively."""
+    def search_galaxy_paths(self, search_dir: Path, depth: int = 0) -> list[str]:
+        """Search for galaxy paths (only one level deep)."""
         galaxy_paths: list[str] = []
         for file in os.listdir(search_dir):
             file_path = Path(file)
-            if file_path.is_dir():
-                galaxy_paths.extend(self.search_galaxy_paths(file_path))
+            if file_path.is_dir() and depth < 1:
+                galaxy_paths.extend(self.search_galaxy_paths(file_path, 1))
             elif fnmatch.fnmatch(file, "galaxy.yml"):
                 galaxy_paths.append(str(search_dir / file))
+        if depth == 0 and not galaxy_paths:
+            return ["galaxy.yml"]
         return galaxy_paths
 
-    # pylint: disable=too-many-locals
     def prepare_environment(  # noqa: C901
         self,
         required_collections: dict[str, str] | None = None,
@@ -586,15 +587,7 @@ class Runtime:
         for req_file in REQUIREMENT_LOCATIONS:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
-        galaxy_paths = self.search_galaxy_paths(self.project_dir)
-        if not galaxy_paths:
-            galaxy_paths = ["galaxy.yml"]
-        if len(galaxy_paths) > 1 and galaxy_paths[0] == "galaxy.yml":
-            _logger.error(
-                "Invalid collection structure. Found multiple galaxy.yml in this namespace.",
-            )
-            galaxy_paths = list(galaxy_paths[0])
-        for gpath in galaxy_paths:
+        for gpath in self.search_galaxy_paths(self.project_dir):
             galaxy_path = Path(gpath)
             if galaxy_path.exists():
                 data = yaml_from_file(galaxy_path)
