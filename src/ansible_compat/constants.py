@@ -1,6 +1,8 @@
 """Constants used by ansible_compat."""
 
+from pathlib import Path
 
+META_MAIN = (Path("meta") / Path("main.yml"), Path("meta") / Path("main.yaml"))
 REQUIREMENT_LOCATIONS = [
     "requirements.yml",
     "roles/requirements.yml",

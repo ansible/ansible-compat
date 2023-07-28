@@ -27,6 +27,7 @@ from ansible_compat.config import (
     parse_ansible_version,
 )
 from ansible_compat.constants import (
+    META_MAIN,
     MSG_INVALID_FQRL,
     RC_ANSIBLE_OPTIONS_ERROR,
     REQUIREMENT_LOCATIONS,
@@ -802,13 +803,17 @@ class Runtime:
         """
         yaml = None
         galaxy_info = {}
-        meta_filename = Path(project_dir) / "meta" / "main.yml"
 
-        if not meta_filename.exists():
+        for meta_main in META_MAIN:
+            meta_filename = Path(project_dir) / meta_main
+
+            if meta_filename.exists():
+                break
+        else:
             if ignore_errors:
                 return
-        else:
-            yaml = yaml_from_file(meta_filename)
+
+        yaml = yaml_from_file(meta_filename)
 
         if yaml and "galaxy_info" in yaml:
             galaxy_info = yaml["galaxy_info"]
