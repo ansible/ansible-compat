@@ -669,7 +669,7 @@ def test_install_collection_from_disk(
     expected_collections: list[str],
 ) -> None:
     """Tests ability to install a local collection."""
-    # ensure we do not have acme.google installed in user directory as it may
+    # ensure we do not have acme.goodies installed in user directory as it may
     # produce false positives
     rmtree(
         pathlib.Path(
