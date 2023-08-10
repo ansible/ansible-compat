@@ -1,19 +1,18 @@
 """Tests for Runtime class."""
 # pylint: disable=protected-access
+from __future__ import annotations
+
 import logging
 import os
 import pathlib
 import subprocess
-from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
 from packaging.version import Version
-from pytest_mock import MockerFixture
 
 from ansible_compat.config import ansible_version
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
@@ -23,6 +22,12 @@ from ansible_compat.errors import (
     InvalidPrerequisiteError,
 )
 from ansible_compat.runtime import CompletedProcess, Runtime
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from _pytest.monkeypatch import MonkeyPatch
+    from pytest_mock import MockerFixture
 
 
 def test_runtime_version(runtime: Runtime) -> None:
@@ -633,8 +638,8 @@ def test_runtime_env_ansible_library(monkeypatch: MonkeyPatch) -> None:
     ids=("1", "2", "3", "4", "5"),
 )
 def test_runtime_version_in_range(
-    lower: Union[str, None],
-    upper: Union[str, None],
+    lower: str | None,
+    upper: str | None,
     expected: bool,
 ) -> None:
     """Validate functioning of version_in_range."""

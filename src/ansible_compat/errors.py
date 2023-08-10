@@ -1,5 +1,7 @@
 """Module to deal with errors."""
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from ansible_compat.constants import ANSIBLE_MISSING_RC, INVALID_PREREQUISITES_RC
 
@@ -14,8 +16,8 @@ class AnsibleCompatError(RuntimeError):
 
     def __init__(
         self,
-        message: Optional[str] = None,
-        proc: Optional[Any] = None,
+        message: str | None = None,
+        proc: CompletedProcess[Any] | None = None,
     ) -> None:
         """Construct generic library exception."""
         super().__init__(message)
@@ -25,7 +27,7 @@ class AnsibleCompatError(RuntimeError):
 class AnsibleCommandError(RuntimeError):
     """Exception running an Ansible command."""
 
-    def __init__(self, proc: "CompletedProcess[Any]") -> None:
+    def __init__(self, proc: CompletedProcess[Any]) -> None:
         """Construct an exception given a completed process."""
         message = (
             f"Got {proc.returncode} exit code while running: {' '.join(proc.args)}"
@@ -41,8 +43,8 @@ class MissingAnsibleError(AnsibleCompatError):
 
     def __init__(
         self,
-        message: Optional[str] = "Unable to find a working copy of ansible executable.",
-        proc: Optional[Any] = None,
+        message: str | None = "Unable to find a working copy of ansible executable.",
+        proc: CompletedProcess[Any] | None = None,
     ) -> None:
         """."""
         super().__init__(message)

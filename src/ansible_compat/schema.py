@@ -1,16 +1,19 @@
 """Utils for JSON Schema validation."""
+from __future__ import annotations
+
 import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Union
+from typing import TYPE_CHECKING
 
 import jsonschema
 from jsonschema.validators import validator_for
 
-from ansible_compat.types import JSON
+if TYPE_CHECKING:
+    from ansible_compat.types import JSON
 
 
-def to_path(schema_path: Sequence[Union[str, int]]) -> str:
+def to_path(schema_path: Sequence[str | int]) -> str:
     """Flatten a path to a dot delimited string.
 
     :param schema_path: The schema path
@@ -19,7 +22,7 @@ def to_path(schema_path: Sequence[Union[str, int]]) -> str:
     return ".".join(str(index) for index in schema_path)
 
 
-def json_path(absolute_path: Sequence[Union[str, int]]) -> str:
+def json_path(absolute_path: Sequence[str | int]) -> str:
     """Flatten a data path to a dot delimited string.
 
     :param absolute_path: The path
@@ -44,7 +47,7 @@ class JsonSchemaError:
     data_path: str
     json_path: str
     message: str
-    expected: Union[bool, int, str]
+    expected: bool | int | str
     relative_schema: str
     validator: str
     found: str
