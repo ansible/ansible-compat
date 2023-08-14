@@ -581,12 +581,17 @@ class Runtime:
         if required_collections is None:
             required_collections = {}
 
+        self._prepare_ansible_paths()
+
         # first one is standard for collection layout repos and the last two
         # are part of Tower specification
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
         for req_file in REQUIREMENT_LOCATIONS:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
+
+        if not install_local:
+            return
 
         for gpath in self.search_galaxy_paths(self.project_dir):
             galaxy_path = Path(gpath)
@@ -611,11 +616,6 @@ class Runtime:
                     f"{name}:>={min_version}",
                     destination=destination,
                 )
-
-            self._prepare_ansible_paths()
-
-            if not install_local:
-                return
 
             if galaxy_path.exists():
                 if destination:
