@@ -1,19 +1,18 @@
 """Tests for Runtime class."""
 # pylint: disable=protected-access
+from __future__ import annotations
+
 import logging
 import os
 import pathlib
 import subprocess
-from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
 from packaging.version import Version
-from pytest_mock import MockerFixture
 
 from ansible_compat.config import ansible_version
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
@@ -23,6 +22,12 @@ from ansible_compat.errors import (
     InvalidPrerequisiteError,
 )
 from ansible_compat.runtime import CompletedProcess, Runtime
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from _pytest.monkeypatch import MonkeyPatch
+    from pytest_mock import MockerFixture
 
 
 def test_runtime_version(runtime: Runtime) -> None:
@@ -468,14 +473,18 @@ def test_install_collection(runtime: Runtime) -> None:
 
 def test_install_collection_dest(runtime: Runtime, tmp_path: pathlib.Path) -> None:
     """Check that valid collection to custom destination passes."""
+    # Since Ansible 2.15.3 there is no guarantee that this will install the collection at requested path
+    # as it might decide to not install anything if requirement is already present at another location.
     runtime.install_collection(
         "examples/reqs_v2/community-molecule-0.1.0.tar.gz",
         destination=tmp_path,
     )
-    expected_file = (
-        tmp_path / "ansible_collections" / "community" / "molecule" / "MANIFEST.json"
-    )
-    assert expected_file.is_file()
+    runtime.load_collections()
+    for collection in runtime.collections:
+        if collection == "community.molecule":
+            return
+    msg = "Failed to find collection as installed."
+    raise AssertionError(msg)
 
 
 def test_install_collection_fail(runtime: Runtime) -> None:
@@ -633,8 +642,8 @@ def test_runtime_env_ansible_library(monkeypatch: MonkeyPatch) -> None:
     ids=("1", "2", "3", "4", "5"),
 )
 def test_runtime_version_in_range(
-    lower: Union[str, None],
-    upper: Union[str, None],
+    lower: str | None,
+    upper: str | None,
     expected: bool,
 ) -> None:
     """Validate functioning of version_in_range."""
@@ -669,7 +678,7 @@ def test_install_collection_from_disk(
     expected_collections: list[str],
 ) -> None:
     """Tests ability to install a local collection."""
-    # ensure we do not have acme.google installed in user directory as it may
+    # ensure we do not have acme.goodies installed in user directory as it may
     # produce false positives
     rmtree(
         pathlib.Path(

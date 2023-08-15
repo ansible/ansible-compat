@@ -1,7 +1,7 @@
 [build-system]
 requires = [
-  "setuptools >= 61.0", # PEP-621
-  "setuptools_scm[toml] >= 7.0.0",
+  "setuptools >= 65.3.0", # required by pyproject+setuptools_scm integration and editable installs
+  "setuptools_scm[toml] >= 7.0.5", # required for "no-local-version" scheme
 ]
 build-backend = "setuptools.build_meta"
 
@@ -135,7 +135,8 @@ ignore = [
   "S607", # Starting a process with a partial executable path
   "PLR0912", # Bug https://github.com/charliermarsh/ruff/issues/4244
   "PLR0913", # Bug https://github.com/charliermarsh/ruff/issues/4244
-
+  "RUF012",
+  "PERF203",
 ]
 target-version = "py39"
 
@@ -154,3 +155,4 @@ known-third-party = ["packaging"]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
+write_to = "src/ansible_compat/_version.py"
