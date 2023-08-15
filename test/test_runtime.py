@@ -473,14 +473,18 @@ def test_install_collection(runtime: Runtime) -> None:
 
 def test_install_collection_dest(runtime: Runtime, tmp_path: pathlib.Path) -> None:
     """Check that valid collection to custom destination passes."""
+    # Since Ansible 2.15.3 there is no guarantee that this will install the collection at requested path
+    # as it might decide to not install anything if requirement is already present at another location.
     runtime.install_collection(
         "examples/reqs_v2/community-molecule-0.1.0.tar.gz",
         destination=tmp_path,
     )
-    expected_file = (
-        tmp_path / "ansible_collections" / "community" / "molecule" / "MANIFEST.json"
-    )
-    assert expected_file.is_file()
+    runtime.load_collections()
+    for collection in runtime.collections:
+        if collection == "community.molecule":
+            return
+    msg = "Failed to find collection as installed."
+    raise AssertionError(msg)
 
 
 def test_install_collection_fail(runtime: Runtime) -> None:
