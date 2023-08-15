@@ -554,19 +554,6 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-    def search_galaxy_paths(self, search_dir: Path, depth: int = 0) -> list[str]:
-        """Search for galaxy paths (only one level deep)."""
-        galaxy_paths: list[str] = []
-        for file in os.listdir(search_dir):
-            file_path = Path(file)
-            if file_path.is_dir() and depth < 1:
-                galaxy_paths.extend(self.search_galaxy_paths(file_path, 1))
-            elif fnmatch.fnmatch(file, "galaxy.yml"):
-                galaxy_paths.append(str(search_dir / file))
-        if depth == 0 and not galaxy_paths:
-            return ["galaxy.yml"]
-        return galaxy_paths
-
     def prepare_environment(  # noqa: C901
         self,
         required_collections: dict[str, str] | None = None,
@@ -588,7 +575,7 @@ class Runtime:
         for req_file in REQUIREMENT_LOCATIONS:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
-        for gpath in self.search_galaxy_paths(self.project_dir):
+        for gpath in search_galaxy_paths(self.project_dir):
             galaxy_path = Path(gpath)
             if galaxy_path.exists():
                 data = yaml_from_file(galaxy_path)
@@ -905,3 +892,17 @@ def _get_galaxy_role_ns(galaxy_infos: dict[str, Any]) -> str:
 def _get_galaxy_role_name(galaxy_infos: dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
     return galaxy_infos.get("role_name", "")
+
+
+def search_galaxy_paths(search_dir: Path, depth: int = 0) -> list[str]:
+    """Search for galaxy paths (only one level deep)."""
+    galaxy_paths: list[str] = []
+    for file in os.listdir(search_dir):
+        file_path = Path(file)
+        if file_path.is_dir() and depth < 1:
+            galaxy_paths.extend(search_galaxy_paths(file_path, 1))
+        elif fnmatch.fnmatch(file, "galaxy.yml"):
+            galaxy_paths.append(str(search_dir / file))
+    if depth == 0 and not galaxy_paths:
+        return ["galaxy.yml"]
+    return galaxy_paths
