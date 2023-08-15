@@ -33,6 +33,7 @@ jobs:
             py39-ansible214
             py39-ansible215
             py311-devel
+            smoke
           platforms: linux,macos
           macos: minmax
   build:
