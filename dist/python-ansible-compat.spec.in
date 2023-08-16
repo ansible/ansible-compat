@@ -1,0 +1,58 @@
+# spell-checker:ignore bcond pkgversion buildrequires autosetup PYTHONPATH noarch buildroot bindir sitelib numprocesses clib
+# All tests require Internet access
+# to test in mock use:  --enable-network --with check
+# to test in a privileged environment use:
+#   --with check --with privileged_tests
+%global debug_package %{nil}
+%bcond_with     check
+%bcond_with     privileged_tests
+
+Name:           ansible-compat
+Version:        VERSION_PLACEHOLDER
+Release:        1%{?dist}
+Summary:        Ansible Compat
+
+License:        GPL-3.0-or-later AND MIT
+URL:            https://github.com/ansible/ansible-compat
+Source0:        %{pypi_source}
+
+BuildArch:      noarch
+
+BuildRequires:  python%{python3_pkgversion}-devel
+%if %{with check}
+# These are required for tests:
+BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-pytest-xdist
+BuildRequires:  python%{python3_pkgversion}-libselinux
+BuildRequires:  python%{python3_pkgversion}-jsonschema
+BuildRequires:  python%{python3_pkgversion}-subprocess-tee
+BuildRequires:  git-core
+%endif
+Requires:       git-core
+
+
+%description
+A python package containing functions that help interacting with various versions of Ansible.
+
+%prep
+%autosetup
+
+
+%build
+%pyproject_wheel
+
+
+%install
+%pyproject_install
+
+
+%if %{with check}
+%check
+pytest
+%endif
+
+
+%files -f %{pyproject_files}
+%doc docs/ README.md
+
+%changelog
