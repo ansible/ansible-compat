@@ -21,7 +21,7 @@ from ansible_compat.errors import (
     AnsibleCompatError,
     InvalidPrerequisiteError,
 )
-from ansible_compat.runtime import CompletedProcess, Runtime
+from ansible_compat.runtime import CompletedProcess, Runtime, search_galaxy_paths
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -798,3 +798,28 @@ def test_runtime_plugins(runtime: Runtime) -> None:
         assert "ansible.builtin.free" in runtime.plugins.strategy
         assert "ansible.builtin.is_abs" in runtime.plugins.test
         assert "ansible.builtin.bool" in runtime.plugins.filter
+
+
+@pytest.mark.parametrize(
+    ("path", "result"),
+    (
+        pytest.param(
+            "test/assets/galaxy_paths",
+            ["test/assets/galaxy_paths/foo/galaxy.yml"],
+            id="1",
+        ),
+        pytest.param(
+            "test/collections",
+            [],  # should find nothing because these folders are not valid namespaces
+            id="2",
+        ),
+        pytest.param(
+            "test/assets/galaxy_paths/foo",
+            ["test/assets/galaxy_paths/foo/galaxy.yml"],
+            id="3",
+        ),
+    ),
+)
+def test_galaxy_path(path: str, result: list[str]) -> None:
+    """Check behavior of galaxy path search."""
+    assert search_galaxy_paths(Path(path)) == result
