@@ -201,10 +201,9 @@ class Runtime:
         if "PYTHONWARNINGS" not in self.environ:  # pragma: no cover
             self.environ["PYTHONWARNINGS"] = "ignore:Blowfish has been deprecated"
 
-        self.config = AnsibleConfig()
-
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
+        self.config = AnsibleConfig()
 
         # Add the sys.path to the collection paths if not isolated
         self._add_sys_path_to_collection_paths()
