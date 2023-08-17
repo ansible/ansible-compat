@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import warnings
 from collections import OrderedDict
@@ -200,9 +201,13 @@ class Runtime:
         if "PYTHONWARNINGS" not in self.environ:  # pragma: no cover
             self.environ["PYTHONWARNINGS"] = "ignore:Blowfish has been deprecated"
 
+        self.config = AnsibleConfig()
+
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
-        self.config = AnsibleConfig()
+
+        # Add the sys.path to the collection paths if not isolated
+        self._add_sys_path_to_collection_paths()
 
         if not self.version_in_range(lower=min_required_version):
             msg = f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
@@ -230,6 +235,11 @@ class Runtime:
 
         # Monkey patch ansible warning in order to use warnings module.
         Display.warning = warning
+
+    def _add_sys_path_to_collection_paths(self) -> None:
+        """Add the sys.path to the collection paths."""
+        if not self.isolated and self.config.collections_scan_sys_path:
+            self.config.collections_paths.extend(sys.path)
 
     def load_collections(self) -> None:
         """Load collection data."""
