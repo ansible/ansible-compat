@@ -504,9 +504,12 @@ def test_scan_sys_path(
             version="0.1.0",
             install=False,
         )
+        raised_missing = False
     except InvalidPrerequisiteError:
-        if param.expected:
-            raise
+        raised_missing = True
+    
+    assert param.expected != raised_missing
+
 
 
 @pytest.mark.parametrize(
