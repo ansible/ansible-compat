@@ -507,9 +507,8 @@ def test_scan_sys_path(
         raised_missing = False
     except InvalidPrerequisiteError:
         raised_missing = True
-    
-    assert param.expected != raised_missing
 
+    assert param.expected != raised_missing
 
 
 @pytest.mark.parametrize(
