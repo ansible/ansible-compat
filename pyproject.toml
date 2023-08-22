@@ -120,6 +120,7 @@ disable = [
 [tool.pytest.ini_options]
 # ensure we treat warnings as error
 filterwarnings = ["error"]
+testpaths = ["test"]
 
 [tool.ruff]
 select = ["ALL"]

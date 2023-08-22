@@ -22,7 +22,12 @@ from ansible_compat.errors import (
     AnsibleCompatError,
     InvalidPrerequisiteError,
 )
-from ansible_compat.runtime import CompletedProcess, Runtime, search_galaxy_paths
+from ansible_compat.runtime import (
+    CompletedProcess,
+    Runtime,
+    is_url,
+    search_galaxy_paths,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -538,6 +543,13 @@ def test_install_collection(runtime: Runtime) -> None:
     runtime.install_collection("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
 
 
+def test_install_collection_git(runtime: Runtime) -> None:
+    """Check that valid collection installs do not fail."""
+    runtime.install_collection(
+        "git+https://github.com/ansible-collections/ansible.posix,main",
+    )
+
+
 def test_install_collection_dest(runtime: Runtime, tmp_path: pathlib.Path) -> None:
     """Check that valid collection to custom destination passes."""
     # Since Ansible 2.15.3 there is no guarantee that this will install the collection at requested path
@@ -728,6 +740,7 @@ def test_runtime_version_in_range(
                 "ansible.posix",  # from tests/requirements.yml
                 "ansible.utils",  # from galaxy.yml
                 "community.molecule",  # from galaxy.yml
+                "community.crypto",  # from galaxy.yml as a git dependency
             ],
             id="normal",
         ),
@@ -890,3 +903,28 @@ def test_runtime_plugins(runtime: Runtime) -> None:
 def test_galaxy_path(path: str, result: list[str]) -> None:
     """Check behavior of galaxy path search."""
     assert search_galaxy_paths(Path(path)) == result
+
+
+@pytest.mark.parametrize(
+    ("name", "result"),
+    (
+        pytest.param(
+            "foo",
+            False,
+            id="0",
+        ),
+        pytest.param(
+            "git+git",
+            True,
+            id="1",
+        ),
+        pytest.param(
+            "git@acme.com",
+            True,
+            id="2",
+        ),
+    ),
+)
+def test_is_url(name: str, result: bool) -> None:
+    """Checks functionality of is_url."""
+    assert is_url(name) == result

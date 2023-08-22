@@ -412,7 +412,9 @@ class Runtime:
     ) -> None:
         """Install an Ansible collection.
 
-        Can accept version constraints like 'foo.bar:>=1.2.3'
+        Can accept arguments like:
+            'foo.bar:>=1.2.3'
+            'git+https://github.com/ansible-collections/ansible.posix.git,main'
         """
         cmd = [
             "ansible-galaxy",
@@ -423,11 +425,18 @@ class Runtime:
         if force:
             cmd.append("--force")
 
+        if isinstance(collection, Path):
+            collection = str(collection)
         # As ansible-galaxy install is not able to automatically determine
         # if the range requires a pre-release, we need to manuall add the --pre
         # flag when needed.
-        matches = version_re.search(str(collection))
-        if matches and CollectionVersion(matches[1]).is_prerelease:
+        matches = version_re.search(collection)
+
+        if (
+            not is_url(collection)
+            and matches
+            and CollectionVersion(matches[1]).is_prerelease
+        ):
             cmd.append("--pre")
 
         cpaths: list[str] = self.config.collections_paths
@@ -602,7 +611,7 @@ class Runtime:
                             required_version,
                         )
                         self.install_collection(
-                            f"{name}:{required_version}",
+                            f"{name}{',' if is_url(name) else ':'}{required_version}",
                             destination=destination,
                         )
 
@@ -916,3 +925,8 @@ def search_galaxy_paths(search_dir: Path) -> list[str]:
         if file_path.is_file():
             galaxy_paths.append(str(file_path))
     return galaxy_paths
+
+
+def is_url(name: str) -> bool:
+    """Return True if a dependency name looks like an URL."""
+    return bool(re.match("^git[+@]", name))
