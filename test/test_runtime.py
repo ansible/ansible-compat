@@ -7,6 +7,7 @@ import os
 import pathlib
 import subprocess
 from contextlib import contextmanager
+from dataclasses import dataclass, fields
 from pathlib import Path
 from shutil import rmtree
 from typing import TYPE_CHECKING, Any
@@ -28,6 +29,8 @@ if TYPE_CHECKING:
 
     from _pytest.monkeypatch import MonkeyPatch
     from pytest_mock import MockerFixture
+
+V2_COLLECTION_TARBALL = Path("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
 
 
 def test_runtime_version(runtime: Runtime) -> None:
@@ -442,6 +445,70 @@ def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
 def test_require_collection(runtime_tmp: Runtime) -> None:
     """Check that require collection successful install case."""
     runtime_tmp.require_collection("community.molecule", "0.1.0")
+
+
+@dataclass
+class ScanSysPath:
+    """Parameters for scan tests."""
+
+    isolated: bool
+    scan: bool
+    expected: bool
+
+    def __str__(self) -> str:
+        """Return a string representation of the object."""
+        parts = [
+            f"{field.name}{str(getattr(self, field.name))[0]}" for field in fields(self)
+        ]
+        return "-".join(parts)
+
+
+@pytest.mark.parametrize(
+    ("param"),
+    (
+        ScanSysPath(isolated=True, scan=True, expected=False),
+        ScanSysPath(isolated=True, scan=False, expected=False),
+        ScanSysPath(isolated=False, scan=True, expected=True),
+        ScanSysPath(isolated=False, scan=False, expected=False),
+    ),
+    ids=str,
+)
+def test_scan_sys_path(
+    monkeypatch: MonkeyPatch,
+    tmp_path: Path,
+    runtime_tmp: Runtime,
+    param: ScanSysPath,
+) -> None:
+    """Confirm sys path is scanned for collections.
+
+    :param monkeypatch: Fixture for monkeypatching
+    :param tmp_path: Fixture for a temp directory
+    :param runtime_tmp: Fixture for a Runtime object
+    :param param: The parameters for the test
+    """
+    runtime_tmp.install_collection(
+        V2_COLLECTION_TARBALL,
+        destination=tmp_path,
+    )
+    runtime_tmp.config.collections_paths.remove(str(tmp_path))
+
+    # Set the runtime to the test parameters
+    runtime_tmp.isolated = param.isolated
+    runtime_tmp.config.collections_scan_sys_path = param.scan
+    monkeypatch.syspath_prepend(str(tmp_path))
+    runtime_tmp._add_sys_path_to_collection_paths()
+
+    try:
+        runtime_tmp.require_collection(
+            name="community.molecule",
+            version="0.1.0",
+            install=False,
+        )
+        raised_missing = False
+    except InvalidPrerequisiteError:
+        raised_missing = True
+
+    assert param.expected != raised_missing
 
 
 @pytest.mark.parametrize(
