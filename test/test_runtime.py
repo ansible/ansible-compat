@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
+import site
 import subprocess
 from contextlib import contextmanager
 from dataclasses import dataclass, fields
@@ -928,3 +929,11 @@ def test_galaxy_path(path: str, result: list[str]) -> None:
 def test_is_url(name: str, result: bool) -> None:
     """Checks functionality of is_url."""
     assert is_url(name) == result
+
+
+def test_runtime_site_package_path() -> None:
+    """Test site package paths."""
+    runtime = Runtime()
+    site_paths = site.getsitepackages()
+    for path in site_paths:
+        assert path in runtime.config.collections_paths
