@@ -60,12 +60,17 @@ def test_scan_sys_path(
     :param tmp_dir: Fixture for a temporary directory
     :param param: The parameters for the test
     """
-    first_site_package_dir = Path(venv_module.site_package_dirs()[0])
-    # Install the collection into the venv site packages directory
+    first_site_package_dir = venv_module.site_package_dirs()[0]
+    # Install the collection into the venv site packages directory, force
+    # as of yet this test is not isolated from the rest of the system
     runtime_tmp.install_collection(
-        V2_COLLECTION_TARBALL,
+        collection=V2_COLLECTION_TARBALL,
         destination=first_site_package_dir,
+        force=True,
     )
+    installed_to = first_site_package_dir / "ansible_collections" / V2_COLLECTION_NAMESPACE / V2_COLLECTION_NAME
+    # Confirm the collection is installed
+    assert installed_to.exists()
     # Set the sys scan path environment variable
     monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(param.scan))
     # Set the ansible collections paths to avoid bleed from other tests
@@ -90,6 +95,5 @@ def test_scan_sys_path(
         assert proc.returncode == 0, (proc.stdout, proc.stderr)
         result = json.loads(proc.stdout)
         assert result["found_version"] == V2_COLLECTION_VERSION
-        expected = first_site_package_dir / "ansible_collections" / V2_COLLECTION_NAMESPACE / V2_COLLECTION_NAME
-        assert result["collection_path"] == str(expected)
+        assert result["collection_path"] == str(installed_to)
 
