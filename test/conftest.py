@@ -33,6 +33,7 @@ def runtime_tmp(
     yield instance
     instance.clean()
 
+
 def query_pkg_version(pkg: str) -> str:
     """Get the version of a current installed package.
 
@@ -41,6 +42,7 @@ def query_pkg_version(pkg: str) -> str:
     """
     return importlib.metadata.version(pkg)
 
+
 @pytest.fixture()
 def pkg_version() -> Callable[[str], str]:
     """Get the version of a current installed package.
@@ -48,7 +50,6 @@ def pkg_version() -> Callable[[str], str]:
     :return: Callable function to get package version
     """
     return query_pkg_version
-
 
 
 @pytest.fixture(scope="module")
@@ -62,6 +63,7 @@ def venv_module(tmp_path_factory: pytest.FixtureRequest) -> None:
     _venv = VirtualEnvironment(tmp_path)
     _venv.create()
     return _venv
+
 
 class VirtualEnvironment:
     """Virtualenv wrapper."""
@@ -108,9 +110,6 @@ class VirtualEnvironment:
 
         :return: List of site packages dirs
         """
-        script = (
-            "import json, site; "
-            "print(json.dumps(site.getsitepackages()))"
-        )
+        script = "import json, site; " "print(json.dumps(site.getsitepackages()))"
         proc = subprocess.check_output(args=[self.python, "-c", script], text=True)
         return json.loads(proc)

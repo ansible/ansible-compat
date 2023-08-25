@@ -35,10 +35,6 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
 
-
-
-
-
 def test_runtime_version(runtime: Runtime) -> None:
     """Tests version property."""
     version = runtime.version
@@ -451,8 +447,6 @@ def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
 def test_require_collection(runtime_tmp: Runtime) -> None:
     """Check that require collection successful install case."""
     runtime_tmp.require_collection("community.molecule", "0.1.0")
-
-
 
 
 @pytest.mark.parametrize(

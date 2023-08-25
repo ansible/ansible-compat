@@ -13,11 +13,10 @@ from ansible_compat.runtime import Runtime
 from .conftest import VirtualEnvironment
 
 V2_COLLECTION_TARBALL = Path("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
-V2_COLLECTION_NAMESPACE= "community"
+V2_COLLECTION_NAMESPACE = "community"
 V2_COLLECTION_NAME = "molecule"
 V2_COLLECTION_VERSION = "0.1.0"
 V2_COLLECTION_FULL_NAME = f"{V2_COLLECTION_NAMESPACE}.{V2_COLLECTION_NAME}"
-
 
 
 @dataclass
@@ -61,31 +60,34 @@ def test_scan_sys_path(
     """
     first_site_package_dir = venv_module.site_package_dirs()[0]
     # Install the collection into the venv site packages directory
-    runtime_tmp.install_collection(V2_COLLECTION_TARBALL, destination=first_site_package_dir)
+    runtime_tmp.install_collection(
+        V2_COLLECTION_TARBALL, destination=first_site_package_dir
+    )
     # Set the sys scan path environment variable
     monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(param.scan))
     # Set the ansible collections paths to nothing as a safeguard
     monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATHS", "")
 
-
-    script = textwrap.dedent(f"""
+    script = textwrap.dedent(
+        f"""
     import json;
     from ansible_compat.runtime import Runtime;
     r = Runtime(isolated={param.isolated});
     fv, cp = r.require_collection(name="{V2_COLLECTION_FULL_NAME}", version="{V2_COLLECTION_VERSION}", install=False);
     print(json.dumps({{"found_version": str(fv), "collection_path": str(cp)}}));
-    """)
+    """
+    )
 
     proc = venv_module.python_script_run(script)
     assert bool(proc.returncode) is not param.expected
     if not param.expected:
-        assert "\'community.molecule\' not found" in proc.stderr
+        assert "'community.molecule' not found" in proc.stderr
     else:
         result = json.loads(proc.stdout)
         assert result["found_version"] == V2_COLLECTION_VERSION
         assert Path(result["collection_path"]) == (
-            Path(first_site_package_dir) /
-            "ansible_collections" /
-            V2_COLLECTION_NAMESPACE /
-            V2_COLLECTION_NAME
+            Path(first_site_package_dir)
+            / "ansible_collections"
+            / V2_COLLECTION_NAMESPACE
+            / V2_COLLECTION_NAME
         )

@@ -739,7 +739,9 @@ class Runtime:
         else:
             if install:
                 self.install_collection(f"{name}:>={version}" if version else name)
-                return self.require_collection(name=name, version=version, install=False)
+                return self.require_collection(
+                    name=name, version=version, install=False
+                )
             msg = f"Collection '{name}' not found in '{paths}'"
             _logger.fatal(msg)
             raise InvalidPrerequisiteError(msg)
