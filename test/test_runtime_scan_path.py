@@ -83,11 +83,11 @@ def test_scan_sys_path(
 
     proc = venv_module.python_script_run(script)
     if param.raises_not_found:
-        assert proc.returncode != 0
+        assert proc.returncode != 0, (proc.stdout, proc.stderr)
         assert "InvalidPrerequisiteError" in proc.stderr
         assert "'community.molecule' not found" in proc.stderr
     else:
-        assert proc.returncode == 0
+        assert proc.returncode == 0, (proc.stdout, proc.stderr)
         result = json.loads(proc.stdout)
         assert result["found_version"] == V2_COLLECTION_VERSION
         expected = first_site_package_dir / "ansible_collections" / V2_COLLECTION_NAMESPACE / V2_COLLECTION_NAME
