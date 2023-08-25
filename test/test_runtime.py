@@ -471,7 +471,12 @@ class ScanSysPath:
 
 @pytest.mark.parametrize(
     ("param"),
-    (ScanSysPath(isolated=False, scan=True, expected=True),),
+    (
+        ScanSysPath(isolated=True, scan=True, expected=False),
+        ScanSysPath(isolated=True, scan=False, expected=False),
+        ScanSysPath(isolated=False, scan=True, expected=True),
+        ScanSysPath(isolated=False, scan=False, expected=False),
+    ),
     ids=str,
 )
 def test_scan_sys_path(
