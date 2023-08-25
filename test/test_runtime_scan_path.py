@@ -68,8 +68,8 @@ def test_scan_sys_path(
     )
     # Set the sys scan path environment variable
     monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(param.scan))
-    # Set the ansible collections paths to a tmp path as a safeguard
-    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATHS", str(tmp_path))
+    # Set the ansible collections paths to avoid bleed from other tests
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", str(tmp_path))
 
     script = textwrap.dedent(
         f"""

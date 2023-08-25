@@ -734,7 +734,7 @@ class Runtime:
                             msg = f"Found {name} collection {found_version} but {version} or newer is required."
                             _logger.fatal(msg)
                             raise InvalidPrerequisiteError(msg)
-                    return found_version, collpath
+                    return found_version, collpath.resolve()
                 break
         else:
             if install:
