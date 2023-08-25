@@ -52,19 +52,6 @@ def pkg_version() -> Callable[[str], str]:
     return query_pkg_version
 
 
-@pytest.fixture(scope="module")
-def venv_module(tmp_path_factory: pytest.FixtureRequest) -> None:
-    """Create a virtualenv in a temporary directory.
-
-    :param tmp_path: pytest fixture for temp path
-    :return: VirtualEnvironment instance
-    """
-    tmp_path = tmp_path_factory.mktemp("venv")
-    _venv = VirtualEnvironment(tmp_path)
-    _venv.create()
-    return _venv
-
-
 class VirtualEnvironment:
     """Virtualenv wrapper."""
 
@@ -79,7 +66,7 @@ class VirtualEnvironment:
 
     def create(self) -> None:
         """Create virtualenv."""
-        cmd = [sys.executable, "-m", "venv", self.path]
+        cmd = [str(sys.executable), "-m", "venv", str(self.path)]
         subprocess.check_call(args=cmd)
         # Install this package into the virtual environment
         self.install(f"{__file__}/../..")
@@ -89,10 +76,10 @@ class VirtualEnvironment:
 
         :param packages: Packages to install
         """
-        cmd = [self.python, "-m", "pip", "install", *packages]
+        cmd = [str(self.python), "-m", "pip", "install", *packages]
         subprocess.check_call(args=cmd)
 
-    def python_script_run(self, script: str) -> None:
+    def python_script_run(self, script: str) -> subprocess.CompletedProcess[str]:
         """Run command in virtualenv.
 
         :param args: Command to run
@@ -110,6 +97,28 @@ class VirtualEnvironment:
 
         :return: List of site packages dirs
         """
-        script = "import json, site; " "print(json.dumps(site.getsitepackages()))"
-        proc = subprocess.check_output(args=[self.python, "-c", script], text=True)
-        return json.loads(proc)
+        script = "import json, site; print(json.dumps(site.getsitepackages()))"
+        proc = subprocess.run(
+            args=[self.python, "-c", script],
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+        dirs = json.loads(proc.stdout)
+        if not isinstance(dirs, list):
+            msg = "Expected list of site packages"
+            raise TypeError(msg)
+        return dirs
+
+
+@pytest.fixture(scope="module")
+def venv_module(tmp_path_factory: pytest.TempPathFactory) -> VirtualEnvironment:
+    """Create a virtualenv in a temporary directory.
+
+    :param tmp_path: pytest fixture for temp path
+    :return: VirtualEnvironment instance
+    """
+    tmp_path = tmp_path_factory.mktemp("venv")
+    _venv = VirtualEnvironment(tmp_path)
+    _venv.create()
+    return _venv

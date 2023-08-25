@@ -25,7 +25,7 @@ class ScanSysPath:
 
     isolated: bool
     scan: bool
-    expected: bool
+    raises_not_found: bool
 
     def __str__(self) -> str:
         """Return a string representation of the object."""
@@ -38,10 +38,10 @@ class ScanSysPath:
 @pytest.mark.parametrize(
     ("param"),
     (
-        ScanSysPath(isolated=True, scan=True, expected=False),
-        ScanSysPath(isolated=True, scan=False, expected=False),
-        ScanSysPath(isolated=False, scan=True, expected=True),
-        ScanSysPath(isolated=False, scan=False, expected=False),
+        ScanSysPath(isolated=True, scan=True, raises_not_found=True),
+        ScanSysPath(isolated=True, scan=False, raises_not_found=True),
+        ScanSysPath(isolated=False, scan=True, raises_not_found=False),
+        ScanSysPath(isolated=False, scan=False, raises_not_found=True),
     ),
     ids=str,
 )
@@ -58,10 +58,11 @@ def test_scan_sys_path(
     :param runtime_tmp: Fixture for a Runtime object
     :param param: The parameters for the test
     """
-    first_site_package_dir = venv_module.site_package_dirs()[0]
+    first_site_package_dir = Path(venv_module.site_package_dirs()[0])
     # Install the collection into the venv site packages directory
     runtime_tmp.install_collection(
-        V2_COLLECTION_TARBALL, destination=first_site_package_dir
+        V2_COLLECTION_TARBALL,
+        destination=first_site_package_dir,
     )
     # Set the sys scan path environment variable
     monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(param.scan))
@@ -75,18 +76,20 @@ def test_scan_sys_path(
     r = Runtime(isolated={param.isolated});
     fv, cp = r.require_collection(name="{V2_COLLECTION_FULL_NAME}", version="{V2_COLLECTION_VERSION}", install=False);
     print(json.dumps({{"found_version": str(fv), "collection_path": str(cp)}}));
-    """
+    """,
     )
 
     proc = venv_module.python_script_run(script)
-    assert bool(proc.returncode) is not param.expected
-    if not param.expected:
+    if param.raises_not_found:
+        assert proc.returncode != 0
+        assert "InvalidPrerequisiteError" in proc.stderr
         assert "'community.molecule' not found" in proc.stderr
     else:
+        assert proc.returncode == 0
         result = json.loads(proc.stdout)
         assert result["found_version"] == V2_COLLECTION_VERSION
         assert Path(result["collection_path"]) == (
-            Path(first_site_package_dir)
+            first_site_package_dir
             / "ansible_collections"
             / V2_COLLECTION_NAMESPACE
             / V2_COLLECTION_NAME

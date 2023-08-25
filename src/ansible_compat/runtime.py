@@ -680,7 +680,7 @@ class Runtime:
         version: str | None = None,
         *,
         install: bool = True,
-    ) -> tuple[str, Path]:
+    ) -> tuple[CollectionVersion, Path]:
         """Check if a minimal collection version is present or exits.
 
         In the future this method may attempt to install a missing or outdated
@@ -740,7 +740,9 @@ class Runtime:
             if install:
                 self.install_collection(f"{name}:>={version}" if version else name)
                 return self.require_collection(
-                    name=name, version=version, install=False
+                    name=name,
+                    version=version,
+                    install=False,
                 )
             msg = f"Collection '{name}' not found in '{paths}'"
             _logger.fatal(msg)
