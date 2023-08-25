@@ -61,19 +61,21 @@ def test_scan_sys_path(
     :param param: The parameters for the test
     """
     first_site_package_dir = venv_module.site_package_dirs()[0]
-    # Install the collection into the venv site packages directory, force
-    # as of yet this test is not isolated from the rest of the system
-    runtime_tmp.install_collection(
-        collection=V2_COLLECTION_TARBALL,
-        destination=first_site_package_dir,
-        force=True,
-    )
+
     installed_to = (
         first_site_package_dir
         / "ansible_collections"
         / V2_COLLECTION_NAMESPACE
         / V2_COLLECTION_NAME
     )
+    if not installed_to.exists():
+        # Install the collection into the venv site packages directory, force
+        # as of yet this test is not isolated from the rest of the system
+        runtime_tmp.install_collection(
+            collection=V2_COLLECTION_TARBALL,
+            destination=first_site_package_dir,
+            force=True,
+        )
     # Confirm the collection is installed
     assert installed_to.exists()
     # Set the sys scan path environment variable
