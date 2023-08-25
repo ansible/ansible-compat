@@ -49,6 +49,7 @@ def test_scan_sys_path(
     venv_module: VirtualEnvironment,
     monkeypatch: MonkeyPatch,
     runtime_tmp: Runtime,
+    tmp_path: Path,
     param: ScanSysPath,
 ) -> None:
     """Confirm sys path is scanned for collections.
@@ -56,6 +57,7 @@ def test_scan_sys_path(
     :param venv_module: Fixture for a virtual environment
     :param monkeypatch: Fixture for monkeypatching
     :param runtime_tmp: Fixture for a Runtime object
+    :param tmp_dir: Fixture for a temporary directory
     :param param: The parameters for the test
     """
     first_site_package_dir = Path(venv_module.site_package_dirs()[0])
@@ -66,8 +68,8 @@ def test_scan_sys_path(
     )
     # Set the sys scan path environment variable
     monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(param.scan))
-    # Set the ansible collections paths to nothing as a safeguard
-    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATHS", "")
+    # Set the ansible collections paths to a tmp path as a safeguard
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATHS", str(tmp_path))
 
     script = textwrap.dedent(
         f"""
