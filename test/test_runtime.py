@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
-import site
 import subprocess
 from contextlib import contextmanager
 from dataclasses import dataclass, fields
@@ -492,7 +491,6 @@ def test_scan_sys_path(
     :param runtime_tmp: Fixture for a Runtime object
     :param param: The parameters for the test
     """
-    tmp_path = Path(site.getsitepackages()[0])
     runtime_tmp.install_collection(
         V2_COLLECTION_TARBALL,
         destination=tmp_path,
