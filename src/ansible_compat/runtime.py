@@ -48,6 +48,7 @@ if TYPE_CHECKING:
 else:
     CompletedProcess = subprocess.CompletedProcess
 
+
 _logger = logging.getLogger(__name__)
 # regex to extract the first version from a collection range specifier
 version_re = re.compile(":[>=<]*([^,]*)")
@@ -679,11 +680,16 @@ class Runtime:
         version: str | None = None,
         *,
         install: bool = True,
-    ) -> None:
+    ) -> tuple[str, Path]:
         """Check if a minimal collection version is present or exits.
 
         In the future this method may attempt to install a missing or outdated
         collection before failing.
+
+        :param name: collection name
+        :param version: minimal version required
+        :param install: if True, attempt to install a missing collection
+        :returns: tuple of (found_version, collection_path)
         """
         try:
             ns, coll = name.split(".", 1)
@@ -728,15 +734,15 @@ class Runtime:
                             msg = f"Found {name} collection {found_version} but {version} or newer is required."
                             _logger.fatal(msg)
                             raise InvalidPrerequisiteError(msg)
+                    return found_version, collpath
                 break
         else:
             if install:
                 self.install_collection(f"{name}:>={version}" if version else name)
-                self.require_collection(name=name, version=version, install=False)
-            else:
-                msg = f"Collection '{name}' not found in '{paths}'"
-                _logger.fatal(msg)
-                raise InvalidPrerequisiteError(msg)
+                return self.require_collection(name=name, version=version, install=False)
+            msg = f"Collection '{name}' not found in '{paths}'"
+            _logger.fatal(msg)
+            raise InvalidPrerequisiteError(msg)
 
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""
