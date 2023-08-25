@@ -243,7 +243,9 @@ class Runtime:
                     path not in self.config.collections_paths
                     and Path(Path(path) / "ansible_collections").is_dir()
                 ):
-                    self.config.collections_paths.append(path)  # pylint: disable=E1101
+                    self.config.collections_paths.append(  # noqa: PERF401 pylint: disable=E1101
+                        path,
+                    )
 
     def load_collections(self) -> None:
         """Load collection data."""
