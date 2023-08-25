@@ -68,7 +68,12 @@ def test_scan_sys_path(
         destination=first_site_package_dir,
         force=True,
     )
-    installed_to = first_site_package_dir / "ansible_collections" / V2_COLLECTION_NAMESPACE / V2_COLLECTION_NAME
+    installed_to = (
+        first_site_package_dir
+        / "ansible_collections"
+        / V2_COLLECTION_NAMESPACE
+        / V2_COLLECTION_NAME
+    )
     # Confirm the collection is installed
     assert installed_to.exists()
     # Set the sys scan path environment variable
@@ -96,4 +101,3 @@ def test_scan_sys_path(
         result = json.loads(proc.stdout)
         assert result["found_version"] == V2_COLLECTION_VERSION
         assert result["collection_path"] == str(installed_to)
-

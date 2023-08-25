@@ -94,7 +94,7 @@ class VirtualEnvironment:
         )
         return proc
 
-    def site_package_dirs(self) -> list[str]:
+    def site_package_dirs(self) -> list[Path]:
         """Get site packages.
 
         :return: List of site packages dirs
