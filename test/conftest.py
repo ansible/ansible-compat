@@ -101,7 +101,7 @@ class VirtualEnvironment:
         """
         script = "import json, site; print(json.dumps(site.getsitepackages()))"
         proc = subprocess.run(
-            args=[self.python, "-c", script],
+            args=[self.venv_python_path, "-c", script],
             capture_output=True,
             check=False,
             text=True,
