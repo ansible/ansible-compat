@@ -60,13 +60,14 @@ class VirtualEnvironment:
 
         :param path: Path to virtualenv
         """
-        self.path = path
-        self.bin_path = path / "bin"
-        self.python = self.bin_path / "python"
+        self.project = path
+        self.venv_path = self.project / "venv"
+        self.venv_bin_path = self.venv_path / "bin"
+        self.venv_python_path = self.venv_bin_path / "python"
 
     def create(self) -> None:
         """Create virtualenv."""
-        cmd = [str(sys.executable), "-m", "venv", str(self.path)]
+        cmd = [str(sys.executable), "-m", "venv", str(self.venv_path)]
         subprocess.check_call(args=cmd)
         # Install this package into the virtual environment
         self.install(f"{__file__}/../..")
@@ -76,17 +77,18 @@ class VirtualEnvironment:
 
         :param packages: Packages to install
         """
-        cmd = [str(self.python), "-m", "pip", "install", *packages]
+        cmd = [str(self.venv_python_path), "-m", "pip", "install", *packages]
         subprocess.check_call(args=cmd)
 
     def python_script_run(self, script: str) -> subprocess.CompletedProcess[str]:
-        """Run command in virtualenv.
+        """Run command in project dir using venv.
 
         :param args: Command to run
         """
         proc = subprocess.run(
-            args=[self.python, "-c", script],
+            args=[self.venv_python_path, "-c", script],
             capture_output=True,
+            cwd=self.project,
             check=False,
             text=True,
         )
@@ -118,7 +120,7 @@ def venv_module(tmp_path_factory: pytest.TempPathFactory) -> VirtualEnvironment:
     :param tmp_path: pytest fixture for temp path
     :return: VirtualEnvironment instance
     """
-    tmp_path = tmp_path_factory.mktemp("venv")
-    _venv = VirtualEnvironment(tmp_path)
+    test_project = tmp_path_factory.mktemp(basename="test_project-", numbered=True)
+    _venv = VirtualEnvironment(test_project)
     _venv.create()
     return _venv
