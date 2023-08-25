@@ -8,7 +8,6 @@ import logging
 import os
 import re
 import shutil
-import site
 import subprocess
 import sys
 import tempfile
@@ -206,11 +205,6 @@ class Runtime:
             self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig()
 
-        # Add the site packages path to the collection paths
-        self.config.collections_paths.extend(  # pylint: disable=E1101
-            site.getusersitepackages(),
-        )
-
         # Add the sys.path to the collection paths if not isolated
         self._add_sys_path_to_collection_paths()
 
@@ -243,8 +237,13 @@ class Runtime:
 
     def _add_sys_path_to_collection_paths(self) -> None:
         """Add the sys.path to the collection paths."""
-        if not self.isolated and self.config.collections_scan_sys_path:
-            self.config.collections_paths.extend(sys.path)  # pylint: disable=E1101
+        if not self.isolated:
+            for path in sys.path:
+                if (
+                    path not in self.config.collections_paths
+                    and Path(Path(path) / "ansible_collections").is_dir()
+                ):
+                    self.config.collections_paths.append(path)  # pylint: disable=E1101
 
     def load_collections(self) -> None:
         """Load collection data."""

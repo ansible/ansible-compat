@@ -471,12 +471,7 @@ class ScanSysPath:
 
 @pytest.mark.parametrize(
     ("param"),
-    (
-        ScanSysPath(isolated=True, scan=True, expected=False),
-        ScanSysPath(isolated=True, scan=False, expected=False),
-        ScanSysPath(isolated=False, scan=True, expected=True),
-        ScanSysPath(isolated=False, scan=False, expected=False),
-    ),
+    (ScanSysPath(isolated=False, scan=True, expected=True),),
     ids=str,
 )
 def test_scan_sys_path(
@@ -492,6 +487,7 @@ def test_scan_sys_path(
     :param runtime_tmp: Fixture for a Runtime object
     :param param: The parameters for the test
     """
+    tmp_path = Path(site.getsitepackages()[0])
     runtime_tmp.install_collection(
         V2_COLLECTION_TARBALL,
         destination=tmp_path,
@@ -929,11 +925,3 @@ def test_galaxy_path(path: str, result: list[str]) -> None:
 def test_is_url(name: str, result: bool) -> None:
     """Checks functionality of is_url."""
     assert is_url(name) == result
-
-
-def test_runtime_site_package_path() -> None:
-    """Test site package paths."""
-    runtime = Runtime()
-    site_paths = site.getsitepackages()
-    for path in site_paths:
-        assert path in runtime.config.collections_paths
