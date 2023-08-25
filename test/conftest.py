@@ -110,7 +110,8 @@ class VirtualEnvironment:
         if not isinstance(dirs, list):
             msg = "Expected list of site packages"
             raise TypeError(msg)
-        return dirs
+        sanitized = list({Path(d).resolve() for d in dirs})
+        return sanitized
 
 
 @pytest.fixture(scope="module")

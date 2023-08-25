@@ -90,9 +90,6 @@ def test_scan_sys_path(
         assert proc.returncode == 0
         result = json.loads(proc.stdout)
         assert result["found_version"] == V2_COLLECTION_VERSION
-        assert Path(result["collection_path"]) == (
-            first_site_package_dir
-            / "ansible_collections"
-            / V2_COLLECTION_NAMESPACE
-            / V2_COLLECTION_NAME
-        )
+        expected = first_site_package_dir / "ansible_collections" / V2_COLLECTION_NAMESPACE / V2_COLLECTION_NAME
+        assert result["collection_path"] == str(expected)
+
