@@ -18,4 +18,3 @@ else
 fi
 
 packit build locally
-
