@@ -238,7 +238,14 @@ class Runtime:
     def _add_sys_path_to_collection_paths(self) -> None:
         """Add the sys.path to the collection paths."""
         if not self.isolated and self.config.collections_scan_sys_path:
-            self.config.collections_paths.extend(sys.path)  # pylint: disable=E1101
+            for path in sys.path:
+                if (
+                    path not in self.config.collections_paths
+                    and (Path(path) / "ansible_collections").is_dir()
+                ):
+                    self.config.collections_paths.append(  # noqa: PERF401 pylint: disable=E1101
+                        path,
+                    )
 
     def load_collections(self) -> None:
         """Load collection data."""
