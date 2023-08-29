@@ -241,7 +241,7 @@ class Runtime:
             for path in sys.path:
                 if (
                     path not in self.config.collections_paths
-                    and Path(Path(path) / "ansible_collections").is_dir()
+                    and (Path(path) / "ansible_collections").is_dir()
                 ):
                     self.config.collections_paths.append(  # noqa: PERF401 pylint: disable=E1101
                         path,
