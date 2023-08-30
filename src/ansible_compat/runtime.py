@@ -555,6 +555,13 @@ class Runtime:
                 "install",
                 "-v",
             ]
+            for collection in reqs_yaml["collections"]:
+                if isinstance(collection, dict) and collection.get("type", "") == "git":
+                    _logger.info(
+                        "Adding '--pre' to ansible-galaxy collection install because we detected one collection being sourced from git.",
+                    )
+                    cmd.append("--pre")
+                    break
             if offline:
                 _logger.warning(
                     "Skipped installing collection dependencies due to running in offline mode.",
