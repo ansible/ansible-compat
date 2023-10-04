@@ -27,6 +27,7 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python",
   "Topic :: System :: Systems Administration",
   "Topic :: Software Development :: Bug Tracking",
@@ -119,7 +120,12 @@ disable = [
 
 [tool.pytest.ini_options]
 # ensure we treat warnings as error
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  # py312 ansible-core
+  # https://github.com/ansible/ansible/issues/81906
+  "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
+]
 testpaths = ["test"]
 
 [tool.ruff]
