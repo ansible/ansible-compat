@@ -23,7 +23,6 @@ V2_COLLECTION_FULL_NAME = f"{V2_COLLECTION_NAMESPACE}.{V2_COLLECTION_NAME}"
 class ScanSysPath:
     """Parameters for scan tests."""
 
-    isolated: bool
     scan: bool
     raises_not_found: bool
 
@@ -38,10 +37,8 @@ class ScanSysPath:
 @pytest.mark.parametrize(
     ("param"),
     (
-        ScanSysPath(isolated=True, scan=True, raises_not_found=True),
-        ScanSysPath(isolated=True, scan=False, raises_not_found=True),
-        ScanSysPath(isolated=False, scan=True, raises_not_found=False),
-        ScanSysPath(isolated=False, scan=False, raises_not_found=True),
+        ScanSysPath(scan=False, raises_not_found=True),
+        ScanSysPath(scan=True, raises_not_found=False),
     ),
     ids=str,
 )
@@ -87,7 +84,7 @@ def test_scan_sys_path(
         f"""
     import json;
     from ansible_compat.runtime import Runtime;
-    r = Runtime(isolated={param.isolated});
+    r = Runtime();
     fv, cp = r.require_collection(name="{V2_COLLECTION_FULL_NAME}", version="{V2_COLLECTION_VERSION}", install=False);
     print(json.dumps({{"found_version": str(fv), "collection_path": str(cp)}}));
     """,
