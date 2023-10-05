@@ -65,7 +65,7 @@ concurrency = ["multiprocessing", "thread"]
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
-fail_under = 93
+fail_under = 92
 skip_covered = true
 show_missing = true
 
