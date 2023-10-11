@@ -238,7 +238,7 @@ class Runtime:
 
     def _add_sys_path_to_collection_paths(self) -> None:
         """Add the sys.path to the collection paths."""
-        if not self.isolated and self.config.collections_scan_sys_path:
+        if self.config.collections_scan_sys_path:
             for path in sys.path:
                 if (
                     path not in self.config.collections_paths
