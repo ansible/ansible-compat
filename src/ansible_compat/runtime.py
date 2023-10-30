@@ -48,6 +48,7 @@ if TYPE_CHECKING:
 else:
     CompletedProcess = subprocess.CompletedProcess
 
+
 _logger = logging.getLogger(__name__)
 # regex to extract the first version from a collection range specifier
 version_re = re.compile(":[>=<]*([^,]*)")
@@ -237,8 +238,15 @@ class Runtime:
 
     def _add_sys_path_to_collection_paths(self) -> None:
         """Add the sys.path to the collection paths."""
-        if not self.isolated and self.config.collections_scan_sys_path:
-            self.config.collections_paths.extend(sys.path)  # pylint: disable=E1101
+        if self.config.collections_scan_sys_path:
+            for path in sys.path:
+                if (
+                    path not in self.config.collections_paths
+                    and (Path(path) / "ansible_collections").is_dir()
+                ):
+                    self.config.collections_paths.append(  # pylint: disable=E1101
+                        path,
+                    )
 
     def load_collections(self) -> None:
         """Load collection data."""
@@ -412,7 +420,9 @@ class Runtime:
     ) -> None:
         """Install an Ansible collection.
 
-        Can accept version constraints like 'foo.bar:>=1.2.3'
+        Can accept arguments like:
+            'foo.bar:>=1.2.3'
+            'git+https://github.com/ansible-collections/ansible.posix.git,main'
         """
         cmd = [
             "ansible-galaxy",
@@ -423,11 +433,18 @@ class Runtime:
         if force:
             cmd.append("--force")
 
+        if isinstance(collection, Path):
+            collection = str(collection)
         # As ansible-galaxy install is not able to automatically determine
         # if the range requires a pre-release, we need to manuall add the --pre
         # flag when needed.
-        matches = version_re.search(str(collection))
-        if matches and CollectionVersion(matches[1]).is_prerelease:
+        matches = version_re.search(collection)
+
+        if (
+            not is_url(collection)
+            and matches
+            and CollectionVersion(matches[1]).is_prerelease
+        ):
             cmd.append("--pre")
 
         cpaths: list[str] = self.config.collections_paths
@@ -531,13 +548,20 @@ class Runtime:
                     raise AnsibleCommandError(result)
 
         # Run galaxy collection install works on v2 requirements.yml
-        if "collections" in reqs_yaml:
+        if "collections" in reqs_yaml and reqs_yaml["collections"] is not None:
             cmd = [
                 "ansible-galaxy",
                 "collection",
                 "install",
                 "-v",
             ]
+            for collection in reqs_yaml["collections"]:
+                if isinstance(collection, dict) and collection.get("type", "") == "git":
+                    _logger.info(
+                        "Adding '--pre' to ansible-galaxy collection install because we detected one collection being sourced from git.",
+                    )
+                    cmd.append("--pre")
+                    break
             if offline:
                 _logger.warning(
                     "Skipped installing collection dependencies due to running in offline mode.",
@@ -602,7 +626,7 @@ class Runtime:
                             required_version,
                         )
                         self.install_collection(
-                            f"{name}:{required_version}",
+                            f"{name}{',' if is_url(name) else ':'}{required_version}",
                             destination=destination,
                         )
 
@@ -663,11 +687,16 @@ class Runtime:
         version: str | None = None,
         *,
         install: bool = True,
-    ) -> None:
+    ) -> tuple[CollectionVersion, Path]:
         """Check if a minimal collection version is present or exits.
 
         In the future this method may attempt to install a missing or outdated
         collection before failing.
+
+        :param name: collection name
+        :param version: minimal version required
+        :param install: if True, attempt to install a missing collection
+        :returns: tuple of (found_version, collection_path)
         """
         try:
             ns, coll = name.split(".", 1)
@@ -712,15 +741,19 @@ class Runtime:
                             msg = f"Found {name} collection {found_version} but {version} or newer is required."
                             _logger.fatal(msg)
                             raise InvalidPrerequisiteError(msg)
+                    return found_version, collpath.resolve()
                 break
         else:
             if install:
                 self.install_collection(f"{name}:>={version}" if version else name)
-                self.require_collection(name=name, version=version, install=False)
-            else:
-                msg = f"Collection '{name}' not found in '{paths}'"
-                _logger.fatal(msg)
-                raise InvalidPrerequisiteError(msg)
+                return self.require_collection(
+                    name=name,
+                    version=version,
+                    install=False,
+                )
+            msg = f"Collection '{name}' not found in '{paths}'"
+            _logger.fatal(msg)
+            raise InvalidPrerequisiteError(msg)
 
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""
@@ -916,3 +949,8 @@ def search_galaxy_paths(search_dir: Path) -> list[str]:
         if file_path.is_file():
             galaxy_paths.append(str(file_path))
     return galaxy_paths
+
+
+def is_url(name: str) -> bool:
+    """Return True if a dependency name looks like an URL."""
+    return bool(re.match("^git[+@]", name))
