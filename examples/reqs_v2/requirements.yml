@@ -9,3 +9,13 @@ roles:
     name: geerlingguy.mysql
 collections:
   - name: community-molecule-0.1.0.tar.gz
+  # Also needed for testing purposes as this should trigger addition of --pre
+  # argument as this is required due to
+  # https://github.com/ansible/ansible-lint/issues/3686
+  # https://github.com/ansible/ansible/issues/79109
+  - name: https://github.com/ansible-collections/amazon.aws.git
+    type: git
+    version: main
+  - name: https://github.com/ansible-collections/community.aws.git
+    type: git
+    version: main
