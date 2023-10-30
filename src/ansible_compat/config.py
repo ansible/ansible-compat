@@ -1,11 +1,13 @@
 """Store configuration options as a singleton."""
+from __future__ import annotations
+
 import ast
 import copy
 import os
 import re
 import subprocess
 from collections import UserDict
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from packaging.version import Version
 
@@ -79,9 +81,9 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     action_warnings: bool = True
     agnostic_become_prompt: bool = True
     allow_world_readable_tmpfiles: bool = False
-    ansible_connection_path: Optional[str] = None
+    ansible_connection_path: str | None = None
     ansible_cow_acceptlist: list[str]
-    ansible_cow_path: Optional[str] = None
+    ansible_cow_path: str | None = None
     ansible_cow_selection: str = "default"
     ansible_force_color: bool = False
     ansible_nocolor: bool = False
@@ -94,16 +96,12 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
         "/usr/share/ansible/plugins/become",
     ]
     cache_plugin: str = "memory"
-    cache_plugin_connection: Optional[str] = None
+    cache_plugin_connection: str | None = None
     cache_plugin_prefix: str = "ansible_facts"
     cache_plugin_timeout: int = 86400
     callable_accept_list: list[str] = []
     callbacks_enabled: list[str] = []
-    collections_on_ansible_version_mismatch: Union[
-        Literal["warning"],
-        Literal["warning"],
-        Literal["ignore"],
-    ] = "warning"
+    collections_on_ansible_version_mismatch: Literal["warning", "ignore"] = "warning"
     collections_paths: list[str] = [
         "~/.ansible/collections",
         "/usr/share/ansible/collections",
@@ -127,7 +125,7 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     conditional_bare_vars: bool = False
     connection_facts_modules: dict[str, str]
     controller_python_warning: bool = True
-    coverage_remote_output: Optional[str]
+    coverage_remote_output: str | None
     coverage_remote_paths: list[str]
     default_action_plugin_path: list[str] = [
         "~/.ansible/plugins/action",
@@ -138,7 +136,7 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     default_ask_vault_pass: bool = False
     default_become: bool = False
     default_become_ask_pass: bool = False
-    default_become_exe: Optional[str] = None
+    default_become_exe: str | None = None
     default_become_flags: str
     default_become_method: str = "sudo"
     default_become_user: str = "root"
@@ -160,18 +158,14 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     ]
     default_debug: bool = False
     default_executable: str = "/bin/sh"
-    default_fact_path: Optional[str] = None
+    default_fact_path: str | None = None
     default_filter_plugin_path: list[str] = [
         "~/.ansible/plugins/filter",
         "/usr/share/ansible/plugins/filter",
     ]
     default_force_handlers: bool = False
     default_forks: int = 5
-    default_gathering: Union[
-        Literal["smart"],
-        Literal["explicit"],
-        Literal["implicit"],
-    ] = "smart"
+    default_gathering: Literal["smart", "explicit", "implicit"] = "smart"
     default_gather_subset: list[str] = ["all"]
     default_gather_timeout: int = 10
     default_handler_includes_static: bool = False
@@ -193,7 +187,7 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     default_load_callback_plugins: bool = False
     default_local_tmp: str = "~/.ansible/tmp"
     default_log_filter: list[str] = []
-    default_log_path: Optional[str] = None
+    default_log_path: str | None = None
     default_lookup_lugin_path: list[str] = [
         "~/.ansible/plugins/lookup",
         "/usr/share/ansible/plugins/lookup",
@@ -216,12 +210,12 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     ]
     default_no_log: bool = False
     default_no_target_syslog: bool = False
-    default_null_representation: Optional[str] = None
+    default_null_representation: str | None = None
     default_poll_interval: int = 15
-    default_private_key_file: Optional[str] = None
+    default_private_key_file: str | None = None
     default_private_role_vars: bool = False
-    default_remote_port: Optional[str] = None
-    default_remote_user: Optional[str] = None
+    default_remote_port: str | None = None
+    default_remote_user: str | None = None
     default_roles_path: list[str] = [
         "~/.ansible/roles",
         "/usr/share/ansible/roles",
@@ -259,11 +253,11 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
         "~/.ansible/plugins/vars",
         "/usr/share/ansible/plugins/vars",
     ]
-    default_vault_encrypt_identity: Optional[str] = None
+    default_vault_encrypt_identity: str | None = None
     default_vault_identity: str = "default"
     default_vault_identity_list: list[str] = []
     default_vault_id_match: bool = False
-    default_vault_password_file: Optional[str] = None
+    default_vault_password_file: str | None = None
     default_verbosity: int = 0
     deprecation_warnings: bool = False
     devel_warning: bool = True
@@ -276,28 +270,20 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
         "~/.ansible/plugins/doc_fragments",
         "/usr/share/ansible/plugins/doc_fragments",
     ]
-    duplicate_yaml_dict_key: Union[
-        Literal["warn"],
-        Literal["error"],
-        Literal["ignore"],
-    ] = "warn"
+    duplicate_yaml_dict_key: Literal["warn", "error", "ignore"] = "warn"
     enable_task_debugger: bool = False
     error_on_missing_handler: bool = True
     facts_modules: list[str] = ["smart"]
     galaxy_cache_dir: str = "~/.ansible/galaxy_cache"
-    galaxy_display_progress: Optional[str] = None
+    galaxy_display_progress: str | None = None
     galaxy_ignore_certs: bool = False
-    galaxy_role_skeleton: Optional[str] = None
+    galaxy_role_skeleton: str | None = None
     galaxy_role_skeleton_ignore: list[str] = ["^.git$", "^.*/.git_keep$"]
     galaxy_server: str = "https://galaxy.ansible.com"
-    galaxy_server_list: Optional[str] = None
+    galaxy_server_list: str | None = None
     galaxy_token_path: str = "~/.ansible/galaxy_token"
     host_key_checking: bool = True
-    host_pattern_mismatch: Union[
-        Literal["warning"],
-        Literal["error"],
-        Literal["ignore"],
-    ] = "warning"
+    host_pattern_mismatch: Literal["warning", "error", "ignore"] = "warning"
     inject_facts_as_vars: bool = True
     interpreter_python: str = "auto_legacy"
     interpreter_python_distro_map: dict[str, str]
@@ -305,8 +291,8 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     invalid_task_attribute_failed: bool = True
     inventory_any_unparsed_is_failed: bool = False
     inventory_cache_enabled: bool = False
-    inventory_cache_plugin: Optional[str] = None
-    inventory_cache_plugin_connection: Optional[str] = None
+    inventory_cache_plugin: str | None = None
+    inventory_cache_plugin_connection: str | None = None
     inventory_cache_plugin_prefix: str = "ansible_facts"
     inventory_cache_timeout: int = 3600
     inventory_enabled: list[str] = [
@@ -324,7 +310,7 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     localhost_warning: bool = True
     max_file_size_for_diff: int = 104448
     module_ignore_exts: str
-    netconf_ssh_config: Optional[str] = None
+    netconf_ssh_config: str | None = None
     network_group_modules: list[str] = [
         "eos",
         "nxos",
@@ -356,19 +342,15 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     persistent_connect_retry_timeout: int = 15
     persistent_connect_timeout: int = 30
     persistent_control_path_dir: str = "~/.ansible/pc"
-    playbook_dir: Optional[str]
-    playbook_vars_root: Union[Literal["top"], Literal["bottom"], Literal["all"]] = "top"
-    plugin_filters_cfg: Optional[str] = None
+    playbook_dir: str | None
+    playbook_vars_root: Literal["top", "bottom", "all"] = "top"
+    plugin_filters_cfg: str | None = None
     python_module_rlimit_nofile: int = 0
     retry_files_enabled: bool = False
-    retry_files_save_path: Optional[str] = None
+    retry_files_save_path: str | None = None
     run_vars_plugins: str = "demand"
     show_custom_stats: bool = False
-    string_conversion_action: Union[
-        Literal["warn"],
-        Literal["error"],
-        Literal["ignore"],
-    ] = "warn"
+    string_conversion_action: Literal["warn", "error", "ignore"] = "warn"
     string_type_filters: list[str] = [
         "string",
         "to_json",
@@ -383,11 +365,11 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     tags_skip: list[str] = []
     task_debugger_ignore_errors: bool = True
     task_timeout: int = 0
-    transform_invalid_group_chars: Union[
-        Literal["always"],
-        Literal["never"],
-        Literal["ignore"],
-        Literal["silently"],
+    transform_invalid_group_chars: Literal[
+        "always",
+        "never",
+        "ignore",
+        "silently",
     ] = "never"
     use_persistent_connections: bool = False
     variable_plugins_enabled: list[str] = ["host_group_vars"]
@@ -407,8 +389,8 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
 
     def __init__(
         self,
-        config_dump: Optional[str] = None,
-        data: Optional[dict[str, object]] = None,
+        config_dump: str | None = None,
+        data: dict[str, object] | None = None,
     ) -> None:
         """Load config dictionary."""
         super().__init__()
@@ -461,11 +443,11 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
         """Allow access to config options using indexing."""
         return super().__getitem__(name.upper())
 
-    def __copy__(self) -> "AnsibleConfig":
+    def __copy__(self) -> AnsibleConfig:
         """Allow users to run copy on Config."""
         return AnsibleConfig(data=self.data)
 
-    def __deepcopy__(self, memo: object) -> "AnsibleConfig":
+    def __deepcopy__(self, memo: object) -> AnsibleConfig:
         """Allow users to run deeepcopy on Config."""
         return AnsibleConfig(data=self.data)
 

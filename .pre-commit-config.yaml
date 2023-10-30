@@ -20,14 +20,14 @@ exclude: |
     test/assets/.*
   )$
 repos:
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.277"
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.0.291"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: "v3.0.0"
+    rev: "v3.0.3"
     hooks:
       - id: prettier
         additional_dependencies:
@@ -62,12 +62,12 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 23.9.1
     hooks:
       - id: black
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.4.1
+    rev: v1.5.1
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -84,7 +84,7 @@ repos:
           - types-pkg_resources
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v3.0.0a6
+    rev: v3.0.0b0
     hooks:
       - id: pylint
         additional_dependencies:

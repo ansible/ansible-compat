@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import contextlib
-import fnmatch
 import importlib
 import json
 import logging
@@ -10,6 +9,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import warnings
 from collections import OrderedDict
@@ -27,6 +27,7 @@ from ansible_compat.config import (
     parse_ansible_version,
 )
 from ansible_compat.constants import (
+    META_MAIN,
     MSG_INVALID_FQRL,
     RC_ANSIBLE_OPTIONS_ERROR,
     REQUIREMENT_LOCATIONS,
@@ -47,9 +48,11 @@ if TYPE_CHECKING:
 else:
     CompletedProcess = subprocess.CompletedProcess
 
+
 _logger = logging.getLogger(__name__)
 # regex to extract the first version from a collection range specifier
 version_re = re.compile(":[>=<]*([^,]*)")
+namespace_re = re.compile("^[a-z][a-z0-9_]+$")
 
 
 class AnsibleWarning(Warning):
@@ -209,6 +212,9 @@ class Runtime:
             self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig()
 
+        # Add the sys.path to the collection paths if not isolated
+        self._add_sys_path_to_collection_paths()
+
         if not self.version_in_range(lower=min_required_version):
             msg = f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
             raise RuntimeError(msg)
@@ -250,6 +256,18 @@ class Runtime:
         _logger.setLevel(logging_level)
         # Use module-level _logger instance to validate it
         _logger.debug("Logging initialized to level %s", logging_level)
+
+    def _add_sys_path_to_collection_paths(self) -> None:
+        """Add the sys.path to the collection paths."""
+        if self.config.collections_scan_sys_path:
+            for path in sys.path:
+                if (
+                    path not in self.config.collections_paths
+                    and (Path(path) / "ansible_collections").is_dir()
+                ):
+                    self.config.collections_paths.append(  # pylint: disable=E1101
+                        path,
+                    )
 
     def load_collections(self) -> None:
         """Load collection data."""
@@ -423,7 +441,9 @@ class Runtime:
     ) -> None:
         """Install an Ansible collection.
 
-        Can accept version constraints like 'foo.bar:>=1.2.3'
+        Can accept arguments like:
+            'foo.bar:>=1.2.3'
+            'git+https://github.com/ansible-collections/ansible.posix.git,main'
         """
         cmd = [
             "ansible-galaxy",
@@ -434,11 +454,18 @@ class Runtime:
         if force:
             cmd.append("--force")
 
+        if isinstance(collection, Path):
+            collection = str(collection)
         # As ansible-galaxy install is not able to automatically determine
         # if the range requires a pre-release, we need to manuall add the --pre
         # flag when needed.
-        matches = version_re.search(str(collection))
-        if matches and CollectionVersion(matches[1]).is_prerelease:
+        matches = version_re.search(collection)
+
+        if (
+            not is_url(collection)
+            and matches
+            and CollectionVersion(matches[1]).is_prerelease
+        ):
             cmd.append("--pre")
 
         cpaths: list[str] = self.config.collections_paths
@@ -545,7 +572,7 @@ class Runtime:
                     raise AnsibleCommandError(result)
 
         # Run galaxy collection install works on v2 requirements.yml
-        if "collections" in reqs_yaml:
+        if "collections" in reqs_yaml and reqs_yaml["collections"] is not None:
             cmd = [
                 "ansible-galaxy",
                 "collection",
@@ -553,6 +580,14 @@ class Runtime:
             ]
             if self.verbosity > 0:
                 cmd.extend(["-" + ("v" * self.verbosity)])
+
+            for collection in reqs_yaml["collections"]:
+                if isinstance(collection, dict) and collection.get("type", "") == "git":
+                    _logger.info(
+                        "Adding '--pre' to ansible-galaxy collection install because we detected one collection being sourced from git.",
+                    )
+                    cmd.append("--pre")
+                    break
             if offline:
                 _logger.warning(
                     "Skipped installing collection dependencies due to running in offline mode.",
@@ -578,19 +613,6 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-    def search_galaxy_paths(self, search_dir: Path, depth: int = 0) -> list[str]:
-        """Search for galaxy paths (only one level deep)."""
-        galaxy_paths: list[str] = []
-        for file in os.listdir(search_dir):
-            file_path = Path(file)
-            if file_path.is_dir() and depth < 1:
-                galaxy_paths.extend(self.search_galaxy_paths(file_path, 1))
-            elif fnmatch.fnmatch(file, "galaxy.yml"):
-                galaxy_paths.append(str(search_dir / file))
-        if depth == 0 and not galaxy_paths:
-            return ["galaxy.yml"]
-        return galaxy_paths
-
     def prepare_environment(  # noqa: C901
         self,
         required_collections: dict[str, str] | None = None,
@@ -612,7 +634,13 @@ class Runtime:
         for req_file in REQUIREMENT_LOCATIONS:
             self.install_requirements(Path(req_file), retry=retry, offline=offline)
 
-        for gpath in self.search_galaxy_paths(self.project_dir):
+        self._prepare_ansible_paths()
+
+        if not install_local:
+            return
+
+        for gpath in search_galaxy_paths(self.project_dir):
+            # processing all found galaxy.yml files
             galaxy_path = Path(gpath)
             if galaxy_path.exists():
                 data = yaml_from_file(galaxy_path)
@@ -624,63 +652,58 @@ class Runtime:
                             required_version,
                         )
                         self.install_collection(
-                            f"{name}:{required_version}",
+                            f"{name}{',' if is_url(name) else ':'}{required_version}",
                             destination=destination,
                         )
 
-            if self.cache_dir:
-                destination = self.cache_dir / "collections"
-            for name, min_version in required_collections.items():
-                self.install_collection(
-                    f"{name}:>={min_version}",
-                    destination=destination,
+        if self.cache_dir:
+            destination = self.cache_dir / "collections"
+        for name, min_version in required_collections.items():
+            self.install_collection(
+                f"{name}:>={min_version}",
+                destination=destination,
+            )
+
+        if Path("galaxy.yml").exists():
+            if destination:
+                # while function can return None, that would not break the logic
+                colpath = Path(
+                    f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}",
                 )
-
-            self._prepare_ansible_paths()
-
-            if not install_local:
-                return
-
-            if galaxy_path.exists():
-                if destination:
-                    # while function can return None, that would not break the logic
-                    colpath = Path(
-                        f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}",
-                    )
-                    if colpath.is_symlink():
-                        if os.path.realpath(colpath) == Path.cwd():
-                            _logger.warning(
-                                "Found symlinked collection, skipping its installation.",
-                            )
-                            return
+                if colpath.is_symlink():
+                    if os.path.realpath(colpath) == Path.cwd():
                         _logger.warning(
-                            "Collection is symlinked, but not pointing to %s directory, so we will remove it.",
-                            Path.cwd(),
+                            "Found symlinked collection, skipping its installation.",
                         )
-                        colpath.unlink()
+                        return
+                    _logger.warning(
+                        "Collection is symlinked, but not pointing to %s directory, so we will remove it.",
+                        Path.cwd(),
+                    )
+                    colpath.unlink()
 
-                # molecule scenario within a collection
-                self.install_collection_from_disk(
-                    galaxy_path.parent,
-                    destination=destination,
-                )
-            elif (
-                Path().resolve().parent.name == "roles"
-                and Path("../../galaxy.yml").exists()
-            ):
-                # molecule scenario located within roles/<role-name>/molecule inside
-                # a collection
-                self.install_collection_from_disk(
-                    Path("../.."),
-                    destination=destination,
-                )
-            else:
-                # no collection, try to recognize and install a standalone role
-                self._install_galaxy_role(
-                    self.project_dir,
-                    role_name_check=role_name_check,
-                    ignore_errors=True,
-                )
+            # molecule scenario within a collection
+            self.install_collection_from_disk(
+                galaxy_path.parent,
+                destination=destination,
+            )
+        elif (
+            Path().resolve().parent.name == "roles"
+            and Path("../../galaxy.yml").exists()
+        ):
+            # molecule scenario located within roles/<role-name>/molecule inside
+            # a collection
+            self.install_collection_from_disk(
+                Path("../.."),
+                destination=destination,
+            )
+        else:
+            # no collection, try to recognize and install a standalone role
+            self._install_galaxy_role(
+                self.project_dir,
+                role_name_check=role_name_check,
+                ignore_errors=True,
+            )
         # reload collections
         self.load_collections()
 
@@ -690,11 +713,16 @@ class Runtime:
         version: str | None = None,
         *,
         install: bool = True,
-    ) -> None:
+    ) -> tuple[CollectionVersion, Path]:
         """Check if a minimal collection version is present or exits.
 
         In the future this method may attempt to install a missing or outdated
         collection before failing.
+
+        :param name: collection name
+        :param version: minimal version required
+        :param install: if True, attempt to install a missing collection
+        :returns: tuple of (found_version, collection_path)
         """
         try:
             ns, coll = name.split(".", 1)
@@ -739,15 +767,19 @@ class Runtime:
                             msg = f"Found {name} collection {found_version} but {version} or newer is required."
                             _logger.fatal(msg)
                             raise InvalidPrerequisiteError(msg)
+                    return found_version, collpath.resolve()
                 break
         else:
             if install:
                 self.install_collection(f"{name}:>={version}" if version else name)
-                self.require_collection(name=name, version=version, install=False)
-            else:
-                msg = f"Collection '{name}' not found in '{paths}'"
-                _logger.fatal(msg)
-                raise InvalidPrerequisiteError(msg)
+                return self.require_collection(
+                    name=name,
+                    version=version,
+                    install=False,
+                )
+            msg = f"Collection '{name}' not found in '{paths}'"
+            _logger.fatal(msg)
+            raise InvalidPrerequisiteError(msg)
 
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""
@@ -827,13 +859,17 @@ class Runtime:
         """
         yaml = None
         galaxy_info = {}
-        meta_filename = Path(project_dir) / "meta" / "main.yml"
 
-        if not meta_filename.exists():
+        for meta_main in META_MAIN:
+            meta_filename = Path(project_dir) / meta_main
+
+            if meta_filename.exists():
+                break
+        else:
             if ignore_errors:
                 return
-        else:
-            yaml = yaml_from_file(meta_filename)
+
+        yaml = yaml_from_file(meta_filename)
 
         if yaml and "galaxy_info" in yaml:
             galaxy_info = yaml["galaxy_info"]
@@ -925,3 +961,22 @@ def _get_galaxy_role_ns(galaxy_infos: dict[str, Any]) -> str:
 def _get_galaxy_role_name(galaxy_infos: dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
     return galaxy_infos.get("role_name", "")
+
+
+def search_galaxy_paths(search_dir: Path) -> list[str]:
+    """Search for galaxy paths (only one level deep)."""
+    galaxy_paths: list[str] = []
+    for file in [".", *os.listdir(search_dir)]:
+        # We ignore any folders that are not valid namespaces, just like
+        # ansible galaxy does at this moment.
+        if file != "." and not namespace_re.match(file):
+            continue
+        file_path = search_dir / file / "galaxy.yml"
+        if file_path.is_file():
+            galaxy_paths.append(str(file_path))
+    return galaxy_paths
+
+
+def is_url(name: str) -> bool:
+    """Return True if a dependency name looks like an URL."""
+    return bool(re.match("^git[+@]", name))

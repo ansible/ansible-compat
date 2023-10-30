@@ -1,19 +1,18 @@
 """Tests for Runtime class."""
 # pylint: disable=protected-access
+from __future__ import annotations
+
 import logging
 import os
 import pathlib
 import subprocess
-from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
 from packaging.version import Version
-from pytest_mock import MockerFixture
 
 from ansible_compat.config import ansible_version
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
@@ -22,7 +21,18 @@ from ansible_compat.errors import (
     AnsibleCompatError,
     InvalidPrerequisiteError,
 )
-from ansible_compat.runtime import CompletedProcess, Runtime
+from ansible_compat.runtime import (
+    CompletedProcess,
+    Runtime,
+    is_url,
+    search_galaxy_paths,
+)
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from _pytest.monkeypatch import MonkeyPatch
+    from pytest_mock import MockerFixture
 
 
 def test_runtime_version(runtime: Runtime) -> None:
@@ -467,16 +477,27 @@ def test_install_collection(runtime: Runtime) -> None:
     runtime.install_collection("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
 
 
+def test_install_collection_git(runtime: Runtime) -> None:
+    """Check that valid collection installs do not fail."""
+    runtime.install_collection(
+        "git+https://github.com/ansible-collections/ansible.posix,main",
+    )
+
+
 def test_install_collection_dest(runtime: Runtime, tmp_path: pathlib.Path) -> None:
     """Check that valid collection to custom destination passes."""
+    # Since Ansible 2.15.3 there is no guarantee that this will install the collection at requested path
+    # as it might decide to not install anything if requirement is already present at another location.
     runtime.install_collection(
         "examples/reqs_v2/community-molecule-0.1.0.tar.gz",
         destination=tmp_path,
     )
-    expected_file = (
-        tmp_path / "ansible_collections" / "community" / "molecule" / "MANIFEST.json"
-    )
-    assert expected_file.is_file()
+    runtime.load_collections()
+    for collection in runtime.collections:
+        if collection == "community.molecule":
+            return
+    msg = "Failed to find collection as installed."
+    raise AssertionError(msg)
 
 
 def test_install_collection_fail(runtime: Runtime) -> None:
@@ -633,8 +654,8 @@ def test_runtime_env_ansible_library(monkeypatch: MonkeyPatch) -> None:
     ids=("1", "2", "3", "4", "5"),
 )
 def test_runtime_version_in_range(
-    lower: Union[str, None],
-    upper: Union[str, None],
+    lower: str | None,
+    upper: str | None,
     expected: bool,
 ) -> None:
     """Validate functioning of version_in_range."""
@@ -652,6 +673,7 @@ def test_runtime_version_in_range(
                 "ansible.posix",  # from tests/requirements.yml
                 "ansible.utils",  # from galaxy.yml
                 "community.molecule",  # from galaxy.yml
+                "community.crypto",  # from galaxy.yml as a git dependency
             ],
             id="normal",
         ),
@@ -789,3 +811,53 @@ def test_runtime_plugins(runtime: Runtime) -> None:
         assert "ansible.builtin.free" in runtime.plugins.strategy
         assert "ansible.builtin.is_abs" in runtime.plugins.test
         assert "ansible.builtin.bool" in runtime.plugins.filter
+
+
+@pytest.mark.parametrize(
+    ("path", "result"),
+    (
+        pytest.param(
+            "test/assets/galaxy_paths",
+            ["test/assets/galaxy_paths/foo/galaxy.yml"],
+            id="1",
+        ),
+        pytest.param(
+            "test/collections",
+            [],  # should find nothing because these folders are not valid namespaces
+            id="2",
+        ),
+        pytest.param(
+            "test/assets/galaxy_paths/foo",
+            ["test/assets/galaxy_paths/foo/galaxy.yml"],
+            id="3",
+        ),
+    ),
+)
+def test_galaxy_path(path: str, result: list[str]) -> None:
+    """Check behavior of galaxy path search."""
+    assert search_galaxy_paths(Path(path)) == result
+
+
+@pytest.mark.parametrize(
+    ("name", "result"),
+    (
+        pytest.param(
+            "foo",
+            False,
+            id="0",
+        ),
+        pytest.param(
+            "git+git",
+            True,
+            id="1",
+        ),
+        pytest.param(
+            "git@acme.com",
+            True,
+            id="2",
+        ),
+    ),
+)
+def test_is_url(name: str, result: bool) -> None:
+    """Checks functionality of is_url."""
+    assert is_url(name) == result
