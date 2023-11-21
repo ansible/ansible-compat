@@ -606,7 +606,11 @@ class Runtime:
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
         for req_file in REQUIREMENT_LOCATIONS:
-            self.install_requirements(Path(req_file), retry=retry, offline=offline)
+            if self.project_dir:
+                req_file = (self.project_dir / req_file)
+            else:
+                req_file = Path(req_file)
+            self.install_requirements(req_file, retry=retry, offline=offline)
 
         self._prepare_ansible_paths()
 
