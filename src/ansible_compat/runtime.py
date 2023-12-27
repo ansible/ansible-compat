@@ -471,7 +471,6 @@ class Runtime:
         destination: Path | None = None,
     ) -> None:
         """Build and install collection from a given disk path."""
-        # breakpoint()
         self.install_collection(path, destination=destination, force=True)
 
     # pylint: disable=too-many-branches
