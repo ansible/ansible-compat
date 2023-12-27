@@ -3,6 +3,4 @@ codecov:
 comment: false
 coverage:
   status:
-    patch: false
-    project:
-      threshold: 0.5%
+    patch: true # we want github annotations

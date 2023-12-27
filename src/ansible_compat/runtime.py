@@ -435,7 +435,7 @@ class Runtime:
         if isinstance(collection, Path):
             collection = str(collection)
         # As ansible-galaxy install is not able to automatically determine
-        # if the range requires a pre-release, we need to manuall add the --pre
+        # if the range requires a pre-release, we need to manually add the --pre
         # flag when needed.
         matches = version_re.search(collection)
 
@@ -614,14 +614,14 @@ class Runtime:
                 destination=destination,
             )
 
-        if Path("galaxy.yml").exists():
+        if (self.project_dir / "galaxy.yml").exists():
             if destination:
                 # while function can return None, that would not break the logic
                 colpath = Path(
-                    f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}",
+                    f"{destination}/ansible_collections/{colpath_from_path(self.project_dir)}",
                 )
                 if colpath.is_symlink():
-                    if os.path.realpath(colpath) == Path.cwd():
+                    if os.path.realpath(colpath) == str(Path.cwd()):
                         _logger.warning(
                             "Found symlinked collection, skipping its installation.",
                         )
@@ -741,7 +741,7 @@ class Runtime:
             msg = "Unexpected ansible configuration"
             raise RuntimeError(msg) from exc
 
-        alterations_list = [
+        alterations_list: list[tuple[list[str], str, bool]] = [
             (library_paths, "plugins/modules", True),
             (roles_path, "roles", True),
         ]
@@ -762,7 +762,7 @@ class Runtime:
                 if must_be_present:
                     continue
                 path.mkdir(parents=True, exist_ok=True)
-            if path not in path_list:
+            if str(path) not in path_list:
                 path_list.insert(0, str(path))
 
         if library_paths != self.config.DEFAULT_MODULE_PATH:
@@ -910,7 +910,10 @@ def _get_galaxy_role_ns(galaxy_infos: dict[str, Any]) -> str:
 
 def _get_galaxy_role_name(galaxy_infos: dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
-    return galaxy_infos.get("role_name", "")
+    result = galaxy_infos.get("role_name", "")
+    if not isinstance(result, str):
+        return ""
+    return result
 
 
 def search_galaxy_paths(search_dir: Path) -> list[str]:
