@@ -216,6 +216,11 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     default_private_role_vars: bool = False
     default_remote_port: str | None = None
     default_remote_user: str | None = None
+    # https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths
+    default_collections_path: list[str] = [
+        "~/.ansible/collections",
+        "/usr/share/ansible/collections",
+    ]
     default_roles_path: list[str] = [
         "~/.ansible/roles",
         "/usr/share/ansible/roles",

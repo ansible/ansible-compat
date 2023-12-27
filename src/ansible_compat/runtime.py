@@ -10,7 +10,6 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import warnings
 from collections import OrderedDict
 from dataclasses import dataclass, field
@@ -456,13 +455,13 @@ class Runtime:
         cmd.append(f"{collection}")
 
         _logger.info("Running from %s : %s", Path.cwd(), " ".join(cmd))
-        run = self.run(
+        process = self.run(
             cmd,
             retry=True,
             env={**self.environ, ansible_collections_path(): ":".join(cpaths)},
         )
-        if run.returncode != 0:
-            msg = f"Command returned {run.returncode} code:\n{run.stdout}\n{run.stderr}"
+        if process.returncode != 0:
+            msg = f"Command returned {process.returncode} code:\n{process.stdout}\n{process.stderr}"
             _logger.error(msg)
             raise InvalidPrerequisiteError(msg)
 
@@ -472,30 +471,7 @@ class Runtime:
         destination: Path | None = None,
     ) -> None:
         """Build and install collection from a given disk path."""
-        if not self.version_in_range(upper="2.11"):
-            self.install_collection(path, destination=destination, force=True)
-            return
-        # older versions of ansible able unable to install without building
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            cmd = [
-                "ansible-galaxy",
-                "collection",
-                "build",
-                "--output-path",
-                str(tmp_dir),
-                str(path),
-            ]
-            _logger.info("Running %s", " ".join(cmd))
-            run = self.run(cmd, retry=False)
-            if run.returncode != 0:
-                _logger.error(run.stdout)
-                raise AnsibleCommandError(run)
-            for archive_file in os.listdir(tmp_dir):
-                self.install_collection(
-                    str(Path(tmp_dir) / archive_file),
-                    destination=destination,
-                    force=True,
-                )
+        self.install_collection(path, destination=destination, force=True)
 
     # pylint: disable=too-many-branches
     def install_requirements(  # noqa: C901
@@ -791,7 +767,7 @@ class Runtime:
 
         if library_paths != self.config.DEFAULT_MODULE_PATH:
             self._update_env("ANSIBLE_LIBRARY", library_paths)
-        if collections_path != self.config.collections_paths:
+        if collections_path != self.config.default_collections_path:
             self._update_env(ansible_collections_path(), collections_path)
         if roles_path != self.config.default_roles_path:
             self._update_env("ANSIBLE_ROLES_PATH", roles_path)
