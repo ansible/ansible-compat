@@ -2,16 +2,15 @@
 # https://packit.dev/docs/configuration/
 # Test locally running: packit build locally
 # spell-checker:ignore packit specfile copr epel
-specfile_path: dist/python-ansible-compat.spec
+specfile_path: dist/python3-ansible-compat.spec
 actions:
   create-archive:
-    # packit.dev service does have these module pre-installed:
+    - sh -c "rm dist/*.tar.gz || true"
     - python3 -m build --sdist --outdir dist
-    - sh -c "ls dist/ansible-compat-*.tar.gz"
+    - sh -c "ls dist/ansible_compat-*.tar.gz"
   get-current-version:
     - ./tools/get-version.sh
   post-upstream-clone:
-    - rm -f dist/*.tar.gz || true
     - ./tools/update-version.sh
 srpm_build_deps:
   - python3-build
@@ -20,7 +19,7 @@ srpm_build_deps:
   - python3-pytest-mock
 jobs:
   - job: copr_build
-    trigger: commit
+    trigger: pull_request
     branch: main
     targets:
       - fedora-rawhide-x86_64
