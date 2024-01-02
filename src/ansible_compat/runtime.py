@@ -563,6 +563,7 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
+    # pylint: disable=too-many-locals
     def prepare_environment(  # noqa: C901
         self,
         required_collections: dict[str, str] | None = None,
