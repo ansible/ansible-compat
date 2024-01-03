@@ -165,6 +165,7 @@ class Runtime:
         require_module: bool = False,
         max_retries: int = 0,
         environ: dict[str, str] | None = None,
+        verbosity: int = 0,
     ) -> None:
         """Initialize Ansible runtime environment.
 
@@ -186,12 +187,17 @@ class Runtime:
                             Default is 0, no retries.
         :param environ: Environment dictionary to use, if undefined
                         ``os.environ`` will be copied and used.
+        :param verbosity: Verbosity level to use.
         """
         self.project_dir = project_dir or Path.cwd()
         self.isolated = isolated
         self.max_retries = max_retries
         self.environ = environ or os.environ.copy()
         self.plugins = Plugins(runtime=self)
+        self.verbosity = verbosity
+
+        self.initialize_logger(level=self.verbosity)
+
         # Reduce noise from paramiko, unless user already defined PYTHONWARNINGS
         # paramiko/transport.py:236: CryptographyDeprecationWarning: Blowfish has been deprecated
         # https://github.com/paramiko/paramiko/issues/2038
@@ -234,6 +240,21 @@ class Runtime:
 
         # Monkey patch ansible warning in order to use warnings module.
         Display.warning = warning
+
+    def initialize_logger(self, level: int = 0) -> None:
+        """Set up the global logging level based on the verbosity number."""
+        verbosity_map = {
+            -2: logging.CRITICAL,
+            -1: logging.ERROR,
+            0: logging.WARNING,
+            1: logging.INFO,
+            2: logging.DEBUG,
+        }
+        # Unknown logging level is treated as DEBUG
+        logging_level = verbosity_map.get(level, logging.DEBUG)
+        _logger.setLevel(logging_level)
+        # Use module-level _logger instance to validate it
+        _logger.debug("Logging initialized to level %s", logging_level)
 
     def _add_sys_path_to_collection_paths(self) -> None:
         """Add the sys.path to the collection paths."""
@@ -505,9 +526,11 @@ class Runtime:
                 "ansible-galaxy",
                 "role",
                 "install",
-                "-vr",
+                "-r",
                 f"{requirement}",
             ]
+            if self.verbosity > 0:
+                cmd.extend(["-" + ("v" * self.verbosity)])
             if self.cache_dir:
                 cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
 
@@ -519,8 +542,9 @@ class Runtime:
                 _logger.info("Running %s", " ".join(cmd))
 
                 result = self.run(cmd, retry=retry)
+                _logger.debug(result.stdout)
                 if result.returncode != 0:
-                    _logger.error(result.stdout)
+                    _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
         # Run galaxy collection install works on v2 requirements.yml
@@ -529,8 +553,10 @@ class Runtime:
                 "ansible-galaxy",
                 "collection",
                 "install",
-                "-v",
             ]
+            if self.verbosity > 0:
+                cmd.extend(["-" + ("v" * self.verbosity)])
+
             for collection in reqs_yaml["collections"]:
                 if isinstance(collection, dict) and collection.get("type", "") == "git":
                     _logger.info(
@@ -558,8 +584,8 @@ class Runtime:
                     retry=retry,
                     env={**os.environ, "ANSIBLE_COLLECTIONS_PATH": ":".join(cpaths)},
                 )
+                _logger.debug(result.stdout)
                 if result.returncode != 0:
-                    _logger.error(result.stdout)
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 

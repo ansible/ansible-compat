@@ -240,10 +240,11 @@ def cwd(path: Path) -> Iterator[None]:
         os.chdir(old_pwd)
 
 
-def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> None:
+def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
     """Checks that the linter can auto-install requirements v1 when found."""
+    runtime = Runtime(verbosity=1)
     path = Path(__file__).parent.parent / "examples" / "reqs_v1"
-    with cwd(path), caplog.at_level(logging.INFO):
+    with cwd(path):
         runtime.prepare_environment()
     assert any(
         msg.startswith("Running ansible-galaxy role install") for msg in caplog.messages
@@ -254,12 +255,12 @@ def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> N
     )
 
 
-def test_prerun_reqs_v2(caplog: pytest.LogCaptureFixture, runtime: Runtime) -> None:
+def test_prerun_reqs_v2(caplog: pytest.LogCaptureFixture) -> None:
     """Checks that the linter can auto-install requirements v2 when found."""
+    runtime = Runtime(verbosity=1)
     path = (Path(__file__).parent.parent / "examples" / "reqs_v2").resolve()
     with cwd(path):
-        with caplog.at_level(logging.INFO):
-            runtime.prepare_environment()
+        runtime.prepare_environment()
         assert any(
             msg.startswith("Running ansible-galaxy role install")
             for msg in caplog.messages
@@ -526,11 +527,10 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
 
 
 def test_install_galaxy_role_unlink(
-    runtime_tmp: Runtime,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test ability to unlink incorrect symlinked roles."""
-    caplog.set_level(logging.INFO)
+    runtime_tmp = Runtime(verbosity=1)
     runtime_tmp.prepare_environment()
     pathlib.Path(f"{runtime_tmp.cache_dir}/roles").mkdir(parents=True, exist_ok=True)
     pathlib.Path(f"{runtime_tmp.cache_dir}/roles/acme.get_rich").symlink_to("/dev/null")
