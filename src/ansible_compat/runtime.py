@@ -10,7 +10,6 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import warnings
 from collections import OrderedDict
 from dataclasses import dataclass, field
@@ -457,7 +456,7 @@ class Runtime:
         if isinstance(collection, Path):
             collection = str(collection)
         # As ansible-galaxy install is not able to automatically determine
-        # if the range requires a pre-release, we need to manuall add the --pre
+        # if the range requires a pre-release, we need to manually add the --pre
         # flag when needed.
         matches = version_re.search(collection)
 
@@ -477,13 +476,13 @@ class Runtime:
         cmd.append(f"{collection}")
 
         _logger.info("Running from %s : %s", Path.cwd(), " ".join(cmd))
-        run = self.run(
+        process = self.run(
             cmd,
             retry=True,
             env={**self.environ, ansible_collections_path(): ":".join(cpaths)},
         )
-        if run.returncode != 0:
-            msg = f"Command returned {run.returncode} code:\n{run.stdout}\n{run.stderr}"
+        if process.returncode != 0:
+            msg = f"Command returned {process.returncode} code:\n{process.stdout}\n{process.stderr}"
             _logger.error(msg)
             raise InvalidPrerequisiteError(msg)
 
@@ -493,30 +492,7 @@ class Runtime:
         destination: Path | None = None,
     ) -> None:
         """Build and install collection from a given disk path."""
-        if not self.version_in_range(upper="2.11"):
-            self.install_collection(path, destination=destination, force=True)
-            return
-        # older versions of ansible able unable to install without building
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            cmd = [
-                "ansible-galaxy",
-                "collection",
-                "build",
-                "--output-path",
-                str(tmp_dir),
-                str(path),
-            ]
-            _logger.info("Running %s", " ".join(cmd))
-            run = self.run(cmd, retry=False)
-            if run.returncode != 0:
-                _logger.error(run.stdout)
-                raise AnsibleCommandError(run)
-            for archive_file in os.listdir(tmp_dir):
-                self.install_collection(
-                    str(Path(tmp_dir) / archive_file),
-                    destination=destination,
-                    force=True,
-                )
+        self.install_collection(path, destination=destination, force=True)
 
     # pylint: disable=too-many-branches
     def install_requirements(  # noqa: C901
@@ -664,14 +640,14 @@ class Runtime:
                 destination=destination,
             )
 
-        if Path("galaxy.yml").exists():
+        if (self.project_dir / "galaxy.yml").exists():
             if destination:
                 # while function can return None, that would not break the logic
                 colpath = Path(
-                    f"{destination}/ansible_collections/{colpath_from_path(Path.cwd())}",
+                    f"{destination}/ansible_collections/{colpath_from_path(self.project_dir)}",
                 )
                 if colpath.is_symlink():
-                    if os.path.realpath(colpath) == Path.cwd():
+                    if os.path.realpath(colpath) == str(Path.cwd()):
                         _logger.warning(
                             "Found symlinked collection, skipping its installation.",
                         )
@@ -791,7 +767,7 @@ class Runtime:
             msg = "Unexpected ansible configuration"
             raise RuntimeError(msg) from exc
 
-        alterations_list = [
+        alterations_list: list[tuple[list[str], str, bool]] = [
             (library_paths, "plugins/modules", True),
             (roles_path, "roles", True),
         ]
@@ -812,12 +788,12 @@ class Runtime:
                 if must_be_present:
                     continue
                 path.mkdir(parents=True, exist_ok=True)
-            if path not in path_list:
+            if str(path) not in path_list:
                 path_list.insert(0, str(path))
 
         if library_paths != self.config.DEFAULT_MODULE_PATH:
             self._update_env("ANSIBLE_LIBRARY", library_paths)
-        if collections_path != self.config.collections_paths:
+        if collections_path != self.config.default_collections_path:
             self._update_env(ansible_collections_path(), collections_path)
         if roles_path != self.config.default_roles_path:
             self._update_env("ANSIBLE_ROLES_PATH", roles_path)
@@ -960,7 +936,10 @@ def _get_galaxy_role_ns(galaxy_infos: dict[str, Any]) -> str:
 
 def _get_galaxy_role_name(galaxy_infos: dict[str, Any]) -> str:
     """Compute role name from meta/main.yml."""
-    return galaxy_infos.get("role_name", "")
+    result = galaxy_infos.get("role_name", "")
+    if not isinstance(result, str):
+        return ""
+    return result
 
 
 def search_galaxy_paths(search_dir: Path) -> list[str]:

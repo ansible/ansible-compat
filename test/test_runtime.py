@@ -24,6 +24,7 @@ from ansible_compat.errors import (
 from ansible_compat.runtime import (
     CompletedProcess,
     Runtime,
+    _get_galaxy_role_name,
     is_url,
     search_galaxy_paths,
 )
@@ -861,3 +862,32 @@ def test_galaxy_path(path: str, result: list[str]) -> None:
 def test_is_url(name: str, result: bool) -> None:
     """Checks functionality of is_url."""
     assert is_url(name) == result
+
+
+def test_prepare_environment_repair_broken_symlink(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Ensure we can deal with broken symlinks in collections."""
+    caplog.set_level(logging.INFO)
+    project_dir = Path(__file__).parent / "collections" / "acme.minimal"
+    runtime = Runtime(isolated=True, project_dir=project_dir)
+    assert runtime.cache_dir
+    acme = runtime.cache_dir / "collections" / "ansible_collections" / "acme"
+    acme.mkdir(parents=True, exist_ok=True)
+    goodies = acme / "minimal"
+    rmtree(goodies, ignore_errors=True)
+    goodies.unlink(missing_ok=True)
+    goodies.symlink_to("/invalid/destination")
+    runtime.prepare_environment(install_local=True)
+    assert any(
+        msg.startswith("Collection is symlinked, but not pointing to")
+        for msg in caplog.messages
+    )
+
+
+def test_get_galaxy_role_name_invalid() -> None:
+    """Verifies that function returns empty string on invalid input."""
+    galaxy_infos = {
+        "role_name": False,  # <-- invalid data, should be string
+    }
+    assert _get_galaxy_role_name(galaxy_infos) == ""
