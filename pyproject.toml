@@ -48,7 +48,7 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = ["argparse-manpage", "black", "mkdocs-ansible[lock]>=0.1.2"]
-test = ["coverage", "pip-tools", "pytest>=7.2.0", "pytest-mock", "pytest-plus"]
+test = ["coverage", "pip-tools", "pytest>=7.2.0", "pytest-mock", "pytest-plus>=0.6.1"]
 
 [project.urls]
 homepage = "https://github.com/ansible/ansible-compat"
