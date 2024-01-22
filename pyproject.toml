@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools >= 65.3.0", # required by pyproject+setuptools_scm integration and editable installs
-  "setuptools_scm[toml] >= 7.0.5", # required for "no-local-version" scheme
+  "setuptools_scm[toml] >= 7.0.5" # required for "no-local-version" scheme
 ]
 build-backend = "setuptools.build_meta"
 
@@ -12,9 +12,9 @@ dynamic = ["version"]
 name = "ansible-compat"
 description = "Ansible compatibility goodies"
 readme = "README.md"
-authors = [{ "name" = "Sorin Sbarnea", "email" = "ssbarnea@redhat.com" }]
-maintainers = [{ "name" = "Sorin Sbarnea", "email" = "ssbarnea@redhat.com" }]
-license = { text = "MIT" }
+authors = [{"name" = "Sorin Sbarnea", "email" = "ssbarnea@redhat.com"}]
+maintainers = [{"name" = "Sorin Sbarnea", "email" = "ssbarnea@redhat.com"}]
+license = {text = "MIT"}
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Console",
@@ -33,7 +33,7 @@ classifiers = [
   "Topic :: Software Development :: Bug Tracking",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
-  "Topic :: Utilities",
+  "Topic :: Utilities"
 ]
 keywords = ["ansible"]
 dependencies = [
@@ -43,8 +43,12 @@ dependencies = [
   "PyYAML",
   "subprocess-tee>=0.4.1",
   "jsonschema>=4.6.0",
-  "typing-extensions>=4.5.0;python_version<'3.10'",
+  "typing-extensions>=4.5.0;python_version<'3.10'"
 ]
+
+[project.optional-dependencies]
+docs = ["argparse-manpage", "black", "mkdocs-ansible[lock]>=0.1.2"]
+test = ["coverage", "pip-tools", "pytest>=7.2.0", "pytest-mock", "pytest-plus>=0.6.1"]
 
 [project.urls]
 homepage = "https://github.com/ansible/ansible-compat"
@@ -52,9 +56,11 @@ documentation = "https://ansible-compat.readthedocs.io/"
 repository = "https://github.com/ansible/ansible-compat"
 changelog = "https://github.com/ansible/ansible-compat/releases"
 
-[project.optional-dependencies]
-docs = ["argparse-manpage", "black", "mkdocs-ansible[lock]>=0.1.2"]
-test = ["coverage", "pip-tools", "pytest>=7.2.0", "pytest-mock", "pytest-plus"]
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+fail_under = 92
+skip_covered = true
+show_missing = true
 
 [tool.coverage.run]
 source = ["src"]
@@ -64,11 +70,8 @@ branch = false
 parallel = true
 concurrency = ["multiprocessing", "thread"]
 
-[tool.coverage.report]
-exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
-fail_under = 92
-skip_covered = true
-show_missing = true
+[tool.isort]
+profile = "black"
 
 [tool.mypy]
 python_version = 3.9
@@ -78,7 +81,7 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_any_generics = true
 # disallow_any_unimported = True
-#; warn_redundant_casts = True
+# ; warn_redundant_casts = True
 # warn_return_any = True
 # warn_unused_configs = True
 exclude = "test/local-content"
@@ -86,9 +89,6 @@ exclude = "test/local-content"
 [[tool.mypy.overrides]]
 module = "ansible.*"
 ignore_missing_imports = true
-
-[tool.isort]
-profile = "black"
 
 [tool.pylint.BASIC]
 good-names = [
@@ -99,7 +99,7 @@ good-names = [
   "ns", # namespace
   "ex",
   "Run",
-  "_",
+  "_"
 ]
 
 [tool.pylint.IMPORTS]
@@ -115,7 +115,7 @@ disable = [
   "too-many-arguments", # PLR0913
   "raise-missing-from",
   # Temporary disable duplicate detection we remove old code from prerun
-  "duplicate-code",
+  "duplicate-code"
 ]
 
 [tool.pytest.ini_options]
@@ -124,7 +124,7 @@ filterwarnings = [
   "error",
   # py312 ansible-core
   # https://github.com/ansible/ansible/issues/81906
-  "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
+  "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning"
 ]
 testpaths = ["test"]
 
@@ -143,12 +143,9 @@ ignore = [
   "PLR0912", # Bug https://github.com/charliermarsh/ruff/issues/4244
   "PLR0913", # Bug https://github.com/charliermarsh/ruff/issues/4244
   "RUF012",
-  "PERF203",
+  "PERF203"
 ]
 target-version = "py39"
-
-[tool.ruff.pydocstyle]
-convention = "pep257"
 
 [tool.ruff.flake8-pytest-style]
 parametrize-values-type = "tuple"
@@ -159,6 +156,9 @@ known-third-party = ["packaging"]
 
 [tool.ruff.per-file-ignores]
 "test/**/*.py" = ["SLF001", "S101", "FBT001"]
+
+[tool.ruff.pydocstyle]
+convention = "pep257"
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
