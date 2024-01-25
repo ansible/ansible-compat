@@ -745,17 +745,17 @@ class Runtime:
                             raise InvalidPrerequisiteError(msg)
                     return found_version, collpath.resolve()
                 break
-        else:
-            if install:
-                self.install_collection(f"{name}:>={version}" if version else name)
-                return self.require_collection(
-                    name=name,
-                    version=version,
-                    install=False,
-                )
-            msg = f"Collection '{name}' not found in '{paths}'"
-            _logger.fatal(msg)
-            raise InvalidPrerequisiteError(msg)
+            else:
+                if install:
+                    self.install_collection(f"{name}:>={version}" if version else name)
+                    return self.require_collection(
+                        name=name,
+                        version=version,
+                        install=False,
+                    )
+                msg = f"Collection '{name}' not found in '{paths}'"
+                _logger.fatal(msg)
+                raise InvalidPrerequisiteError(msg)
 
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""
