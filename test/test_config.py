@@ -1,4 +1,5 @@
 """Tests for ansible_compat.config submodule."""
+
 import copy
 import subprocess
 

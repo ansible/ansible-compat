@@ -1,4 +1,5 @@
 """Tests for ansible_compat.prerun module."""
+
 from pathlib import Path
 
 from ansible_compat.prerun import get_cache_dir

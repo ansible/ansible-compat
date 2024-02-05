@@ -1,4 +1,5 @@
 """Utils for JSON Schema validation."""
+
 from __future__ import annotations
 
 import json
