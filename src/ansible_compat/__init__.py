@@ -1,4 +1,5 @@
 """ansible_compat package."""
+
 from importlib.metadata import PackageNotFoundError, version
 
 try:

@@ -1,4 +1,5 @@
 """Tests for Runtime class."""
+
 # pylint: disable=protected-access
 from __future__ import annotations
 
@@ -580,7 +581,7 @@ def test_install_galaxy_role_name_role_name_check_equals_to_1(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Check install role with bad role name in galaxy info."""
-    caplog.set_level(logging.WARN)
+    caplog.set_level(logging.WARNING)
     pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").write_text(
         galaxy_info,

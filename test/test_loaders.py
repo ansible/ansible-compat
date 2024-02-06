@@ -1,4 +1,5 @@
 """Test for ansible_compat.loaders module."""
+
 from pathlib import Path
 
 from ansible_compat.loaders import colpath_from_path
