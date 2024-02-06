@@ -42,6 +42,7 @@ jobs:
           macos: minmax
   build:
     name: ${{ matrix.name }}
+    environment: test
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs: pre
     strategy:
@@ -93,8 +94,8 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           name: ${{ matrix.passed_name }}
-          fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
           token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true # see https://github.com/codecov/codecov-action/issues/598
           verbose: true # optional (default = false)
 
   check: # This job does nothing and is only used for the branch protection
