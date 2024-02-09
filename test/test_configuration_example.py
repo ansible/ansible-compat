@@ -1,4 +1,5 @@
 """Sample usage of AnsibleConfig."""
+
 from ansible_compat.config import AnsibleConfig
 
 

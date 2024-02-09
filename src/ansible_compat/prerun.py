@@ -1,4 +1,5 @@
 """Utilities for configuring ansible runtime environment."""
+
 import hashlib
 import os
 from pathlib import Path

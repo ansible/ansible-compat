@@ -1,4 +1,5 @@
 """Pytest fixtures."""
+
 import importlib.metadata
 import json
 import pathlib
