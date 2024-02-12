@@ -105,6 +105,10 @@ jobs:
       - build
     runs-on: ubuntu-22.04
     steps:
+      - name: Check codecov.io status
+        if: github.event_name == 'pull_request'
+        uses: coactions/codecov-status@main
+
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
