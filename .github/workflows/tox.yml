@@ -42,6 +42,7 @@ jobs:
           macos: minmax
   build:
     name: ${{ matrix.name }}
+    environment: test
     runs-on: ${{ matrix.os || 'ubuntu-22.04' }}
     needs: pre
     strategy:
@@ -62,13 +63,13 @@ jobs:
           python-version: ${{ matrix.python_version }}
 
       - name: Pre-commit cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
           key: ${{ matrix.name }}-pre-commit-${{ hashFiles('setup.cfg', 'tox.ini', 'pyproject.toml', '.pre-commit-config.yaml') }}
 
       - name: Pip cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ matrix.name }}-pip-${{ hashFiles('setup.cfg', 'tox.ini', 'pyproject.toml', '.pre-commit-config.yaml') }}
@@ -90,11 +91,11 @@ jobs:
 
       - name: Upload coverage data
         if: ${{ startsWith(matrix.passed_name, 'py') }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           name: ${{ matrix.passed_name }}
-          fail_ci_if_error: false # see https://github.com/codecov/codecov-action/issues/598
           token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true # see https://github.com/codecov/codecov-action/issues/598
           verbose: true # optional (default = false)
 
   check: # This job does nothing and is only used for the branch protection
@@ -104,6 +105,10 @@ jobs:
       - build
     runs-on: ubuntu-22.04
     steps:
+      - name: Check codecov.io status
+        if: github.event_name == 'pull_request'
+        uses: coactions/codecov-status@main
+
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:

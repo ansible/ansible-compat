@@ -1,4 +1,5 @@
 """Sample use of Runtime class."""
+
 from ansible_compat.runtime import Runtime
 
 

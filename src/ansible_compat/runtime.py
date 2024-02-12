@@ -1,4 +1,5 @@
 """Ansible runtime environment manager."""
+
 from __future__ import annotations
 
 import contextlib
@@ -94,11 +95,11 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
     lookup: dict[str, str] = field(init=False)
     netconf: dict[str, str] = field(init=False)
     shell: dict[str, str] = field(init=False)
-    vars: dict[str, str] = field(init=False)  # noqa: A003
+    vars: dict[str, str] = field(init=False)
     module: dict[str, str] = field(init=False)
     strategy: dict[str, str] = field(init=False)
     test: dict[str, str] = field(init=False)
-    filter: dict[str, str] = field(init=False)  # noqa: A003
+    filter: dict[str, str] = field(init=False)
     role: dict[str, str] = field(init=False)
     keyword: dict[str, str] = field(init=False)
 
@@ -777,13 +778,15 @@ class Runtime:
         ]
 
         alterations_list.extend(
-            [
-                (roles_path, f"{self.cache_dir}/roles", False),
-                (library_paths, f"{self.cache_dir}/modules", False),
-                (collections_path, f"{self.cache_dir}/collections", False),
-            ]
-            if self.isolated
-            else [],
+            (
+                [
+                    (roles_path, f"{self.cache_dir}/roles", False),
+                    (library_paths, f"{self.cache_dir}/modules", False),
+                    (collections_path, f"{self.cache_dir}/collections", False),
+                ]
+                if self.isolated
+                else []
+            ),
         )
 
         for path_list, path_, must_be_present in alterations_list:
