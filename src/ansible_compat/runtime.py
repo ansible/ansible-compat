@@ -590,6 +590,7 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
+    # pylint: disable=too-many-locals
     def prepare_environment(  # noqa: C901
         self,
         required_collections: dict[str, str] | None = None,
@@ -609,7 +610,10 @@ class Runtime:
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
         for req_file in REQUIREMENT_LOCATIONS:
-            self.install_requirements(Path(req_file), retry=retry, offline=offline)
+            file_path = Path(req_file)
+            if self.project_dir:
+                file_path = self.project_dir / req_file
+            self.install_requirements(file_path, retry=retry, offline=offline)
 
         self._prepare_ansible_paths()
 

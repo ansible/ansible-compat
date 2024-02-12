@@ -243,8 +243,8 @@ def cwd(path: Path) -> Iterator[None]:
 
 def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
     """Checks that the linter can auto-install requirements v1 when found."""
-    runtime = Runtime(verbosity=1)
     path = Path(__file__).parent.parent / "examples" / "reqs_v1"
+    runtime = Runtime(project_dir=path, verbosity=1)
     with cwd(path):
         runtime.prepare_environment()
     assert any(
@@ -258,8 +258,8 @@ def test_prerun_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
 
 def test_prerun_reqs_v2(caplog: pytest.LogCaptureFixture) -> None:
     """Checks that the linter can auto-install requirements v2 when found."""
-    runtime = Runtime(verbosity=1)
     path = (Path(__file__).parent.parent / "examples" / "reqs_v2").resolve()
+    runtime = Runtime(project_dir=path, verbosity=1)
     with cwd(path):
         runtime.prepare_environment()
         assert any(
@@ -272,9 +272,10 @@ def test_prerun_reqs_v2(caplog: pytest.LogCaptureFixture) -> None:
         )
 
 
-def test_prerun_reqs_broken(runtime: Runtime) -> None:
+def test_prerun_reqs_broken() -> None:
     """Checks that the we report invalid requirements.yml file."""
     path = (Path(__file__).parent.parent / "examples" / "reqs_broken").resolve()
+    runtime = Runtime(project_dir=path, verbosity=1)
     with cwd(path), pytest.raises(InvalidPrerequisiteError):
         runtime.prepare_environment()
 
