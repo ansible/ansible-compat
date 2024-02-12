@@ -22,7 +22,7 @@ exclude: |
   )$
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.1.9"
+    rev: "v0.2.0"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -32,7 +32,7 @@ repos:
       - id: toml-sort-fix
   - repo: https://github.com/pre-commit/mirrors-prettier
     # keep it before yamllint
-    rev: "v3.0.3"
+    rev: "v4.0.0-alpha.8"
     hooks:
       - id: prettier
         additional_dependencies:
@@ -67,7 +67,7 @@ repos:
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 24.1.1
     hooks:
       - id: black
         language_version: python3
