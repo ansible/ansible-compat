@@ -860,7 +860,7 @@ class Runtime:
         fqrn = _get_role_fqrn(galaxy_info, project_dir)
 
         if role_name_check in [0, 1]:
-            if not re.match(r"[a-z0-9][a-z0-9_]+\.[a-z][a-z0-9_]+$", fqrn):
+            if not re.match(r"[a-z0-9][a-z0-9_-]+\.[a-z][a-z0-9_]+$", fqrn):
                 msg = MSG_INVALID_FQRL.format(fqrn)
                 if role_name_check == 1:
                     _logger.warning(msg)
