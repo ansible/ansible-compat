@@ -12,7 +12,7 @@ actions:
     - ./tools/get-version.sh
   post-upstream-clone:
     - rm -f dist/*.tar.gz || true
-    - ./tools/update-version.sh
+    - ./tools/update-spec.sh
 srpm_build_deps:
   - python3-build
   - python3-setuptools_scm
