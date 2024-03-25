@@ -20,7 +20,7 @@ srpm_build_deps:
   - python3-pytest-mock
 jobs:
   - job: copr_build
-    trigger: commit
+    trigger: pull_request
     branch: main
     targets:
       - fedora-rawhide-x86_64
