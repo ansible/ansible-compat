@@ -22,7 +22,7 @@ exclude: |
   )$
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.2.0"
+    rev: "v0.3.4"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -60,19 +60,19 @@ repos:
     hooks:
       - id: codespell
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.33.0
+    rev: v1.35.1
     hooks:
       - id: yamllint
         files: \.(yaml|yml)$
         types: [file, yaml]
         entry: yamllint --strict
   - repo: https://github.com/psf/black
-    rev: 24.1.1
+    rev: 24.3.0
     hooks:
       - id: black
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+    rev: v1.9.0
     hooks:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
@@ -89,7 +89,7 @@ repos:
           - types-pkg_resources
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v3.0.3
+    rev: v3.1.0
     hooks:
       - id: pylint
         additional_dependencies:
@@ -104,20 +104,20 @@ repos:
         name: Upgrade constraints files and requirements
         files: ^(pyproject\.toml|requirements\.txt)$
         language: python
-        entry: python -m piptools compile --resolver=backtracking --upgrade -q --strip-extras --extra docs --extra test --output-file=requirements.txt pyproject.toml --unsafe-package ansible-core --unsafe-package resolvelib --unsafe-package typing_extensions
+        entry: python -m piptools compile --resolver=backtracking --upgrade -q --strip-extras --all-extras --output-file=.config/requirements.txt pyproject.toml --unsafe-package ansible-core --unsafe-package resolvelib --unsafe-package typing_extensions
         pass_filenames: false
         stages:
           - manual
         additional_dependencies:
-          - pip-tools>=6.11.0
+          - pip-tools>=7.4.1
       - id: pip-compile
         name: Check constraints files and requirements
         files: ^(pyproject\.toml|requirements\.txt)$
         language: python
-        entry: python -m piptools compile --resolver=backtracking -q --strip-extras --extra docs --extra test --output-file=requirements.txt pyproject.toml --unsafe-package ansible-core --unsafe-package resolvelib --unsafe-package typing_extensions
+        entry: python -m piptools compile --resolver=backtracking -q --strip-extras --all-extras --output-file=.config/requirements.txt pyproject.toml --unsafe-package ansible-core --unsafe-package resolvelib --unsafe-package typing_extensions
         pass_filenames: false
         additional_dependencies:
-          - pip-tools>=6.11.0
+          - pip-tools>=7.4.1
   - repo: https://github.com/packit/pre-commit-hooks
     rev: v1.2.0
     hooks:

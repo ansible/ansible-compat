@@ -1,0 +1,7 @@
+# https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
+ansible-core>=2.12
+packaging
+PyYAML
+subprocess-tee>=0.4.1
+jsonschema>=4.6.0
+typing-extensions>=4.5.0;python_version<'3.10'
