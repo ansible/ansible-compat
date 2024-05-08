@@ -1,5 +1,8 @@
 ---
 proseWrap: always
+plugins:
+  - prettier-plugin-sort-json
+  - prettier-plugin-toml
 jsonRecursiveSort: true # prettier-plugin-sort-json
 tabWidth: 2
 useTabs: false
