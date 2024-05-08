@@ -5,12 +5,8 @@ on:
     types: [published]
 
 jobs:
-  before-release:
-    uses: ansible/ansible-compat/.github/workflows/tox.yml@main
-
   release:
     name: release ${{ github.event.ref }}
-    needs: before-release
     # unable to use environment with uses/with, basically cannot reuse release pipelines
     environment: release
     runs-on: ubuntu-22.04
