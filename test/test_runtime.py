@@ -893,3 +893,16 @@ def test_get_galaxy_role_name_invalid() -> None:
         "role_name": False,  # <-- invalid data, should be string
     }
     assert _get_galaxy_role_name(galaxy_infos) == ""
+
+
+def test_runtime_has_playbook() -> None:
+    """Tests has_playbook method."""
+    runtime = Runtime(require_module=True)
+
+    assert not runtime.has_playbook("this-does-not-exist.yml")
+    # call twice to ensure cache is used:
+    assert not runtime.has_playbook("this-does-not-exist.yml")
+
+    assert not runtime.has_playbook("this-does-not-exist.yml", basedir=Path())
+    # this is part of community.molecule collection
+    assert runtime.has_playbook("community.molecule.validate.yml")
