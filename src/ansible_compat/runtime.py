@@ -156,6 +156,7 @@ class Runtime:
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
     plugins: Plugins
+    _has_playbook_cache: dict[tuple[str, Path | None], bool] = {}
 
     def __init__(
         self,
@@ -431,6 +432,28 @@ class Runtime:
         if upper and self.version >= Version(upper):
             return False
         return True
+
+    def has_playbook(self, playbook: str, *, basedir: Path | None = None) -> bool:
+        """Return true if ansible can load a given playbook.
+
+        This is also used for checking if playbooks from within collections
+        are present and if they pass syntax check.
+        """
+        if (playbook, basedir) in self._has_playbook_cache:
+            return self._has_playbook_cache[playbook, basedir]
+
+        proc = self.run(["ansible-playbook", "--syntax-check", playbook], cwd=basedir)
+        result = proc.returncode == 0
+        if not result:
+            if not basedir:
+                basedir = Path()
+            msg = f"has_playbook returned false for '{basedir / playbook}' due to syntax check returning {proc.returncode}"
+            logging.debug(msg)
+
+        # cache the result
+        self._has_playbook_cache[playbook, basedir] = result
+
+        return result
 
     def install_collection(
         self,
