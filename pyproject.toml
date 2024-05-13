@@ -51,6 +51,7 @@ show_missing = true
 
 [tool.coverage.run]
 source = ["src"]
+omit = ["src/ansible_compat/types.py"]
 # Do not use branch until bug is fixes:
 # https://github.com/nedbat/coveragepy/issues/605
 branch = false
