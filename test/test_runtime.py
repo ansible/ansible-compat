@@ -741,6 +741,70 @@ def test_install_collection_from_disk_fail() -> None:
         )
 
 
+def test_load_collections_failure(mocker: MockerFixture) -> None:
+    """Tests for ansible-galaxy erroring."""
+    mocker.patch(
+        "ansible_compat.runtime.Runtime.run",
+        return_value=CompletedProcess(
+            ["x"],
+            returncode=1,
+            stdout="There was an error",
+            stderr="This is the error",
+        ),
+        autospec=True,
+    )
+    runtime = Runtime()
+    with pytest.raises(RuntimeError, match="Unable to list collections: "):
+        runtime.load_collections()
+
+
+@pytest.mark.parametrize(
+    "value",
+    ("[]", '{"path": "bad data"}', '{"path": {"ansible.posix": 123}}'),
+    ids=["list", "malformed_collection", "bad_collection_data"],
+)
+def test_load_collections_garbage(value: str, mocker: MockerFixture) -> None:
+    """Tests for ansible-galaxy returning bad data."""
+    mocker.patch(
+        "ansible_compat.runtime.Runtime.run",
+        return_value=CompletedProcess(
+            ["x"],
+            returncode=0,
+            stdout=value,
+            stderr="",
+        ),
+        autospec=True,
+    )
+    runtime = Runtime()
+    with pytest.raises(TypeError, match="Unexpected collection data, "):
+        runtime.load_collections()
+
+
+@pytest.mark.parametrize(
+    "value",
+    ("", '{"path": {123: 456}}'),
+    ids=["nothing", "bad_collection_name"],
+)
+def test_load_collections_invalid_json(value: str, mocker: MockerFixture) -> None:
+    """Tests for ansible-galaxy returning bad data."""
+    mocker.patch(
+        "ansible_compat.runtime.Runtime.run",
+        return_value=CompletedProcess(
+            ["x"],
+            returncode=0,
+            stdout=value,
+            stderr="",
+        ),
+        autospec=True,
+    )
+    runtime = Runtime()
+    with pytest.raises(
+        RuntimeError,
+        match=f"Unable to parse galaxy output as JSON: {value}",
+    ):
+        runtime.load_collections()
+
+
 def test_prepare_environment_offline_role() -> None:
     """Ensure that we can make use of offline roles."""
     with cwd(Path("test/roles/acme.missing_deps")):
