@@ -567,6 +567,18 @@ def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
         runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
 
 
+def test_install_galaxy_role_no_meta(runtime_tmp: Runtime) -> None:
+    """Check install role with missing meta/main.yml."""
+    # This should fail because meta/main.yml is missing
+    with pytest.raises(
+        FileNotFoundError,
+        match=f"No such file or directory: '{runtime_tmp.project_dir.absolute()}/meta/main.yaml'",
+    ):
+        runtime_tmp._install_galaxy_role(runtime_tmp.project_dir)
+    # But ignore_errors will return without doing anything
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, ignore_errors=True)
+
+
 @pytest.mark.parametrize(
     "galaxy_info",
     (
