@@ -817,11 +817,19 @@ def test_load_collections_invalid_json(value: str, mocker: MockerFixture) -> Non
         runtime.load_collections()
 
 
-def test_prepare_environment_offline_role() -> None:
+def test_prepare_environment_offline_role(caplog: pytest.LogCaptureFixture) -> None:
     """Ensure that we can make use of offline roles."""
     with cwd(Path("test/roles/acme.missing_deps")):
         runtime = Runtime(isolated=True)
         runtime.prepare_environment(install_local=True, offline=True)
+        assert (
+            "Skipped installing old role dependencies due to running in offline mode."
+            in caplog.text
+        )
+        assert (
+            "Skipped installing collection dependencies due to running in offline mode."
+            in caplog.text
+        )
 
 
 def test_runtime_run(runtime: Runtime) -> None:
