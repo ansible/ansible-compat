@@ -182,14 +182,13 @@ def test_runtime_install_role(
     runtime.cache_dir = tmp_dir
 
 
-def test_prepare_environment_with_collections(tmp_path: pathlib.Path) -> None:
+def test_prepare_environment_with_collections(runtime_tmp: Runtime) -> None:
     """Check that collections are correctly installed."""
-    runtime = Runtime(isolated=True, project_dir=tmp_path)
-    runtime.prepare_environment(
+    runtime_tmp.prepare_environment(
         required_collections={"community.molecule": "0.1.0"},
         install_local=True,
     )
-    assert "community.molecule" in runtime.collections
+    assert "community.molecule" in runtime_tmp.collections
 
 
 def test_runtime_install_requirements_missing_file() -> None:
@@ -442,14 +441,13 @@ def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
         runtime.require_collection("community.molecule")
 
 
-def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
+def test_require_collection_preexisting_broken(runtime_tmp: Runtime) -> None:
     """Check that require_collection raise with broken pre-existing collection."""
-    runtime = Runtime(isolated=True, project_dir=tmp_path)
-    dest_path: str = runtime.config.collections_paths[0]
+    dest_path: str = runtime_tmp.config.collections_paths[0]
     dest = pathlib.Path(dest_path) / "ansible_collections" / "foo" / "bar"
     dest.mkdir(parents=True, exist_ok=True)
     with pytest.raises(InvalidPrerequisiteError, match="missing MANIFEST.json"):
-        runtime.require_collection("foo.bar")
+        runtime_tmp.require_collection("foo.bar")
 
 
 def test_require_collection(runtime_tmp: Runtime) -> None:
@@ -958,7 +956,17 @@ def test_is_url(name: str, result: bool) -> None:
     assert is_url(name) == result
 
 
-def test_prepare_environment_valid_symlink(
+@pytest.mark.parametrize(
+    ("dest", "message"),
+    (
+        ("/invalid/destination", "Collection is symlinked, but not pointing to"),
+        (Path.cwd(), "Found symlinked collection, skipping its installation."),
+    ),
+    ids=["broken", "valid"],
+)
+def test_prepare_environment_symlink(
+    dest: str | Path,
+    message: str,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Ensure avalid symlinks to collections are properly detected."""
@@ -970,30 +978,9 @@ def test_prepare_environment_valid_symlink(
     goodies = acme / "minimal"
     rmtree(goodies, ignore_errors=True)
     goodies.unlink(missing_ok=True)
-    goodies.symlink_to(Path.cwd())
+    goodies.symlink_to(dest)
     runtime.prepare_environment(install_local=True)
-    assert "Found symlinked collection, skipping its installation." in caplog.text
-
-
-def test_prepare_environment_repair_broken_symlink(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Ensure we can deal with broken symlinks in collections."""
-    caplog.set_level(logging.INFO)
-    project_dir = Path(__file__).parent / "collections" / "acme.minimal"
-    runtime = Runtime(isolated=True, project_dir=project_dir)
-    assert runtime.cache_dir
-    acme = runtime.cache_dir / "collections" / "ansible_collections" / "acme"
-    acme.mkdir(parents=True, exist_ok=True)
-    goodies = acme / "minimal"
-    rmtree(goodies, ignore_errors=True)
-    goodies.unlink(missing_ok=True)
-    goodies.symlink_to("/invalid/destination")
-    runtime.prepare_environment(install_local=True)
-    assert any(
-        msg.startswith("Collection is symlinked, but not pointing to")
-        for msg in caplog.messages
-    )
+    assert message in caplog.text
 
 
 def test_get_galaxy_role_name_invalid() -> None:
