@@ -50,7 +50,7 @@ jobs:
       matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
     env:
       FORCE_COLOR: 1
-      PYTEST_REQPASS: 105
+      PYTEST_REQPASS: 106
     steps:
       - uses: actions/checkout@v4
         with:

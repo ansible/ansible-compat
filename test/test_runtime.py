@@ -958,6 +958,23 @@ def test_is_url(name: str, result: bool) -> None:
     assert is_url(name) == result
 
 
+def test_prepare_environment_valid_symlink(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Ensure avalid symlinks to collections are properly detected."""
+    project_dir = Path(__file__).parent / "collections" / "acme.minimal"
+    runtime = Runtime(isolated=True, project_dir=project_dir)
+    assert runtime.cache_dir
+    acme = runtime.cache_dir / "collections" / "ansible_collections" / "acme"
+    acme.mkdir(parents=True, exist_ok=True)
+    goodies = acme / "minimal"
+    rmtree(goodies, ignore_errors=True)
+    goodies.unlink(missing_ok=True)
+    goodies.symlink_to(Path.cwd())
+    runtime.prepare_environment(install_local=True)
+    assert "Found symlinked collection, skipping its installation." in caplog.text
+
+
 def test_prepare_environment_repair_broken_symlink(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
