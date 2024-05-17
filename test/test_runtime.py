@@ -185,7 +185,11 @@ def test_runtime_install_role(
 def test_prepare_environment_with_collections(tmp_path: pathlib.Path) -> None:
     """Check that collections are correctly installed."""
     runtime = Runtime(isolated=True, project_dir=tmp_path)
-    runtime.prepare_environment(required_collections={"community.molecule": "0.1.0"})
+    runtime.prepare_environment(
+        required_collections={"community.molecule": "0.1.0"},
+        install_local=True,
+    )
+    assert "community.molecule" in runtime.collections
 
 
 def test_runtime_install_requirements_missing_file() -> None:
