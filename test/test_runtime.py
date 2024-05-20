@@ -1,6 +1,6 @@
 """Tests for Runtime class."""
 
-# pylint: disable=protected-access
+# pylint: disable=protected-access,too-many-lines
 from __future__ import annotations
 
 import logging
