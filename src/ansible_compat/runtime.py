@@ -227,7 +227,7 @@ class Runtime:
             msg: str,
             *,
             formatted: bool = False,  # noqa: ARG001
-        ) -> None:
+        ) -> None:  # pragma: no cover
             """Override ansible.utils.display.Display.warning to avoid printing warnings."""
             warnings.warn(
                 message=msg,
@@ -274,7 +274,7 @@ class Runtime:
         proc = self.run(["ansible-galaxy", "collection", "list", "--format=json"])
         if proc.returncode == RC_ANSIBLE_OPTIONS_ERROR and (
             no_collections_msg in proc.stdout or no_collections_msg in proc.stderr
-        ):
+        ):  # pragma: no cover
             _logger.debug("Ansible reported no installed collections at all.")
             return
         if proc.returncode != 0:
