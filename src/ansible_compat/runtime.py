@@ -285,15 +285,19 @@ class Runtime:
             _logger.error(proc)
             msg = f"Unable to list collections: {proc}"
             raise RuntimeError(msg)
-        data = json.loads(proc.stdout)
+        try:
+            data = json.loads(proc.stdout)
+        except json.decoder.JSONDecodeError as exc:
+            msg = f"Unable to parse galaxy output as JSON: {proc.stdout}"
+            raise RuntimeError(msg) from exc
         if not isinstance(data, dict):
             msg = f"Unexpected collection data, {data}"
             raise TypeError(msg)
         for path in data:
+            if not isinstance(data[path], dict):
+                msg = f"Unexpected collection data, {data[path]}"
+                raise TypeError(msg)
             for collection, collection_info in data[path].items():
-                if not isinstance(collection, str):
-                    msg = f"Unexpected collection data, {collection}"
-                    raise TypeError(msg)
                 if not isinstance(collection_info, dict):
                     msg = f"Unexpected collection data, {collection_info}"
                     raise TypeError(msg)
@@ -772,18 +776,16 @@ class Runtime:
                             _logger.fatal(msg)
                             raise InvalidPrerequisiteError(msg)
                     return found_version, collpath.resolve()
-                break
-        else:
-            if install:
-                self.install_collection(f"{name}:>={version}" if version else name)
-                return self.require_collection(
-                    name=name,
-                    version=version,
-                    install=False,
-                )
-            msg = f"Collection '{name}' not found in '{paths}'"
-            _logger.fatal(msg)
-            raise InvalidPrerequisiteError(msg)
+        if install:
+            self.install_collection(f"{name}:>={version}" if version else name)
+            return self.require_collection(
+                name=name,
+                version=version,
+                install=False,
+            )
+        msg = f"Collection '{name}' not found in '{paths}'"
+        _logger.fatal(msg)
+        raise InvalidPrerequisiteError(msg)
 
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""

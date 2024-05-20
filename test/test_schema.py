@@ -72,3 +72,16 @@ def test_schema(index: int) -> None:
 def test_json_path() -> None:
     """Test json_path function."""
     assert json_path(["a", 1, "b"]) == "$.a[1].b"
+
+
+def test_validate_invalid_schema() -> None:
+    """Test validate function error handling."""
+    schema = "[]"
+    data = json_from_asset("assets/validate0_data.json")
+    errors = validate(schema, data)
+
+    assert len(errors) == 1
+    assert (
+        errors[0].to_friendly()
+        == "In 'schema sanity check': Invalid schema, must be a mapping."
+    )

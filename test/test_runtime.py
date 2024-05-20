@@ -1,6 +1,6 @@
 """Tests for Runtime class."""
 
-# pylint: disable=protected-access
+# pylint: disable=protected-access,too-many-lines
 from __future__ import annotations
 
 import logging
@@ -182,10 +182,13 @@ def test_runtime_install_role(
     runtime.cache_dir = tmp_dir
 
 
-def test_prepare_environment_with_collections(tmp_path: pathlib.Path) -> None:
+def test_prepare_environment_with_collections(runtime_tmp: Runtime) -> None:
     """Check that collections are correctly installed."""
-    runtime = Runtime(isolated=True, project_dir=tmp_path)
-    runtime.prepare_environment(required_collections={"community.molecule": "0.1.0"})
+    runtime_tmp.prepare_environment(
+        required_collections={"community.molecule": "0.1.0"},
+        install_local=True,
+    )
+    assert "community.molecule" in runtime_tmp.collections
 
 
 def test_runtime_install_requirements_missing_file() -> None:
@@ -438,14 +441,13 @@ def test_require_collection_invalid_collections_path(runtime: Runtime) -> None:
         runtime.require_collection("community.molecule")
 
 
-def test_require_collection_preexisting_broken(tmp_path: pathlib.Path) -> None:
+def test_require_collection_preexisting_broken(runtime_tmp: Runtime) -> None:
     """Check that require_collection raise with broken pre-existing collection."""
-    runtime = Runtime(isolated=True, project_dir=tmp_path)
-    dest_path: str = runtime.config.collections_paths[0]
+    dest_path: str = runtime_tmp.config.collections_paths[0]
     dest = pathlib.Path(dest_path) / "ansible_collections" / "foo" / "bar"
     dest.mkdir(parents=True, exist_ok=True)
     with pytest.raises(InvalidPrerequisiteError, match="missing MANIFEST.json"):
-        runtime.require_collection("foo.bar")
+        runtime_tmp.require_collection("foo.bar")
 
 
 def test_require_collection(runtime_tmp: Runtime) -> None:
@@ -565,6 +567,18 @@ def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
     # this should raise an error regardless the role_name_check value
     with pytest.raises(AnsibleCompatError, match="Role namespace must be string, not"):
         runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+
+
+def test_install_galaxy_role_no_meta(runtime_tmp: Runtime) -> None:
+    """Check install role with missing meta/main.yml."""
+    # This should fail because meta/main.yml is missing
+    with pytest.raises(
+        FileNotFoundError,
+        match=f"No such file or directory: '{runtime_tmp.project_dir.absolute()}/meta/main.yaml'",
+    ):
+        runtime_tmp._install_galaxy_role(runtime_tmp.project_dir)
+    # But ignore_errors will return without doing anything
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, ignore_errors=True)
 
 
 @pytest.mark.parametrize(
@@ -741,11 +755,83 @@ def test_install_collection_from_disk_fail() -> None:
         )
 
 
-def test_prepare_environment_offline_role() -> None:
+def test_load_collections_failure(mocker: MockerFixture) -> None:
+    """Tests for ansible-galaxy erroring."""
+    mocker.patch(
+        "ansible_compat.runtime.Runtime.run",
+        return_value=CompletedProcess(
+            ["x"],
+            returncode=1,
+            stdout="There was an error",
+            stderr="This is the error",
+        ),
+        autospec=True,
+    )
+    runtime = Runtime()
+    with pytest.raises(RuntimeError, match="Unable to list collections: "):
+        runtime.load_collections()
+
+
+@pytest.mark.parametrize(
+    "value",
+    ("[]", '{"path": "bad data"}', '{"path": {"ansible.posix": 123}}'),
+    ids=["list", "malformed_collection", "bad_collection_data"],
+)
+def test_load_collections_garbage(value: str, mocker: MockerFixture) -> None:
+    """Tests for ansible-galaxy returning bad data."""
+    mocker.patch(
+        "ansible_compat.runtime.Runtime.run",
+        return_value=CompletedProcess(
+            ["x"],
+            returncode=0,
+            stdout=value,
+            stderr="",
+        ),
+        autospec=True,
+    )
+    runtime = Runtime()
+    with pytest.raises(TypeError, match="Unexpected collection data, "):
+        runtime.load_collections()
+
+
+@pytest.mark.parametrize(
+    "value",
+    ("", '{"path": {123: 456}}'),
+    ids=["nothing", "bad_collection_name"],
+)
+def test_load_collections_invalid_json(value: str, mocker: MockerFixture) -> None:
+    """Tests for ansible-galaxy returning bad data."""
+    mocker.patch(
+        "ansible_compat.runtime.Runtime.run",
+        return_value=CompletedProcess(
+            ["x"],
+            returncode=0,
+            stdout=value,
+            stderr="",
+        ),
+        autospec=True,
+    )
+    runtime = Runtime()
+    with pytest.raises(
+        RuntimeError,
+        match=f"Unable to parse galaxy output as JSON: {value}",
+    ):
+        runtime.load_collections()
+
+
+def test_prepare_environment_offline_role(caplog: pytest.LogCaptureFixture) -> None:
     """Ensure that we can make use of offline roles."""
     with cwd(Path("test/roles/acme.missing_deps")):
         runtime = Runtime(isolated=True)
         runtime.prepare_environment(install_local=True, offline=True)
+        assert (
+            "Skipped installing old role dependencies due to running in offline mode."
+            in caplog.text
+        )
+        assert (
+            "Skipped installing collection dependencies due to running in offline mode."
+            in caplog.text
+        )
 
 
 def test_runtime_run(runtime: Runtime) -> None:
@@ -870,11 +956,20 @@ def test_is_url(name: str, result: bool) -> None:
     assert is_url(name) == result
 
 
-def test_prepare_environment_repair_broken_symlink(
+@pytest.mark.parametrize(
+    ("dest", "message"),
+    (
+        ("/invalid/destination", "Collection is symlinked, but not pointing to"),
+        (Path.cwd(), "Found symlinked collection, skipping its installation."),
+    ),
+    ids=["broken", "valid"],
+)
+def test_prepare_environment_symlink(
+    dest: str | Path,
+    message: str,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Ensure we can deal with broken symlinks in collections."""
-    caplog.set_level(logging.INFO)
+    """Ensure avalid symlinks to collections are properly detected."""
     project_dir = Path(__file__).parent / "collections" / "acme.minimal"
     runtime = Runtime(isolated=True, project_dir=project_dir)
     assert runtime.cache_dir
@@ -883,12 +978,9 @@ def test_prepare_environment_repair_broken_symlink(
     goodies = acme / "minimal"
     rmtree(goodies, ignore_errors=True)
     goodies.unlink(missing_ok=True)
-    goodies.symlink_to("/invalid/destination")
+    goodies.symlink_to(dest)
     runtime.prepare_environment(install_local=True)
-    assert any(
-        msg.startswith("Collection is symlinked, but not pointing to")
-        for msg in caplog.messages
-    )
+    assert message in caplog.text
 
 
 def test_get_galaxy_role_name_invalid() -> None:

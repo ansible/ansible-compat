@@ -1,2 +1,4 @@
 collections:
   - foo.bar # collection that does not exist, so we can test offline mode
+roles:
+  - this_role_does_not_exist # and also role that does not exist
