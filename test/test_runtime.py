@@ -532,11 +532,14 @@ def test_install_galaxy_role_unlink(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test ability to unlink incorrect symlinked roles."""
-    runtime_tmp = Runtime(verbosity=1)
+    runtime_tmp = Runtime(verbosity=1, isolated=True)
     runtime_tmp.prepare_environment()
+    assert runtime_tmp.cache_dir is not None
     pathlib.Path(f"{runtime_tmp.cache_dir}/roles").mkdir(parents=True, exist_ok=True)
-    pathlib.Path(f"{runtime_tmp.cache_dir}/roles/acme.get_rich").symlink_to("/dev/null")
-    pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
+    roledir = pathlib.Path(f"{runtime_tmp.cache_dir}/roles/acme.get_rich")
+    if not roledir.exists():
+        roledir.symlink_to("/dev/null")
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir(exist_ok=True)
     pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").write_text(
         """galaxy_info:
   role_name: get_rich
@@ -546,6 +549,7 @@ def test_install_galaxy_role_unlink(
     )
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir)
     assert "symlink to current repository" in caplog.text
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").unlink()
 
 
 def test_install_galaxy_role_bad_namespace(runtime_tmp: Runtime) -> None:
