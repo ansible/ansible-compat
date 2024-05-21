@@ -45,12 +45,15 @@ changelog = "https://github.com/ansible/ansible-compat/releases"
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
-fail_under = 92
-skip_covered = true
+fail_under = 98
 show_missing = true
+skip_covered = true
+skip_empty = true
+sort = "Cover"
+
 
 [tool.coverage.run]
-source = ["src"]
+source_pkgs = ["ansible_compat"]
 # Do not use branch until bug is fixes:
 # https://github.com/nedbat/coveragepy/issues/605
 branch = false
