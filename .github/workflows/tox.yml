@@ -29,8 +29,6 @@ jobs:
             lint
             docs
             pkg
-            py39-ansible212
-            py39-ansible213
             py39-ansible214
             py39-ansible215
             py310-ansible215
@@ -139,7 +137,7 @@ jobs:
 
       - name: Check for expected number of coverage.xml reports
         run: |
-          JOBS_PRODUCING_COVERAGE=14
+          JOBS_PRODUCING_COVERAGE=12
           if [ "$(find . -name coverage.xml | wc -l | bc)" -ne "${JOBS_PRODUCING_COVERAGE}" ]; then
             echo "::error::Number of coverage.xml files was not the expected one (${JOBS_PRODUCING_COVERAGE}): $(find . -name coverage.xml |xargs echo)"
             exit 1
