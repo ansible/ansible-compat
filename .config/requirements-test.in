@@ -1,9 +1,8 @@
 coverage
 pip-tools
 pre-commit
-pytest
-pytest-xdist
 pytest-mock
 pytest-plus>=0.6.1
+pytest-xdist
 pytest>=7.2.0
 tox
