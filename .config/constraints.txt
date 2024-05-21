@@ -20,6 +20,8 @@ black==24.4.2
     # via ansible-compat (pyproject.toml)
 build==1.2.1
     # via pip-tools
+cachetools==5.3.3
+    # via tox
 cairocffi==1.7.0
     # via cairosvg
 cairosvg==2.7.1
@@ -30,6 +32,10 @@ cffi==1.16.0
     # via
     #   cairocffi
     #   cryptography
+cfgv==3.4.0
+    # via pre-commit
+chardet==5.2.0
+    # via tox
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
@@ -42,6 +48,7 @@ colorama==0.4.6
     # via
     #   griffe
     #   mkdocs-material
+    #   tox
 coverage==7.5.1
     # via ansible-compat (pyproject.toml)
 cryptography==42.0.7
@@ -52,16 +59,26 @@ cssselect2==0.7.0
     # via cairosvg
 defusedxml==0.7.1
     # via cairosvg
+distlib==0.3.8
+    # via virtualenv
 dnspython==2.6.1
     # via linkchecker
 exceptiongroup==1.2.1
     # via pytest
+execnet==2.1.1
+    # via pytest-xdist
+filelock==3.14.0
+    # via
+    #   tox
+    #   virtualenv
 ghp-import==2.1.0
     # via mkdocs
 griffe==0.44.0
     # via mkdocstrings-python
 htmlmin2==0.1.13
     # via mkdocs-minify-plugin
+identify==2.5.36
+    # via pre-commit
 idna==3.7
     # via requests
 iniconfig==2.0.0
@@ -145,6 +162,8 @@ mkdocstrings-python==1.10.0
     # via mkdocs-ansible
 mypy-extensions==1.0.0
     # via black
+nodeenv==1.8.0
+    # via pre-commit
 packaging==24.0
     # via
     #   ansible-compat (pyproject.toml)
@@ -153,7 +172,9 @@ packaging==24.0
     #   build
     #   mkdocs
     #   pipdeptree
+    #   pyproject-api
     #   pytest
+    #   tox
 paginate==0.5.6
     # via mkdocs-material
 pathspec==0.12.1
@@ -177,8 +198,14 @@ platformdirs==4.2.1
     #   black
     #   mkdocs-get-deps
     #   mkdocstrings
+    #   tox
+    #   virtualenv
 pluggy==1.5.0
-    # via pytest
+    # via
+    #   pytest
+    #   tox
+pre-commit==3.7.1
+    # via ansible-compat (pyproject.toml)
 pycparser==2.22
     # via cffi
 pygments==2.18.0
@@ -189,6 +216,8 @@ pymdown-extensions==10.8.1
     #   mkdocs-ansible
     #   mkdocs-material
     #   mkdocstrings
+pyproject-api==1.6.1
+    # via tox
 pyproject-hooks==1.1.0
     # via
     #   build
@@ -198,9 +227,12 @@ pytest==8.2.0
     #   ansible-compat (pyproject.toml)
     #   pytest-mock
     #   pytest-plus
+    #   pytest-xdist
 pytest-mock==3.14.0
     # via ansible-compat (pyproject.toml)
 pytest-plus==0.7.0
+    # via ansible-compat (pyproject.toml)
+pytest-xdist==3.6.1
     # via ansible-compat (pyproject.toml)
 python-dateutil==2.9.0.post0
     # via
@@ -215,6 +247,7 @@ pyyaml==6.0.1
     #   mkdocs
     #   mkdocs-get-deps
     #   mkdocs-macros-plugin
+    #   pre-commit
     #   pymdown-extensions
     #   pyyaml-env-tag
 pyyaml-env-tag==0.1
@@ -235,7 +268,9 @@ rpds-py==0.18.1
     #   jsonschema
     #   referencing
 setuptools==69.5.1
-    # via pip-tools
+    # via
+    #   nodeenv
+    #   pip-tools
 six==1.16.0
     # via python-dateutil
 soupsieve==2.5
@@ -256,11 +291,19 @@ tomli==2.0.1
     #   black
     #   build
     #   pip-tools
+    #   pyproject-api
     #   pytest
+    #   tox
+tox==4.15.0
+    # via ansible-compat (pyproject.toml)
 typing-extensions==4.11.0
     # via black
 urllib3==2.2.1
     # via requests
+virtualenv==20.26.2
+    # via
+    #   pre-commit
+    #   tox
 watchdog==4.0.0
     # via mkdocs
 webencodings==0.5.1

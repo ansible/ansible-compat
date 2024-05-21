@@ -1,5 +1,6 @@
 coverage
 pip-tools
+pre-commit
 pytest
 pytest-xdist
 pytest-mock
