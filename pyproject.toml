@@ -339,6 +339,7 @@ disable = [
 ]
 
 [tool.pytest.ini_options]
+addopts = "-ra --showlocals --durations=10"
 # ensure we treat warnings as error
 filterwarnings = [
   "error",
@@ -347,6 +348,8 @@ filterwarnings = [
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
 ]
 testpaths = ["test"]
+tmp_path_retention_policy = "failed"
+verbosity_assertions = 2
 
 [tool.ruff]
 target-version = "py39"
