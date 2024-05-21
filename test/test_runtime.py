@@ -450,9 +450,16 @@ def test_require_collection_preexisting_broken(runtime_tmp: Runtime) -> None:
         runtime_tmp.require_collection("foo.bar")
 
 
-def test_require_collection(runtime_tmp: Runtime) -> None:
-    """Check that require collection successful install case."""
-    runtime_tmp.require_collection("community.molecule", "0.1.0")
+def test_require_collection_install(runtime_tmp: Runtime) -> None:
+    """Check that require collection successful install case, including upgrade path."""
+    runtime_tmp.install_collection("ansible.posix:==1.5.2")
+    runtime_tmp.load_collections()
+    collection = runtime_tmp.collections["ansible.posix"]
+    assert collection.version == "1.5.2"
+    runtime_tmp.require_collection(name="ansible.posix", version="1.5.4", install=True)
+    runtime_tmp.load_collections()
+    collection = runtime_tmp.collections["ansible.posix"]
+    assert collection.version == "1.5.4"
 
 
 @pytest.mark.parametrize(
