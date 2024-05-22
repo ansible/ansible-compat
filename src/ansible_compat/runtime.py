@@ -23,7 +23,6 @@ from packaging.version import Version
 from ansible_compat.config import (
     AnsibleConfig,
     ansible_collections_path,
-    ansible_version,
     parse_ansible_version,
 )
 from ansible_compat.constants import (
@@ -128,9 +127,6 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
             try:
                 result = super().__getattribute__(attr)
             except AttributeError as exc:
-                if ansible_version() < Version("2.14") and attr in {"filter", "test"}:
-                    msg = "Ansible version below 2.14 does not support retrieving filter and test plugins."
-                    raise RuntimeError(msg) from exc
                 proc = self.runtime.run(
                     ["ansible-doc", "--json", "-l", "-t", attr],
                 )
