@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from packaging.version import Version
 
-from ansible_compat.config import ansible_version
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
 from ansible_compat.errors import (
     AnsibleCommandError,
