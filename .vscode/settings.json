@@ -1,13 +1,17 @@
 {
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[python]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
-      "source.fixAll.ruff": "never",
-      "source.organizeImports": "never"
-    }
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
   },
   "editor.formatOnSave": true,
   "evenBetterToml.formatter.alignComments": false,
@@ -24,17 +28,15 @@
   "grammarly.files.include": ["**/*.txt", "**/*.md"],
   "grammarly.hideUnavailablePremiumAlerts": true,
   "grammarly.showExamples": true,
+  "markiscodecoverage.searchCriteria": "coverage.lcov",
+  "mypy-type-checker.importStrategy": "fromEnvironment",
+  "mypy-type-checker.preferDaemon": true,
+  "mypy-type-checker.reportingScope": "workspace",
   "python.analysis.exclude": ["build"],
-  "python.formatting.provider": "black",
-  "python.linting.flake8Args": ["--ignore=E501,W503"],
-  "python.linting.flake8Enabled": false,
-  "python.linting.mypyCategorySeverity.error": "Warning",
-  "python.linting.mypyEnabled": true,
-  "python.linting.pylintEnabled": true,
   "python.terminal.activateEnvironment": true,
+  "python.testing.pytestArgs": ["tests"],
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
-  "sortLines.filterBlankLines": true,
   "yaml.completion": true,
   "yaml.customTags": ["!encrypted/pkcs1-oaep scalar", "!vault scalar"],
   "yaml.format.enable": false,
