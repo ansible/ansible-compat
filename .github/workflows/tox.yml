@@ -48,7 +48,7 @@ jobs:
       matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
     env:
       FORCE_COLOR: 1
-      PYTEST_REQPASS: 106
+      PYTEST_REQPASS: 108
     steps:
       - uses: actions/checkout@v4
         with:
@@ -147,7 +147,6 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           name: ${{ matrix.passed_name }}
-          # token: ${{ secrets.CODECOV_TOKEN }}
           # verbose: true # optional (default = false)
           fail_ci_if_error: true
           use_oidc: true # cspell:ignore oidc
