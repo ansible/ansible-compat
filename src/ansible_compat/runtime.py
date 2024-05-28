@@ -1,5 +1,7 @@
 """Ansible runtime environment manager."""
 
+# pylint: disable=too-many-lines
+
 from __future__ import annotations
 
 import contextlib
@@ -271,7 +273,15 @@ class Runtime:
         self.collections = OrderedDict()
         no_collections_msg = "None of the provided paths were usable"
 
-        proc = self.run(["ansible-galaxy", "collection", "list", "--format=json"])
+        proc = self.run(
+            [
+                "ansible-galaxy",
+                "collection",
+                "list",
+                "--format=json",
+                f"-p={':'.join(self.config.collections_paths)}",
+            ],
+        )
         if proc.returncode == RC_ANSIBLE_OPTIONS_ERROR and (
             no_collections_msg in proc.stdout or no_collections_msg in proc.stderr
         ):  # pragma: no cover
@@ -298,11 +308,15 @@ class Runtime:
                     msg = f"Unexpected collection data, {collection_info}"
                     raise TypeError(msg)
 
-                self.collections[collection] = Collection(
-                    name=collection,
-                    version=collection_info["version"],
-                    path=path,
-                )
+                if collection in self.collections:
+                    msg = f"Multiple versions of '{collection}' were found installed, only the first one will be used, {self.collections[collection].version} ({self.collections[collection].path})."
+                    logging.warning(msg)
+                else:
+                    self.collections[collection] = Collection(
+                        name=collection,
+                        version=collection_info["version"],
+                        path=path,
+                    )
 
     def _ensure_module_available(self) -> None:
         """Assure that Ansible Python module is installed and matching CLI version."""

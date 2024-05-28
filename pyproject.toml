@@ -45,7 +45,7 @@ changelog = "https://github.com/ansible/ansible-compat/releases"
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
-fail_under = 92
+fail_under = 100
 skip_covered = true
 show_missing = true
 
@@ -346,6 +346,7 @@ filterwarnings = [
 testpaths = ["test"]
 
 [tool.ruff]
+extend-include = ["src/ansible_compat/_version.py"]
 target-version = "py39"
 lint.select = ["ALL"]
 lint.ignore = [
