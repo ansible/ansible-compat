@@ -209,7 +209,7 @@ class Runtime:
 
         if isolated:
             self.cache_dir = get_cache_dir(self.project_dir)
-        self.config = AnsibleConfig()
+        self.config = AnsibleConfig(cache_dir=self.cache_dir)
 
         # Add the sys.path to the collection paths if not isolated
         self._add_sys_path_to_collection_paths()
@@ -273,13 +273,13 @@ class Runtime:
         self.collections = OrderedDict()
         no_collections_msg = "None of the provided paths were usable"
 
+        # do not use --path because it does not allow multiple values
         proc = self.run(
             [
                 "ansible-galaxy",
                 "collection",
                 "list",
                 "--format=json",
-                f"-p={':'.join(self.config.collections_paths)}",
             ],
         )
         if proc.returncode == RC_ANSIBLE_OPTIONS_ERROR and (
@@ -391,6 +391,8 @@ class Runtime:
 
         # https://github.com/ansible/ansible-lint/issues/3522
         env["ANSIBLE_VERBOSE_TO_STDERR"] = "True"
+
+        env["ANSIBLE_COLLECTIONS_PATH"] = ":".join(self.config.collections_paths)
 
         for _ in range(self.max_retries + 1 if retry else 1):
             result = run_func(
@@ -520,7 +522,7 @@ class Runtime:
             env={**self.environ, ansible_collections_path(): ":".join(cpaths)},
         )
         if process.returncode != 0:
-            msg = f"Command returned {process.returncode} code:\n{process.stdout}\n{process.stderr}"
+            msg = f"Command {' '.join(cmd)}, returned {process.returncode} code:\n{process.stdout}\n{process.stderr}"
             _logger.error(msg)
             raise InvalidPrerequisiteError(msg)
 
@@ -608,19 +610,10 @@ class Runtime:
                 )
             else:
                 cmd.extend(["-r", str(requirement)])
-                cpaths = self.config.collections_paths
-                if self.cache_dir:
-                    # we cannot use '-p' because it breaks galaxy ability to ignore already installed collections, so
-                    # we hack ansible_collections_path instead and inject our own path there.
-                    dest_path = f"{self.cache_dir}/collections"
-                    if dest_path not in cpaths:
-                        # pylint: disable=no-member
-                        cpaths.insert(0, dest_path)
                 _logger.info("Running %s", " ".join(cmd))
                 result = self.run(
                     cmd,
                     retry=retry,
-                    env={**os.environ, "ANSIBLE_COLLECTIONS_PATH": ":".join(cpaths)},
                 )
                 _logger.debug(result.stdout)
                 if result.returncode != 0:
@@ -756,12 +749,6 @@ class Runtime:
             raise InvalidPrerequisiteError(
                 msg,
             )
-
-        if self.cache_dir:
-            # if we have a cache dir, we want to be use that would be preferred
-            # destination when installing a missing collection
-            # https://github.com/PyCQA/pylint/issues/4667
-            paths.insert(0, f"{self.cache_dir}/collections")  # pylint: disable=E1101
 
         for path in paths:
             collpath = Path(path) / "ansible_collections" / ns / coll
