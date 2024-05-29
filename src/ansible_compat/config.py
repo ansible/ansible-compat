@@ -8,13 +8,16 @@ import os
 import re
 import subprocess
 from collections import UserDict
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from packaging.version import Version
 
 from ansible_compat.constants import ANSIBLE_MIN_VERSION
 from ansible_compat.errors import InvalidPrerequisiteError, MissingAnsibleError
 from ansible_compat.ports import cache
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 # do not use lru_cache here, as environment can change between calls
@@ -397,35 +400,49 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
         self,
         config_dump: str | None = None,
         data: dict[str, object] | None = None,
+        cache_dir: Path | None = None,
     ) -> None:
         """Load config dictionary."""
         super().__init__()
 
+        self.cache_dir = cache_dir
         if data:
             self.data = copy.deepcopy(data)
+        else:
+            if not config_dump:
+                env = os.environ.copy()
+                # Avoid possible ANSI garbage
+                env["ANSIBLE_FORCE_COLOR"] = "0"
+                config_dump = subprocess.check_output(
+                    ["ansible-config", "dump"],  # noqa: S603
+                    universal_newlines=True,
+                    env=env,
+                )
+
+            for match in re.finditer(
+                r"^(?P<key>[A-Za-z0-9_]+).* = (?P<value>.*)$",
+                config_dump,
+                re.MULTILINE,
+            ):
+                key = match.groupdict()["key"]
+                value = match.groupdict()["value"]
+                try:
+                    self[key] = ast.literal_eval(value)
+                except (NameError, SyntaxError, ValueError):
+                    self[key] = value
+        # inject isolation collections paths into the config
+        if self.cache_dir:
+            cpaths = self.data["COLLECTIONS_PATHS"]
+            if cpaths and isinstance(cpaths, list):
+                cpaths.insert(
+                    0,
+                    f"{self.cache_dir}/collections",
+                )
+            else:  # pragma: no cover
+                msg = f"Unexpected data type for COLLECTIONS_PATHS: {cpaths}"
+                raise RuntimeError(msg)
+        if data:
             return
-
-        if not config_dump:
-            env = os.environ.copy()
-            # Avoid possible ANSI garbage
-            env["ANSIBLE_FORCE_COLOR"] = "0"
-            config_dump = subprocess.check_output(
-                ["ansible-config", "dump"],  # noqa: S603
-                universal_newlines=True,
-                env=env,
-            )
-
-        for match in re.finditer(
-            r"^(?P<key>[A-Za-z0-9_]+).* = (?P<value>.*)$",
-            config_dump,
-            re.MULTILINE,
-        ):
-            key = match.groupdict()["key"]
-            value = match.groupdict()["value"]
-            try:
-                self[key] = ast.literal_eval(value)
-            except (NameError, SyntaxError, ValueError):
-                self[key] = value
 
     def __getattribute__(self, attr_name: str) -> object:
         """Allow access of config options as attributes."""
