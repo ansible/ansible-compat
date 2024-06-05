@@ -394,7 +394,6 @@ class Runtime:
         # https://github.com/ansible/ansible-lint/issues/3522
         env["ANSIBLE_VERBOSE_TO_STDERR"] = "True"
 
-        # Assume the caller has a proper env, if not use a sane default
         if set_acp:
             env["ANSIBLE_COLLECTIONS_PATH"] = ":".join(self.config.collections_paths)
 
