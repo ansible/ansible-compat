@@ -374,11 +374,13 @@ class Runtime:
         tee: bool = False,
         env: dict[str, str] | None = None,
         cwd: Path | None = None,
+        set_acp: bool = True,
     ) -> CompletedProcess:
         """Execute a command inside an Ansible environment.
 
         :param retry: Retry network operations on failures.
         :param tee: Also pass captured stdout/stderr to system while running.
+        :param set_acp: Set the ANSIBLE_COLLECTIONS_PATH
         """
         if tee:
             run_func: Callable[..., CompletedProcess] = subprocess_tee.run
@@ -392,8 +394,7 @@ class Runtime:
         # https://github.com/ansible/ansible-lint/issues/3522
         env["ANSIBLE_VERBOSE_TO_STDERR"] = "True"
 
-        # Assume the caller has a proper env, if not use a sane default
-        if "ANSIBLE_COLLECTIONS_PATH" not in env:
+        if set_acp:
             env["ANSIBLE_COLLECTIONS_PATH"] = ":".join(self.config.collections_paths)
 
         for _ in range(self.max_retries + 1 if retry else 1):
