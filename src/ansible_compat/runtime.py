@@ -392,7 +392,9 @@ class Runtime:
         # https://github.com/ansible/ansible-lint/issues/3522
         env["ANSIBLE_VERBOSE_TO_STDERR"] = "True"
 
-        env["ANSIBLE_COLLECTIONS_PATH"] = ":".join(self.config.collections_paths)
+        # Assume the caller has a proper env, if not use a sane default
+        if "ANSIBLE_COLLECTIONS_PATH" not in env:
+            env["ANSIBLE_COLLECTIONS_PATH"] = ":".join(self.config.collections_paths)
 
         for _ in range(self.max_retries + 1 if retry else 1):
             result = run_func(
