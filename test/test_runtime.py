@@ -406,7 +406,7 @@ def test__update_env(
 def test_require_collection_wrong_version(runtime: Runtime) -> None:
     """Tests behaviour of require_collection."""
     subprocess.check_output(
-        [  # noqa: S603
+        [
             "ansible-galaxy",
             "collection",
             "install",
