@@ -448,9 +448,7 @@ class Runtime:
         """
         if lower and self.version < Version(lower):
             return False
-        if upper and self.version >= Version(upper):
-            return False
-        return True
+        return not (upper and self.version >= Version(upper))
 
     def has_playbook(self, playbook: str, *, basedir: Path | None = None) -> bool:
         """Return true if ansible can load a given playbook.
@@ -701,10 +699,7 @@ class Runtime:
                 galaxy_path.parent,
                 destination=destination,
             )
-        elif (
-            Path().resolve().parent.name == "roles"
-            and Path("../../galaxy.yml").exists()
-        ):
+        elif Path.cwd().parent.name == "roles" and Path("../../galaxy.yml").exists():
             # molecule scenario located within roles/<role-name>/molecule inside
             # a collection
             self.install_collection_from_disk(
