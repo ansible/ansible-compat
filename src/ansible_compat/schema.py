@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 import jsonschema
 from jsonschema.validators import validator_for
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from ansible_compat.types import JSON
 
 

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from ansible_compat.constants import ANSIBLE_MISSING_RC, INVALID_PREREQUISITES_RC
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from subprocess import CompletedProcess
 
 

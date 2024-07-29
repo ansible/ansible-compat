@@ -42,7 +42,7 @@ from ansible_compat.errors import (
 from ansible_compat.loaders import colpath_from_path, yaml_from_file
 from ansible_compat.prerun import get_cache_dir
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     # https://github.com/PyCQA/pylint/issues/3240
     # pylint: disable=unsubscriptable-object
     CompletedProcess = subprocess.CompletedProcess[Any]
