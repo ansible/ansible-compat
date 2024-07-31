@@ -8,7 +8,7 @@ import yaml
 
 from ansible_compat.errors import InvalidPrerequisiteError
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pathlib import Path
 
 
