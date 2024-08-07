@@ -87,7 +87,7 @@ repos:
           - subprocess-tee>=0.4.1
           - "typing-extensions>=4.5.0;python_version<'3.10'"
           - types-PyYAML
-          - types-pkg_resources
+          - types-setuptools
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
     rev: v3.2.4
