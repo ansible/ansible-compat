@@ -102,8 +102,8 @@ def validate(
                 data_path=to_path(validation_error.absolute_path),
                 json_path=json_path(validation_error.absolute_path),
                 schema_path=to_path(validation_error.schema_path),
-                relative_schema=validation_error.schema,
-                expected=validation_error.validator_value,
+                relative_schema=str(validation_error.schema),
+                expected=str(validation_error.validator_value),
                 validator=str(validation_error.validator),
                 found=str(validation_error.instance),
             )

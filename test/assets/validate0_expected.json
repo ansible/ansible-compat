@@ -4,7 +4,7 @@
     "data_path": "environment.a",
     "json_path": "$.environment.a",
     "schema_path": "properties.environment.additionalProperties.type",
-    "relative_schema": { "type": "string" },
+    "relative_schema": "{'type': 'string'}",
     "expected": "string",
     "validator": "type",
     "found": "False"
@@ -14,7 +14,7 @@
     "data_path": "environment.b",
     "json_path": "$.environment.b",
     "schema_path": "properties.environment.additionalProperties.type",
-    "relative_schema": { "type": "string" },
+    "relative_schema": "{'type': 'string'}",
     "expected": "string",
     "validator": "type",
     "found": "True"
