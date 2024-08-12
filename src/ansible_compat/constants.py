@@ -34,7 +34,7 @@ role_name: my_name  # if absent directory name hosting role is used instead
 namespace: my_galaxy_namespace  # if absent, author is used instead
 
 Namespace: https://old-galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
-Role: https://old-galaxy.ansible.com/docs/contributing/creating_role.html#role-names 
+Role: https://old-galaxy.ansible.com/docs/contributing/creating_role.html#role-names
 
 As an alternative, you can add 'role-name' to either skip_list or warn_list.
 """
