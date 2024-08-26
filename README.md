@@ -8,5 +8,31 @@
 A python package contains functions that facilitate working with various
 versions of Ansible 2.14 and newer.
 
+## Documentation
+
 Documentation is available at
 [ansible-compat.readthedocs.io](https://ansible-compat.readthedocs.io/).
+
+## Communication
+
+Join the Ansible forum to ask questions, get help, and interact with the
+community.
+
+- [Get Help](https://forum.ansible.com/c/help/6): get help or help others.
+  Please add appropriate tags if you start new discussions, for example the
+  `compat` tag.
+- [Social Spaces](https://forum.ansible.com/c/chat/4): meet and interact with
+  fellow enthusiasts.
+- [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide
+  announcements including social events.
+
+To get release announcements and important changes from the community, check out
+the Ansible [Bullhorn newsletter](https://forum.ansible.com/c/news/bullhorn/17).
+
+For more information about getting in touch, see the
+[Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
+
+## Code of Conduct
+
+Please see the official
+[Ansible Community Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
