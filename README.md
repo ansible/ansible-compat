@@ -26,8 +26,8 @@ community.
 - [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide
   announcements including social events.
 
-To get release announcements and important changes from the community, check out
-the Ansible [Bullhorn newsletter](https://forum.ansible.com/c/news/bullhorn/17).
+To get release announcements and important changes from the community, see the
+[Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
 
 For more information about getting in touch, see the
 [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
