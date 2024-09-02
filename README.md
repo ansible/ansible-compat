@@ -1,7 +1,7 @@
 # ansible-compat
 
 [![pypi](https://img.shields.io/pypi/v/ansible-compat.svg)](https://pypi.org/project/ansible-compat/)
-[![docs](https://readthedocs.org/projects/ansible-compat/badge/?version=latest)](https://ansible-compat.readthedocs.io/)
+[![docs](https://readthedocs.org/projects/ansible-compat/badge/?version=latest)](https://ansible.readthedocs.io/projects/compat/)
 [![gh](https://github.com/ansible/ansible-compat/actions/workflows/tox.yml/badge.svg)](https://github.com/ansible/ansible-compat/actions/workflows/tox.yml)
 [![codecov.io](https://codecov.io/github/ansible/ansible-compat/coverage.svg?branch=main)](https://codecov.io/github/ansible/ansible-compat?branch=main)
 
@@ -11,7 +11,7 @@ versions of Ansible 2.14 and newer.
 ## Documentation
 
 Documentation is available at
-[ansible-compat.readthedocs.io](https://ansible-compat.readthedocs.io/).
+[ansible.readthedocs.io/projects/compat/](https://ansible.readthedocs.io/projects/compat/).
 
 ## Communication
 
