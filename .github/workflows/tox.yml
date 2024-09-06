@@ -87,6 +87,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: logs-${{ matrix.name }}.zip
+          include-hidden-files: true
           path: |
             .tox/**/log/
             .tox/**/.coverage*
@@ -127,6 +128,7 @@ jobs:
         uses: actions/upload-artifact/merge@v4
         with:
           name: logs.zip
+          include-hidden-files: true
           pattern: logs-*.zip
           # artifacts like py312.zip and py312-macos do have overlapping files
           separate-directories: true
@@ -165,4 +167,5 @@ jobs:
       - name: Delete Merged Artifacts
         uses: actions/upload-artifact/merge@v4
         with:
+          include-hidden-files: true
           delete-merged: true
