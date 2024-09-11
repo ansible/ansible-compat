@@ -309,7 +309,7 @@ class Runtime:
                     raise TypeError(msg)
 
                 if collection in self.collections:
-                    msg = f"Multiple versions of '{collection}' were found installed, only the first one will be used, {self.collections[collection].version} ({self.collections[collection].path})."
+                    msg = f"Another version of '{collection}' {collection_info['version']} was found installed in {path}, only the first one will be used, {self.collections[collection].version} ({self.collections[collection].path})."
                     logging.warning(msg)
                 else:
                     self.collections[collection] = Collection(
