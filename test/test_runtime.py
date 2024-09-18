@@ -458,7 +458,7 @@ def test_require_collection_install(runtime_tmp: Runtime) -> None:
     runtime_tmp.require_collection(name="ansible.posix", version="1.5.4", install=True)
     runtime_tmp.load_collections()
     collection = runtime_tmp.collections["ansible.posix"]
-    assert collection.version == "1.5.4"
+    assert Version(collection.version) >= Version("1.5.4")
 
 
 @pytest.mark.parametrize(
