@@ -922,7 +922,8 @@ class Runtime:
             return
         orig_value = self.environ.get(varname, default)
         if orig_value:
-            value = [*value, *orig_value.split(":")]
+            # we just want to avoid repeating the same entries, but order is important
+            value = list(dict.fromkeys([*value, *orig_value.split(":")]))
         value_str = ":".join(value)
         if value_str != self.environ.get(varname, ""):
             self.environ[varname] = value_str
