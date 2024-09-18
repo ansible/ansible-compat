@@ -395,7 +395,9 @@ class Runtime:
         env["ANSIBLE_VERBOSE_TO_STDERR"] = "True"
 
         if set_acp:
-            env["ANSIBLE_COLLECTIONS_PATH"] = ":".join(self.config.collections_paths)
+            env["ANSIBLE_COLLECTIONS_PATH"] = ":".join(
+                list(dict.fromkeys(self.config.collections_paths)),
+            )
 
         for _ in range(self.max_retries + 1 if retry else 1):
             result = run_func(
@@ -636,6 +638,7 @@ class Runtime:
         if required_collections is None:
             required_collections = {}
 
+        self._prepare_ansible_paths()
         # first one is standard for collection layout repos and the last two
         # are part of Tower specification
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
@@ -645,8 +648,6 @@ class Runtime:
             if self.project_dir:
                 file_path = self.project_dir / req_file
             self.install_requirements(file_path, retry=retry, offline=offline)
-
-        self._prepare_ansible_paths()
 
         if not install_local:
             return
