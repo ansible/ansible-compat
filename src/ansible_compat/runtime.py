@@ -155,6 +155,7 @@ class Runtime:
     initialized: bool = False
     plugins: Plugins
     _has_playbook_cache: dict[tuple[str, Path | None], bool] = {}
+    require_module: bool = False
 
     def __init__(
         self,
@@ -218,6 +219,7 @@ class Runtime:
             msg = f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
             raise RuntimeError(msg)
         if require_module:
+            self.require_module = True
             self._ensure_module_available()
 
         # pylint: disable=import-outside-toplevel
@@ -339,17 +341,20 @@ class Runtime:
         # https://github.com/ansible/ansible-lint/issues/2945
         if not Runtime.initialized:
             col_path = [f"{self.cache_dir}/collections"]
+            # noinspection PyProtectedMember
+            from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
+                _AnsibleCollectionFinder,
+            )
+
             if self.version >= Version("2.15.0.dev0"):
                 # pylint: disable=import-outside-toplevel,no-name-in-module
                 from ansible.plugins.loader import init_plugin_loader
 
+                _AnsibleCollectionFinder(  # noqa: SLF001
+                    paths=col_path,
+                )._remove()  # pylint: disable=protected-access
                 init_plugin_loader(col_path)
             else:
-                # noinspection PyProtectedMember
-                from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
-                    _AnsibleCollectionFinder,
-                )
-
                 # noinspection PyProtectedMember
                 # pylint: disable=protected-access
                 col_path += self.config.collections_paths
@@ -622,6 +627,9 @@ class Runtime:
                 if result.returncode != 0:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
+        if self.require_module:
+            Runtime.initialized = False
+            self._ensure_module_available()
 
     # pylint: disable=too-many-locals
     def prepare_environment(  # noqa: C901
