@@ -345,6 +345,7 @@ class Runtime:
             from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
                 _AnsibleCollectionFinder,
             )
+
             if self.version >= Version("2.15.0.dev0"):
                 # pylint: disable=import-outside-toplevel,no-name-in-module
                 from ansible.plugins.loader import init_plugin_loader
