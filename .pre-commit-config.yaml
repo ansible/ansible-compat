@@ -22,7 +22,7 @@ exclude: |
   )$
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.6.3"
+    rev: "v0.6.9"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -41,7 +41,7 @@ repos:
           - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
@@ -90,7 +90,7 @@ repos:
           - types-setuptools
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v3.2.7
+    rev: v3.3.1
     hooks:
       - id: pylint
         additional_dependencies:
