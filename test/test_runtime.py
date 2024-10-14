@@ -13,9 +13,8 @@ from shutil import rmtree
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from packaging.version import Version
-
 from ansible.plugins.loader import module_loader
+from packaging.version import Version
 
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
 from ansible_compat.errors import (
@@ -764,6 +763,7 @@ def test_load_plugins(
     """Tests ability to load plugin from a collection installed by requirement."""
     with cwd(Path(path)):
         from ansible_compat.prerun import get_cache_dir
+
         rmtree(get_cache_dir(Path.cwd()), ignore_errors=True)
         runtime = Runtime(isolated=True, require_module=True)
         runtime.prepare_environment(install_local=True)
