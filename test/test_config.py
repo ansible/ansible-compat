@@ -24,7 +24,7 @@ def test_config() -> None:
     assert isinstance(config.CONNECTION_FACTS_MODULES, dict)
     assert config.ANSIBLE_COW_PATH is None
     assert isinstance(config.NETWORK_GROUP_MODULES, list)
-    assert isinstance(config.DEFAULT_GATHER_TIMEOUT, (int, type(None)))
+    assert isinstance(config.DEFAULT_FORKS, (int, type(None)))
 
     # check lowercase and older name aliasing
     assert isinstance(config.collections_paths, list)
