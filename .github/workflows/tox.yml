@@ -23,7 +23,7 @@ jobs:
         uses: coactions/dynamic-matrix@v4
         with:
           min_python: "3.9"
-          max_python: "3.12"
+          max_python: "3.13"
           default_python: "3.10"
           other_names: |
             lint
@@ -37,6 +37,7 @@ jobs:
             py312-ansible216
             py312-ansible217
             py312-devel
+            py313-devel
             smoke
           platforms: linux,macos
           macos: minmax
