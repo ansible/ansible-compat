@@ -14,7 +14,7 @@ import pytest
 from ansible_compat.runtime import Runtime
 
 
-@pytest.fixture()
+@pytest.fixture
 # pylint: disable=unused-argument
 def runtime(scope: str = "session") -> Generator[Runtime, None, None]:  # noqa: ARG001
     """Isolated runtime fixture."""
@@ -23,7 +23,7 @@ def runtime(scope: str = "session") -> Generator[Runtime, None, None]:  # noqa: 
     instance.clean()
 
 
-@pytest.fixture()
+@pytest.fixture
 # pylint: disable=unused-argument
 def runtime_tmp(
     tmp_path: pathlib.Path,
@@ -44,7 +44,7 @@ def query_pkg_version(pkg: str) -> str:
     return importlib.metadata.version(pkg)
 
 
-@pytest.fixture()
+@pytest.fixture
 def pkg_version() -> Callable[[str], str]:
     """Get the version of a current installed package.
 
