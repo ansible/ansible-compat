@@ -105,20 +105,20 @@ repos:
         name: Upgrade constraints files and requirements
         files: ^(pyproject\.toml|requirements\.txt)$
         language: python
-        entry: python3 -m piptools compile --resolver=backtracking --upgrade -q --strip-extras --all-extras --output-file=.config/constraints.txt pyproject.toml --unsafe-package ansible-core --unsafe-package resolvelib --unsafe-package typing_extensions
+        entry: python3 -m uv pip compile -q --all-extras --output-file=.config/constraints.txt pyproject.toml --upgrade
         pass_filenames: false
         stages:
           - manual
         additional_dependencies:
-          - pip-tools>=7.4.1
+          - uv>=0.4.3
       - id: pip-compile
         name: Check constraints files and requirements
         files: ^(pyproject\.toml|requirements\.txt)$
         language: python
-        entry: python3 -m piptools compile --resolver=backtracking -q --strip-extras --all-extras --output-file=.config/constraints.txt pyproject.toml --unsafe-package ansible-core --unsafe-package resolvelib --unsafe-package typing_extensions
+        entry: python3 -m uv pip compile -q --all-extras --output-file=.config/constraints.txt pyproject.toml
         pass_filenames: false
         additional_dependencies:
-          - pip-tools>=7.4.1
+          - uv>=0.4.3
   - repo: https://github.com/packit/pre-commit-hooks
     rev: v1.2.0
     hooks:
