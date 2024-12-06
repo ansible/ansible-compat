@@ -476,8 +476,8 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
 
 
 __all__ = [
-    "ansible_collections_path",
-    "parse_ansible_version",
-    "ansible_version",
     "AnsibleConfig",
+    "ansible_collections_path",
+    "ansible_version",
+    "parse_ansible_version",
 ]
