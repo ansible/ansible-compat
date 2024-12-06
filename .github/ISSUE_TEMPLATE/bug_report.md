@@ -53,8 +53,8 @@ Possible security bugs should be reported via email to `security@ansible.com`
 
 <!--- Describe what happened. If possible run with extra verbosity (-vvvv) -->
 
-Please give some details of what is happening. Include a [minimum complete
-verifiable example].
+Please give some details of what is happening. Include a [minimum
+complete verifiable example].
 
 <!--- Paste verbatim command output between triple backticks -->
 
