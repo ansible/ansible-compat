@@ -31,9 +31,9 @@ repos:
   #   rev: v0.23.1
   #   hooks:
   #     - id: toml-sort-fix
-  - repo: https://github.com/pre-commit/mirrors-prettier
+  - repo: https://github.com/rbubley/mirrors-prettier
     # keep it before yamllint
-    rev: "v4.0.0-alpha.8"
+    rev: "v3.4.2"
     hooks:
       - id: prettier
         additional_dependencies:
