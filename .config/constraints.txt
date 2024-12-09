@@ -58,7 +58,8 @@ pluggy==1.5.0             # via pytest
 pycparser==2.22           # via cffi
 pygments==2.18.0          # via mkdocs-material
 pymdown-extensions==10.12  # via markdown-exec, mkdocs-ansible, mkdocs-material, mkdocstrings
-pytest==8.3.4             # via pytest-mock, pytest-plus, ansible-compat (pyproject.toml)
+pytest==8.3.4             # via pytest-instafail, pytest-mock, pytest-plus, ansible-compat (pyproject.toml)
+pytest-instafail==0.5.0   # via ansible-compat (pyproject.toml)
 pytest-mock==3.14.0       # via ansible-compat (pyproject.toml)
 pytest-plus==0.7.0        # via ansible-compat (pyproject.toml)
 python-dateutil==2.9.0.post0  # via ghp-import, mkdocs-macros-plugin
