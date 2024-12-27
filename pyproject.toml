@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools >= 65.3.0", # required by pyproject+setuptools_scm integration and editable installs
-  "setuptools_scm[toml] >= 7.0.5", # required for "no-local-version" scheme
+  "setuptools_scm[toml] >= 7.0.5" # required for "no-local-version" scheme
 ]
 build-backend = "setuptools.build_meta"
 
@@ -34,7 +34,7 @@ classifiers = [
   "Topic :: Software Development :: Bug Tracking",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
-  "Topic :: Utilities",
+  "Topic :: Utilities"
 ]
 keywords = ["ansible"]
 
@@ -92,7 +92,7 @@ good-names = [
   "ns", # namespace
   "ex",
   "Run",
-  "_",
+  "_"
 ]
 
 [tool.pylint.IMPORTS]
@@ -333,7 +333,7 @@ disable = [
   "too-many-arguments", # PLR0913
   "raise-missing-from",
   # Temporary disable duplicate detection we remove old code from prerun
-  "duplicate-code",
+  "duplicate-code"
 ]
 
 [tool.pytest.ini_options]
@@ -342,7 +342,7 @@ filterwarnings = [
   "error",
   # py312 ansible-core
   # https://github.com/ansible/ansible/issues/81906
-  "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning",
+  "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning"
 ]
 testpaths = ["test"]
 
@@ -352,7 +352,6 @@ target-version = "py39"
 lint.select = ["ALL"]
 lint.ignore = [
   # Disabled on purpose:
-  "ANN101", # Missing type annotation for `self` in method
   "D203", # incompatible with D211
   "D211",
   "D213", # incompatible with D212
@@ -363,7 +362,7 @@ lint.ignore = [
   "PLR0912", # Bug https://github.com/charliermarsh/ruff/issues/4244
   "PLR0913", # Bug https://github.com/charliermarsh/ruff/issues/4244
   "RUF012",
-  "PERF203",
+  "PERF203"
 ]
 
 [tool.ruff.lint.flake8-pytest-style]
@@ -396,7 +395,7 @@ git_describe_command = [
   "--tags",
   "--long",
   "--match",
-  "v*.*",
+  "v*.*"
 ]
 
 [tool.uv.pip]

@@ -149,7 +149,7 @@ class Runtime:
 
     _version: Version | None = None
     collections: OrderedDict[str, Collection] = OrderedDict()
-    cache_dir: Path | None = None
+    cache_dir: Path
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
@@ -161,7 +161,7 @@ class Runtime:
         self,
         project_dir: Path | None = None,
         *,
-        isolated: bool = False,
+        isolated: bool = True,
         min_required_version: str | None = None,
         require_module: bool = False,
         max_retries: int = 0,
@@ -208,8 +208,7 @@ class Runtime:
         if "PYTHONWARNINGS" not in self.environ:  # pragma: no cover
             self.environ["PYTHONWARNINGS"] = "ignore:Blowfish has been deprecated"
 
-        if isolated:
-            self.cache_dir = get_cache_dir(self.project_dir)
+        self.cache_dir = get_cache_dir(self.project_dir)
         self.config = AnsibleConfig(cache_dir=self.cache_dir)
 
         # Add the sys.path to the collection paths if not isolated
@@ -369,7 +368,10 @@ class Runtime:
     def clean(self) -> None:
         """Remove content of cache_dir."""
         if self.cache_dir:
-            shutil.rmtree(self.cache_dir, ignore_errors=True)
+            _logger.error("Cleaning cache directory %s", self.cache_dir)
+            if not str(self.cache_dir).endswith(".cache"):
+                breakpoint()
+            # shutil.rmtree(self.cache_dir, ignore_errors=True)
 
     def run(  # ruff: disable=PLR0913
         self,
