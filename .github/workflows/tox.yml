@@ -20,21 +20,22 @@ jobs:
   tox:
     uses: ansible/team-devtools/.github/workflows/tox.yml@main
     with:
-      jobs_producing_coverage: 11
-      other_names: |
-        docs
-        lint
-        pkg
-        py39-ansible214
-        py39-ansible215
-        py310-ansible215
-        py310-ansible217
-        py311-ansible215
-        py312-ansible216
-        py312-ansible217
-        py312-devel
-        py313-devel
-        py310-macos:tox -e py310
-        py313-macos:tox -e py313
-        smoke
+      other_names: devel
+      # jobs_producing_coverage: 11
+      # other_names: |
+      #   docs
+      #   lint
+      #   pkg
+      #   py39-ansible214
+      #   py39-ansible215
+      #   py310-ansible215
+      #   py310-ansible217
+      #   py311-ansible215
+      #   py312-ansible216
+      #   py312-ansible217
+      #   py312-devel
+      #   py313-devel
+      #   py310-macos:tox -e py310
+      #   py313-macos:tox -e py313
+      #   smoke
       skip_explode: "1"

@@ -1,22 +1,22 @@
 """Utilities for configuring ansible runtime environment."""
 
-import hashlib
 import os
+import warnings
+from functools import cache
 from pathlib import Path
 
 
+@cache
 def get_cache_dir(project_dir: Path) -> Path:
     """Compute cache directory to be used based on project path."""
-    # we only use the basename instead of the full path in order to ensure that
-    # we would use the same key regardless the location of the user home
-    # directory or where the project is clones (as long the project folder uses
-    # the same name).
-    basename = project_dir.resolve().name.encode(encoding="utf-8")
-    # 6 chars of entropy should be enough
-    cache_key = hashlib.sha256(basename).hexdigest()[:6]
-    cache_dir = (
-        Path(os.getenv("XDG_CACHE_HOME", "~/.cache")).expanduser()
-        / "ansible-compat"
-        / cache_key
-    )
+    venv_path = os.environ.get("VIRTUAL_ENV", None)
+    if not venv_path:
+        cache_dir = Path(project_dir) / ".cache"
+        warnings.warn(
+            f"No VIRTUAL_ENV found, will use of unisolated cache directory: {cache_dir}",
+            stacklevel=0,
+        )
+    else:
+        cache_dir = Path(venv_path) / ".cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
     return cache_dir

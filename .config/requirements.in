@@ -1,5 +1,6 @@
 # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
 ansible-core>=2.14
+ansible-dev-environment>=24.12.0
 packaging
 PyYAML
 subprocess-tee>=0.4.1

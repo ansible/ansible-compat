@@ -652,11 +652,18 @@ def test_upgrade_collection(runtime_tmp: Runtime) -> None:
     runtime_tmp.require_collection("community.molecule", "0.1.0")
 
 
-def test_require_collection_no_cache_dir() -> None:
-    """Check require_collection without a cache directory."""
-    runtime = Runtime()
-    assert not runtime.cache_dir
+def test_require_collection_not_isolated() -> None:
+    """Check require_collection without isolation."""
+    runtime = Runtime(isolated=False)
+    assert str(runtime.cache_dir).endswith(".cache")
     runtime.require_collection("community.molecule", "0.1.0", install=True)
+
+
+def test_runtime_implicit_isolation() -> None:
+    """Check that runtime does use isolation by default."""
+    runtime = Runtime()
+    assert ".cache" in str(runtime.cache_dir)
+    assert runtime.cache_dir.is_dir()
 
 
 def test_runtime_env_ansible_library(monkeypatch: MonkeyPatch) -> None:
@@ -1021,6 +1028,7 @@ def test_get_galaxy_role_name_invalid() -> None:
 def test_runtime_has_playbook() -> None:
     """Tests has_playbook method."""
     runtime = Runtime(require_module=True)
+    runtime.require_collection("community.molecule")
 
     assert not runtime.has_playbook("this-does-not-exist.yml")
     # call twice to ensure cache is used:

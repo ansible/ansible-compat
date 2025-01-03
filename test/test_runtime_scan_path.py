@@ -57,6 +57,9 @@ def test_scan_sys_path(
     :param tmp_dir: Fixture for a temporary directory
     :param param: The parameters for the test
     """
+    # hide our virtual environment from the test, or we risk not using the
+    # venv_module fixture currectly.
+    monkeypatch.delenv("VIRTUAL_ENV", raising=False)
     first_site_package_dir = venv_module.site_package_dirs()[0]
 
     installed_to = (
