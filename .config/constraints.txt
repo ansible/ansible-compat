@@ -52,11 +52,11 @@ mypy-extensions==1.0.0    # via black
 packaging==24.2           # via ansible-core, black, mkdocs, mkdocs-macros-plugin, pytest, ansible-compat (pyproject.toml)
 paginate==0.5.7           # via mkdocs-material
 pathspec==0.12.1          # via black, mkdocs, mkdocs-macros-plugin
-pillow==11.0.0            # via cairosvg, mkdocs-ansible
+pillow==11.1.0            # via cairosvg, mkdocs-ansible
 platformdirs==4.3.6       # via black, mkdocs-get-deps, mkdocstrings
 pluggy==1.5.0             # via pytest
 pycparser==2.22           # via cffi
-pygments==2.18.0          # via mkdocs-material
+pygments==2.19.0          # via mkdocs-material
 pymdown-extensions==10.13  # via markdown-exec, mkdocs-ansible, mkdocs-material, mkdocstrings
 pytest==8.3.4             # via pytest-instafail, pytest-mock, pytest-plus, ansible-compat (pyproject.toml)
 pytest-instafail==0.5.0   # via ansible-compat (pyproject.toml)
