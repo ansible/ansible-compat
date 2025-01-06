@@ -596,7 +596,7 @@ class Runtime:
                     raise AnsibleCommandError(result)
 
         # Run galaxy collection install works on v2 requirements.yml
-        if "collections" in reqs_yaml and reqs_yaml["collections"] is not None:
+        if isinstance(reqs_yaml, dict) and "collections" in reqs_yaml and reqs_yaml["collections"] is not None:
             cmd = [
                 "ansible-galaxy",
                 "collection",
