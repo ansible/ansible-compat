@@ -937,25 +937,25 @@ def test_runtime_plugins(runtime: Runtime) -> None:
     ("path", "result"),
     (
         pytest.param(
-            "test/assets/galaxy_paths",
-            ["test/assets/galaxy_paths/foo/galaxy.yml"],
+            Path("test/assets/galaxy_paths"),
+            [Path("test/assets/galaxy_paths/foo/galaxy.yml").resolve()],
             id="1",
         ),
         pytest.param(
-            "test/collections",
+            Path("test/collections"),
             [],  # should find nothing because these folders are not valid namespaces
             id="2",
         ),
         pytest.param(
-            "test/assets/galaxy_paths/foo",
-            ["test/assets/galaxy_paths/foo/galaxy.yml"],
+            Path("test/assets/galaxy_paths/foo"),
+            [Path("test/assets/galaxy_paths/foo/galaxy.yml").resolve()],
             id="3",
         ),
     ),
 )
-def test_galaxy_path(path: str, result: list[str]) -> None:
+def test_galaxy_path(path: Path, result: list[Path]) -> None:
     """Check behavior of galaxy path search."""
-    assert search_galaxy_paths(Path(path)) == result
+    assert search_galaxy_paths(path) == result
 
 
 @pytest.mark.parametrize(

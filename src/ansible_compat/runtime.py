@@ -52,8 +52,8 @@ else:
 
 _logger = logging.getLogger(__name__)
 # regex to extract the first version from a collection range specifier
-version_re = re.compile(":[>=<]*([^,]*)")
-namespace_re = re.compile("^[a-z][a-z0-9_]+$")
+version_re = re.compile(r":[>=<]*([^,]*)")
+namespace_re = re.compile(r"^[a-z][a-z0-9_]+$")
 
 
 class AnsibleWarning(Warning):
@@ -660,11 +660,10 @@ class Runtime:
         if not install_local:
             return
 
-        for gpath in search_galaxy_paths(self.project_dir):
+        for item in search_galaxy_paths(self.project_dir):
             # processing all found galaxy.yml files
-            galaxy_path = Path(gpath)
-            if galaxy_path.exists():
-                data = yaml_from_file(galaxy_path)
+            if item.exists():
+                data = yaml_from_file(item)
                 if isinstance(data, dict) and "dependencies" in data:
                     for name, required_version in data["dependencies"].items():
                         _logger.info(
@@ -685,7 +684,8 @@ class Runtime:
                 destination=destination,
             )
 
-        if (self.project_dir / "galaxy.yml").exists():
+        galaxy_path = self.project_dir / "galaxy.yml"
+        if (galaxy_path).exists():
             if destination:
                 # while function can return None, that would not break the logic
                 colpath = Path(
@@ -979,20 +979,27 @@ def _get_galaxy_role_name(galaxy_infos: dict[str, Any]) -> str:
     return result
 
 
-def search_galaxy_paths(search_dir: Path) -> list[str]:
-    """Search for galaxy paths (only one level deep)."""
-    galaxy_paths: list[str] = []
-    for file in [".", *os.listdir(search_dir)]:
+def search_galaxy_paths(search_dir: Path) -> list[Path]:
+    """Search for galaxy paths (only one level deep).
+
+    Returns:
+        list[Path]: List of galaxy.yml found.
+    """
+    galaxy_paths: list[Path] = []
+    for item in [Path(), *search_dir.iterdir()]:
         # We ignore any folders that are not valid namespaces, just like
         # ansible galaxy does at this moment.
-        if file != "." and not namespace_re.match(file):
+        file_path = item.resolve()
+        if file_path.is_file() and file_path.name == "galaxy.yml":
+            galaxy_paths.append(file_path)
             continue
-        file_path = search_dir / file / "galaxy.yml"
-        if file_path.is_file():
-            galaxy_paths.append(str(file_path))
+        if file_path.is_dir() and namespace_re.match(file_path.name):
+            file_path /= "galaxy.yml"
+            if file_path.exists():
+                galaxy_paths.append(file_path)
     return galaxy_paths
 
 
 def is_url(name: str) -> bool:
     """Return True if a dependency name looks like an URL."""
-    return bool(re.match("^git[+@]", name))
+    return bool(re.match(r"^git[+@]", name))
