@@ -2,7 +2,6 @@
 
 import json
 import textwrap
-from dataclasses import dataclass, fields
 from pathlib import Path
 
 import pytest
@@ -19,26 +18,11 @@ V2_COLLECTION_VERSION = "0.1.0"
 V2_COLLECTION_FULL_NAME = f"{V2_COLLECTION_NAMESPACE}.{V2_COLLECTION_NAME}"
 
 
-@dataclass
-class ScanSysPath:
-    """Parameters for scan tests."""
-
-    scan: bool
-    raises_not_found: bool
-
-    def __str__(self) -> str:
-        """Return a string representation of the object."""
-        parts = [
-            f"{field.name}{str(getattr(self, field.name))[0]}" for field in fields(self)
-        ]
-        return "-".join(parts)
-
-
 @pytest.mark.parametrize(
-    ("param"),
+    ("scan", "raises_not_found"),
     (
-        ScanSysPath(scan=False, raises_not_found=True),
-        ScanSysPath(scan=True, raises_not_found=False),
+        pytest.param(False, True, id="0"),
+        pytest.param(True, False, id="1"),
     ),
     ids=str,
 )
@@ -47,16 +31,23 @@ def test_scan_sys_path(
     monkeypatch: MonkeyPatch,
     runtime_tmp: Runtime,
     tmp_path: Path,
-    param: ScanSysPath,
+    scan: bool,
+    raises_not_found: bool,
 ) -> None:
     """Confirm sys path is scanned for collections.
 
-    :param venv_module: Fixture for a virtual environment
-    :param monkeypatch: Fixture for monkeypatching
-    :param runtime_tmp: Fixture for a Runtime object
-    :param tmp_dir: Fixture for a temporary directory
-    :param param: The parameters for the test
+    Args:
+        venv_module: Fixture for a virtual environment
+        monkeypatch: Fixture for monkeypatching
+        runtime_tmp: Fixture for a Runtime object
+        tmp_path: Fixture for a temporary directory
+        scan: Whether to scan the sys path
+        raises_not_found: Whether the collection is expected to be found
     """
+    # Isolated the test from the others, so ansible will not find collections
+    # that might be installed by other tests.
+    monkeypatch.setenv("VIRTUAL_ENV", venv_module.project.as_posix())
+    monkeypatch.setenv("ANSIBLE_HOME", tmp_path.as_posix())
     first_site_package_dir = venv_module.site_package_dirs()[0]
 
     installed_to = (
@@ -76,7 +67,7 @@ def test_scan_sys_path(
     # Confirm the collection is installed
     assert installed_to.exists()
     # Set the sys scan path environment variable
-    monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(param.scan))
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(scan))
     # Set the ansible collections paths to avoid bleed from other tests
     monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", str(tmp_path))
 
@@ -91,7 +82,7 @@ def test_scan_sys_path(
     )
 
     proc = venv_module.python_script_run(script)
-    if param.raises_not_found:
+    if raises_not_found:
         assert proc.returncode != 0, (proc.stdout, proc.stderr)
         assert "InvalidPrerequisiteError" in proc.stderr
         assert "'community.molecule' not found" in proc.stderr

@@ -175,11 +175,6 @@ def test_runtime_install_role(
             f"{Path(runtime.config.default_roles_path[0]).expanduser()}/{role_name}",
         ).is_symlink()
     runtime.clean()
-    # also test that clean does not break when cache_dir is missing
-    tmp_dir = runtime.cache_dir
-    runtime.cache_dir = None
-    runtime.clean()
-    runtime.cache_dir = tmp_dir
 
 
 def test_prepare_environment_with_collections(runtime_tmp: Runtime) -> None:
@@ -654,10 +649,9 @@ def test_upgrade_collection(runtime_tmp: Runtime) -> None:
     runtime_tmp.require_collection("community.molecule", "0.1.0")
 
 
-def test_require_collection_no_cache_dir() -> None:
+def test_require_collection_not_isolated() -> None:
     """Check require_collection without a cache directory."""
-    runtime = Runtime()
-    assert not runtime.cache_dir
+    runtime = Runtime(isolated=False)
     runtime.require_collection("community.molecule", "0.1.0", install=True)
 
 
@@ -1023,6 +1017,11 @@ def test_get_galaxy_role_name_invalid() -> None:
 def test_runtime_has_playbook() -> None:
     """Tests has_playbook method."""
     runtime = Runtime(require_module=True)
+
+    runtime.prepare_environment(
+        required_collections={"community.molecule": "0.1.0"},
+        install_local=True,
+    )
 
     assert not runtime.has_playbook("this-does-not-exist.yml")
     # call twice to ensure cache is used:
