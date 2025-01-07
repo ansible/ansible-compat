@@ -16,7 +16,6 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -36,7 +35,7 @@ maintainers = [{"email" = "ssbarnea@redhat.com", "name" = "Sorin Sbarnea"}]
 name = "ansible-compat"
 readme = "README.md"
 # https://peps.python.org/pep-0621/#readme
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [project.urls]
 changelog = "https://github.com/ansible/ansible-compat/releases"
@@ -72,7 +71,7 @@ error_summary = true
 # warn_return_any = True
 # warn_unused_configs = True
 exclude = "test/local-content"
-python_version = "3.9"
+python_version = "3.10"
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
@@ -364,7 +363,7 @@ testpaths = ["test"]
 [tool.ruff]
 extend-include = ["src/ansible_compat/_version.py"]
 preview = true
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.format]
 docstring-code-format = true

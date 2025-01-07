@@ -14,7 +14,7 @@ REQUIREMENT_LOCATIONS = [
 ]
 
 # Minimal version of Ansible we support for runtime
-ANSIBLE_MIN_VERSION = "2.14"
+ANSIBLE_MIN_VERSION = "2.16"
 
 # Based on https://docs.ansible.com/ansible/latest/reference_appendices/config.html
 ANSIBLE_DEFAULT_ROLES_PATH = (

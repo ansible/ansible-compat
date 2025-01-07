@@ -5,9 +5,8 @@ import json
 import pathlib
 import subprocess
 import sys
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from pathlib import Path
-from typing import Callable
 
 import pytest
 
