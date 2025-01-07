@@ -17,7 +17,7 @@ import warnings
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, no_type_check
+from typing import TYPE_CHECKING, Any, no_type_check
 
 import subprocess_tee
 from packaging.version import Version
@@ -46,6 +46,7 @@ if TYPE_CHECKING:  # pragma: no cover
     # https://github.com/PyCQA/pylint/issues/3240
     # pylint: disable=unsubscriptable-object
     CompletedProcess = subprocess.CompletedProcess[Any]
+    from collections.abc import Callable
 else:
     CompletedProcess = subprocess.CompletedProcess
 
@@ -337,7 +338,7 @@ class Runtime:
             msg = f"Ansible CLI ({self.version}) and python module ({ansible_module_version}) versions do not match. This indicates a broken execution environment."
             raise RuntimeError(msg)
 
-        # For ansible 2.15+ we need to initialize the plugin loader
+        # We need to initialize the plugin loader
         # https://github.com/ansible/ansible-lint/issues/2945
         if not Runtime.initialized:
             col_path = [f"{self.cache_dir}/collections"]
@@ -346,24 +347,15 @@ class Runtime:
                 _AnsibleCollectionFinder,  # noqa: PLC2701
             )
 
-            if self.version >= Version("2.15.0.dev0"):
-                # pylint: disable=import-outside-toplevel,no-name-in-module
-                from ansible.plugins.loader import init_plugin_loader
-
-                _AnsibleCollectionFinder(  # noqa: SLF001
-                    paths=col_path,
-                )._remove()  # pylint: disable=protected-access
-                init_plugin_loader(col_path)
-            else:
-                # noinspection PyProtectedMember
-                # pylint: disable=protected-access
-                col_path += self.config.collections_paths
-                col_path += os.path.dirname(  # noqa: PTH120
-                    os.environ.get(ansible_collections_path(), "."),
-                ).split(":")
-                _AnsibleCollectionFinder(  # noqa: SLF001
-                    paths=col_path,
-                )._install()  # pylint: disable=protected-access
+            # noinspection PyProtectedMember
+            # pylint: disable=protected-access
+            col_path += self.config.collections_paths
+            col_path += os.path.dirname(  # noqa: PTH120
+                os.environ.get(ansible_collections_path(), "."),
+            ).split(":")
+            _AnsibleCollectionFinder(  # noqa: SLF001
+                paths=col_path,
+            )._install()  # pylint: disable=protected-access
             Runtime.initialized = True
 
     def clean(self) -> None:
@@ -559,7 +551,7 @@ class Runtime:
         if not Path(requirement).exists():
             return
         reqs_yaml = yaml_from_file(Path(requirement))
-        if not isinstance(reqs_yaml, (dict, list)):
+        if not isinstance(reqs_yaml, dict | list):
             msg = f"{requirement} file is not a valid Ansible requirements file."
             raise InvalidPrerequisiteError(msg)
 

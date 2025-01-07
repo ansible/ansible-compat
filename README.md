@@ -6,7 +6,7 @@
 [![codecov.io](https://codecov.io/github/ansible/ansible-compat/coverage.svg?branch=main)](https://codecov.io/github/ansible/ansible-compat?branch=main)
 
 A python package contains functions that facilitate working with various
-versions of Ansible 2.14 and newer.
+versions of Ansible.
 
 ## Documentation
 
