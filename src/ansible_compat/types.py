@@ -1,4 +1,4 @@
-"""Custom types."""
+"""Custom types."""  # noqa: A005
 
 from __future__ import annotations
 

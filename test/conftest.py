@@ -123,6 +123,6 @@ def venv_module(tmp_path_factory: pytest.TempPathFactory) -> VirtualEnvironment:
     :return: VirtualEnvironment instance
     """
     test_project = tmp_path_factory.mktemp(basename="test_project-", numbered=True)
-    _venv = VirtualEnvironment(test_project)
-    _venv.create()
-    return _venv
+    venv_ = VirtualEnvironment(test_project)
+    venv_.create()
+    return venv_

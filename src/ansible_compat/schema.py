@@ -17,8 +17,11 @@ if TYPE_CHECKING:  # pragma: no cover
 def to_path(schema_path: Sequence[str | int]) -> str:
     """Flatten a path to a dot delimited string.
 
-    :param schema_path: The schema path
-    :returns: The dot delimited path
+    Args:
+        schema_path: The schema path
+
+    Returns:
+        The dot delimited path
     """
     return ".".join(str(index) for index in schema_path)
 
@@ -26,8 +29,11 @@ def to_path(schema_path: Sequence[str | int]) -> str:
 def json_path(absolute_path: Sequence[str | int]) -> str:
     """Flatten a data path to a dot delimited string.
 
-    :param absolute_path: The path
-    :returns: The dot delimited string
+    Args:
+        absolute_path: The path
+
+    Returns:
+        The dot delimited string
     """
     path = "$"
     for elem in absolute_path:
@@ -56,7 +62,7 @@ class JsonSchemaError:
     def to_friendly(self) -> str:
         """Provide a friendly explanation of the error.
 
-        :returns: The error message
+        Return: The error message
         """
         return f"In '{self.data_path}': {self.message}."
 
@@ -67,9 +73,15 @@ def validate(
 ) -> list[JsonSchemaError]:
     """Validate some data against a JSON schema.
 
-    :param schema: the JSON schema to use for validation
-    :param data: The data to validate
-    :returns: Any errors encountered
+    Args:
+        schema: the JSON schema to use for validation
+        data: The data to validate
+
+    Returns:
+        Any errors encountered
+
+    Raises:
+        SchemaError if the schema is invalid
     """
     errors: list[JsonSchemaError] = []
 
