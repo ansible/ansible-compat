@@ -11,7 +11,7 @@ import logging
 import os
 import re
 import shutil
-import subprocess
+import subprocess  # noqa: S404
 import sys
 import warnings
 from collections import OrderedDict
@@ -243,7 +243,7 @@ class Runtime:
         # Monkey patch ansible warning in order to use warnings module.
         Display.warning = warning
 
-    def initialize_logger(self, level: int = 0) -> None:
+    def initialize_logger(self, level: int = 0) -> None:  # noqa: PLR6301
         """Set up the global logging level based on the verbosity number."""
         verbosity_map = {
             -2: logging.CRITICAL,
@@ -312,7 +312,7 @@ class Runtime:
 
                 if collection in self.collections:
                     msg = f"Another version of '{collection}' {collection_info['version']} was found installed in {path}, only the first one will be used, {self.collections[collection].version} ({self.collections[collection].path})."
-                    logging.warning(msg)
+                    _logger.warning(msg)
                 else:
                     self.collections[collection] = Collection(
                         name=collection,
@@ -343,7 +343,7 @@ class Runtime:
             col_path = [f"{self.cache_dir}/collections"]
             # noinspection PyProtectedMember
             from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
-                _AnsibleCollectionFinder,
+                _AnsibleCollectionFinder,  # noqa: PLC2701
             )
 
             if self.version >= Version("2.15.0.dev0"):
@@ -472,7 +472,7 @@ class Runtime:
             if not basedir:
                 basedir = Path()
             msg = f"has_playbook returned false for '{basedir / playbook}' due to syntax check returning {proc.returncode}"
-            logging.debug(msg)
+            _logger.debug(msg)
 
         # cache the result
         self._has_playbook_cache[playbook, basedir] = result
@@ -565,7 +565,7 @@ class Runtime:
 
         if isinstance(reqs_yaml, dict):
             for key in reqs_yaml:
-                if key not in ("roles", "collections"):
+                if key not in {"roles", "collections"}:
                     msg = f"{requirement} file is not a valid Ansible requirements file. Only 'roles' and 'collections' keys are allowed at root level. Recognized valid locations are: {', '.join(REQUIREMENT_LOCATIONS)}"
                     raise InvalidPrerequisiteError(msg)
 
@@ -741,10 +741,13 @@ class Runtime:
         In the future this method may attempt to install a missing or outdated
         collection before failing.
 
-        :param name: collection name
-        :param version: minimal version required
-        :param install: if True, attempt to install a missing collection
-        :returns: tuple of (found_version, collection_path)
+        Args:
+            name: collection name
+            version: minimal version required
+            install: if True, attempt to install a missing collection
+
+        Returns:
+            tuple of (found_version, collection_path)
         """
         try:
             ns, coll = name.split(".", 1)
@@ -861,14 +864,16 @@ class Runtime:
     ) -> None:
         """Detect standalone galaxy role and installs it.
 
-        :param: role_name_check: logic to used to check role name
-            0: exit with error if name is not compliant (default)
-            1: warn if name is not compliant
-            2: bypass any name checking
+        Args:
+            project_dir: path to the role
+            role_name_check: logic to used to check role name
+                0: exit with error if name is not compliant (default)
+                1: warn if name is not compliant
+                2: bypass any name checking
 
-        :param: ignore_errors: if True, bypass installing invalid roles.
+            ignore_errors: if True, bypass installing invalid roles.
 
-        Our implementation aims to match ansible-galaxy's behaviour for installing
+        Our implementation aims to match ansible-galaxy's behavior for installing
         roles from a tarball or scm. For example ansible-galaxy will install a role
         that has both galaxy.yml and meta/main.yml present but empty. Also missing
         galaxy.yml is accepted but missing meta/main.yml is not.
@@ -892,7 +897,7 @@ class Runtime:
 
         fqrn = _get_role_fqrn(galaxy_info, project_dir)
 
-        if role_name_check in [0, 1]:
+        if role_name_check in {0, 1}:
             if not re.match(r"[a-z0-9][a-z0-9_-]+\.[a-z][a-z0-9_]+$", fqrn):
                 msg = MSG_INVALID_FQRL.format(fqrn)
                 if role_name_check == 1:

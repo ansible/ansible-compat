@@ -76,7 +76,7 @@ def test_ansible_version_missing(monkeypatch: MonkeyPatch) -> None:
     )
     with pytest.raises(
         MissingAnsibleError,
-        match="Unable to find a working copy of ansible executable.",
+        match=r"Unable to find a working copy of ansible executable.",
     ):
         # bypassing lru cache
         ansible_version.__wrapped__()

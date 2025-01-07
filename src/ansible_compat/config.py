@@ -6,7 +6,7 @@ import ast
 import copy
 import os
 import re
-import subprocess
+import subprocess  # noqa: S404
 from collections import UserDict
 from typing import TYPE_CHECKING, Literal
 
@@ -446,9 +446,9 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
 
     def __getattribute__(self, attr_name: str) -> object:
         """Allow access of config options as attributes."""
-        _dict = super().__dict__  # pylint: disable=no-member
-        if attr_name in _dict:
-            return _dict[attr_name]
+        parent_dict = super().__dict__  # pylint: disable=no-member
+        if attr_name in parent_dict:
+            return parent_dict[attr_name]
 
         data = super().__getattribute__("data")
         if attr_name == "data":  # pragma: no cover
