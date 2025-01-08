@@ -343,20 +343,16 @@ class Runtime:
         if not Runtime.initialized:
             col_path = [f"{self.cache_dir}/collections"]
             # noinspection PyProtectedMember
+            # pylint: disable=import-outside-toplevel,no-name-in-module
+            from ansible.plugins.loader import init_plugin_loader
             from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
                 _AnsibleCollectionFinder,  # noqa: PLC2701
             )
 
-            # noinspection PyProtectedMember
-            # pylint: disable=protected-access
-            col_path += self.config.collections_paths
-            col_path += os.path.dirname(  # noqa: PTH120
-                os.environ.get(ansible_collections_path(), "."),
-            ).split(":")
             _AnsibleCollectionFinder(  # noqa: SLF001
                 paths=col_path,
-            )._install()  # pylint: disable=protected-access
-            Runtime.initialized = True
+            )._remove()  # pylint: disable=protected-access
+            init_plugin_loader(col_path)
 
     def clean(self) -> None:
         """Remove content of cache_dir."""
