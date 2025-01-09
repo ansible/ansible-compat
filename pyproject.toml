@@ -397,7 +397,16 @@ known-first-party = ["ansible_compat"]
 known-third-party = ["packaging"]
 
 [tool.ruff.lint.per-file-ignores]
-"test/**/*.py" = ["DOC402", "DOC501", "SLF001", "S101", "S404", "FBT001", "PLC2701"]
+"test/**/*.py" = [
+  "DOC402",
+  "DOC501",
+  "FBT001",
+  "PLC2701",
+  "PLR0917",
+  "S101",
+  "S404",
+  "SLF001"
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -430,4 +439,10 @@ sort_table_keys = true
 [tool.uv.pip]
 annotation-style = "line"
 custom-compile-command = "tox run deps"
-no-emit-package = ["ansible-core", "pip", "resolvelib", "typing_extensions", "uv"]
+no-emit-package = [
+  "ansible-core",
+  "pip",
+  "resolvelib",
+  "typing_extensions",
+  "uv"
+]

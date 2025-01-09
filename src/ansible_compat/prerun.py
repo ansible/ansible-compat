@@ -1,22 +1,29 @@
 """Utilities for configuring ansible runtime environment."""
 
-import hashlib
 import os
 from pathlib import Path
 
 
-def get_cache_dir(project_dir: Path) -> Path:
-    """Compute cache directory to be used based on project path."""
-    # we only use the basename instead of the full path in order to ensure that
-    # we would use the same key regardless the location of the user home
-    # directory or where the project is clones (as long the project folder uses
-    # the same name).
-    basename = project_dir.resolve().name.encode(encoding="utf-8")
-    # 6 chars of entropy should be enough
-    cache_key = hashlib.sha256(basename).hexdigest()[:6]
-    cache_dir = (
-        Path(os.getenv("XDG_CACHE_HOME", "~/.cache")).expanduser()
-        / "ansible-compat"
-        / cache_key
-    )
+def get_cache_dir(project_dir: Path, *, isolated: bool = True) -> Path:
+    """Compute cache directory to be used based on project path.
+
+    Args:
+        project_dir: Path to the project directory.
+        isolated: Whether to use isolated cache directory.
+
+    Returns:
+        Cache directory path.
+    """
+    if "VIRTUAL_ENV" in os.environ:
+        cache_dir = Path(os.environ["VIRTUAL_ENV"]) / ".ansible"
+    elif isolated:
+        cache_dir = project_dir / ".ansible"
+    else:
+        cache_dir = Path(os.environ.get("ANSIBLE_HOME", "~/.ansible")).expanduser()
+
+    # Ensure basic folder structure exists so `ansible-galaxy list` does not
+    # fail with: None of the provided paths were usable. Please specify a valid path with
+    for name in ("roles", "collections"):  # pragma: no cover
+        (cache_dir / name).mkdir(parents=True, exist_ok=True)
+
     return cache_dir

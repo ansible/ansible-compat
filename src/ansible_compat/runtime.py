@@ -150,7 +150,7 @@ class Runtime:
 
     _version: Version | None = None
     collections: OrderedDict[str, Collection] = OrderedDict()
-    cache_dir: Path | None = None
+    cache_dir: Path
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
@@ -209,8 +209,8 @@ class Runtime:
         if "PYTHONWARNINGS" not in self.environ:  # pragma: no cover
             self.environ["PYTHONWARNINGS"] = "ignore:Blowfish has been deprecated"
 
-        if isolated:
-            self.cache_dir = get_cache_dir(self.project_dir)
+        self.cache_dir = get_cache_dir(self.project_dir, isolated=self.isolated)
+
         self.config = AnsibleConfig(cache_dir=self.cache_dir)
 
         # Add the sys.path to the collection paths if not isolated
@@ -356,8 +356,7 @@ class Runtime:
 
     def clean(self) -> None:
         """Remove content of cache_dir."""
-        if self.cache_dir:
-            shutil.rmtree(self.cache_dir, ignore_errors=True)
+        shutil.rmtree(self.cache_dir, ignore_errors=True)
 
     def run(  # ruff: disable=PLR0913
         self,
@@ -567,8 +566,7 @@ class Runtime:
             ]
             if self.verbosity > 0:
                 cmd.extend(["-" + ("v" * self.verbosity)])
-            if self.cache_dir:
-                cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
+            cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
 
             if offline:
                 _logger.warning(
@@ -668,8 +666,7 @@ class Runtime:
                             destination=destination,
                         )
 
-        if self.cache_dir:
-            destination = self.cache_dir / "collections"
+        destination = self.cache_dir / "collections"
         for name, min_version in required_collections.items():
             self.install_collection(
                 f"{name}:>={min_version}",
@@ -837,10 +834,7 @@ class Runtime:
         not mentioned or set to `False`, it returns the first path in
         `default_roles_path`.
         """
-        if self.cache_dir:
-            path = Path(f"{self.cache_dir}/roles")
-        else:
-            path = Path(self.config.default_roles_path[0]).expanduser()
+        path = Path(f"{self.cache_dir}/roles")
         return path
 
     def _install_galaxy_role(
