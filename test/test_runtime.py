@@ -1030,3 +1030,13 @@ def test_runtime_has_playbook() -> None:
     assert not runtime.has_playbook("this-does-not-exist.yml", basedir=Path())
     # this is part of community.molecule collection
     assert runtime.has_playbook("community.molecule.validate.yml")
+
+
+def test_runtime_exception(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Asserts that we raise a runtime exception if unsupported environment variable is detected."""
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATHS", "foo")
+    with pytest.raises(
+        RuntimeError,
+        match=r"ANSIBLE_COLLECTIONS_PATHS was detected, replace it with ANSIBLE_COLLECTION_PATH to continue.",
+    ):
+        Runtime()

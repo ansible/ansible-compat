@@ -20,18 +20,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from pathlib import Path
 
 
-# do not use lru_cache here, as environment can change between calls
-def ansible_collections_path() -> str:
-    """Return collection path variable for current version of Ansible."""
-    for env_var in [
-        "ANSIBLE_COLLECTIONS_PATH",
-        "ANSIBLE_COLLECTIONS_PATHS",
-    ]:
-        if env_var in os.environ:
-            return env_var
-    return "ANSIBLE_COLLECTIONS_PATH"
-
-
 def parse_ansible_version(stdout: str) -> Version:
     """Parse output of 'ansible --version'."""
     # Ansible can produce extra output before displaying version in debug mode.
@@ -477,7 +465,6 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
 
 __all__ = [
     "AnsibleConfig",
-    "ansible_collections_path",
     "ansible_version",
     "parse_ansible_version",
 ]

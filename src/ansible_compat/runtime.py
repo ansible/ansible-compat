@@ -24,7 +24,6 @@ from packaging.version import Version
 
 from ansible_compat.config import (
     AnsibleConfig,
-    ansible_collections_path,
     parse_ansible_version,
 )
 from ansible_compat.constants import (
@@ -195,6 +194,9 @@ class Runtime:
         self.isolated = isolated
         self.max_retries = max_retries
         self.environ = environ or os.environ.copy()
+        if "ANSIBLE_COLLECTIONS_PATHS" in self.environ:
+            msg = "ANSIBLE_COLLECTIONS_PATHS was detected, replace it with ANSIBLE_COLLECTION_PATH to continue."
+            raise RuntimeError(msg)
         self.plugins = Plugins(runtime=self)
         self.verbosity = verbosity
 
@@ -505,7 +507,7 @@ class Runtime:
         cpaths: list[str] = self.config.collections_paths
         if destination and str(destination) not in cpaths:
             # we cannot use '-p' because it breaks galaxy ability to ignore already installed collections, so
-            # we hack ansible_collections_path instead and inject our own path there.
+            # we hack ANSIBLE_COLLECTION_PATH instead and inject our own path there.
             # pylint: disable=no-member
             cpaths.insert(0, str(destination))
         cmd.append(f"{collection}")
@@ -514,7 +516,7 @@ class Runtime:
         process = self.run(
             cmd,
             retry=True,
-            env={**self.environ, ansible_collections_path(): ":".join(cpaths)},
+            env={**self.environ, "ANSIBLE_COLLECTION_PATH": ":".join(cpaths)},
         )
         if process.returncode != 0:
             msg = f"Command {' '.join(cmd)}, returned {process.returncode} code:\n{process.stdout}\n{process.stderr}"
@@ -822,7 +824,7 @@ class Runtime:
         if library_paths != self.config.DEFAULT_MODULE_PATH:
             self._update_env("ANSIBLE_LIBRARY", library_paths)
         if collections_path != self.config.default_collections_path:
-            self._update_env(ansible_collections_path(), collections_path)
+            self._update_env("ANSIBLE_COLLECTION_PATH", collections_path)
         if roles_path != self.config.default_roles_path:
             self._update_env("ANSIBLE_ROLES_PATH", roles_path)
 
