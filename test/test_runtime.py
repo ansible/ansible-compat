@@ -1037,6 +1037,6 @@ def test_runtime_exception(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATHS", "foo")
     with pytest.raises(
         RuntimeError,
-        match=r"ANSIBLE_COLLECTIONS_PATHS was detected, replace it with ANSIBLE_COLLECTION_PATH to continue.",
+        match=r"ANSIBLE_COLLECTIONS_PATHS was detected, replace it with ANSIBLE_COLLECTIONS_PATH to continue.",
     ):
         Runtime()
