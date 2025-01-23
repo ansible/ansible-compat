@@ -195,7 +195,7 @@ class Runtime:
         self.max_retries = max_retries
         self.environ = environ or os.environ.copy()
         if "ANSIBLE_COLLECTIONS_PATHS" in self.environ:
-            msg = "ANSIBLE_COLLECTIONS_PATHS was detected, replace it with ANSIBLE_COLLECTION_PATH to continue."
+            msg = "ANSIBLE_COLLECTIONS_PATHS was detected, replace it with ANSIBLE_COLLECTIONS_PATH to continue."
             raise RuntimeError(msg)
         self.plugins = Plugins(runtime=self)
         self.verbosity = verbosity
@@ -507,7 +507,7 @@ class Runtime:
         cpaths: list[str] = self.config.collections_paths
         if destination and str(destination) not in cpaths:
             # we cannot use '-p' because it breaks galaxy ability to ignore already installed collections, so
-            # we hack ANSIBLE_COLLECTION_PATH instead and inject our own path there.
+            # we hack ANSIBLE_COLLECTIONS_PATH instead and inject our own path there.
             # pylint: disable=no-member
             cpaths.insert(0, str(destination))
         cmd.append(f"{collection}")
@@ -516,7 +516,7 @@ class Runtime:
         process = self.run(
             cmd,
             retry=True,
-            env={**self.environ, "ANSIBLE_COLLECTION_PATH": ":".join(cpaths)},
+            env={**self.environ, "ANSIBLE_COLLECTIONS_PATH": ":".join(cpaths)},
         )
         if process.returncode != 0:
             msg = f"Command {' '.join(cmd)}, returned {process.returncode} code:\n{process.stdout}\n{process.stderr}"
