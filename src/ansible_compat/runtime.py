@@ -11,6 +11,7 @@ import logging
 import os
 import re
 import shutil
+import site
 import subprocess  # noqa: S404
 import sys
 import warnings
@@ -216,7 +217,7 @@ class Runtime:
         self.config = AnsibleConfig(cache_dir=self.cache_dir)
 
         # Add the sys.path to the collection paths if not isolated
-        self._add_sys_path_to_collection_paths()
+        self._patch_collection_paths()
 
         if not self.version_in_range(lower=min_required_version):
             msg = f"Found incompatible version of ansible runtime {self.version}, instead of {min_required_version} or newer."
@@ -261,17 +262,43 @@ class Runtime:
         # Use module-level _logger instance to validate it
         _logger.debug("Logging initialized to level %s", logging_level)
 
-    def _add_sys_path_to_collection_paths(self) -> None:
-        """Add the sys.path to the collection paths."""
+    def _patch_collection_paths(self) -> None:
+        """Modify Ansible collection path for testing purposes.
+
+        - Add the sys.path to the end of collection paths.
+        - Add the site-packages to the beginning of collection paths to match
+          ansible-core and ade behavior and trick ansible-galaxy to install
+          default to the venv site-packages location (isolation).
+        """
+        collections_paths: list[str] = self.config.collections_paths.copy()
         if self.config.collections_scan_sys_path:
             for path in sys.path:
                 if (
-                    path not in self.config.collections_paths
+                    path not in collections_paths
                     and (Path(path) / "ansible_collections").is_dir()
                 ):
-                    self.config.collections_paths.append(  # pylint: disable=E1101
+                    collections_paths.append(  # pylint: disable=E1101
                         path,
                     )
+            # When inside a venv, we also add the site-packages to the top of the
+            # collections path because this is the first place where ansible-core
+            # will look for them. This also ensures that when calling ansible-galaxy
+            # to install content, it will be installed in the venv site-packages instead
+            # of altering the user configuration. Matches behavior of ADE and
+            # ensures isolation.
+            for path in reversed(site.getsitepackages()):
+                if path not in collections_paths:
+                    collections_paths.insert(0, path)
+
+            if collections_paths != self.config.collections_paths:
+                _logger.info(
+                    "Collection paths was patch to include extra directories %s",
+                    ",".join(collections_paths),
+                )
+        else:
+            msg = "ANSIBLE_COLLECTIONS_SCAN_SYS_PATH is disabled, not patching collection paths. This may lead to unexpected behavior when using dev tools and prevent full isolation from user environment."
+            _logger.warning(msg)
+        self.config.collections_paths = collections_paths
 
     def load_collections(self) -> None:
         """Load collection data."""
@@ -824,7 +851,7 @@ class Runtime:
         if library_paths != self.config.DEFAULT_MODULE_PATH:
             self._update_env("ANSIBLE_LIBRARY", library_paths)
         if collections_path != self.config.default_collections_path:
-            self._update_env("ANSIBLE_COLLECTION_PATH", collections_path)
+            self._update_env("ANSIBLE_COLLECTIONS_PATH", collections_path)
         if roles_path != self.config.default_roles_path:
             self._update_env("ANSIBLE_ROLES_PATH", roles_path)
 

@@ -59,10 +59,206 @@ def ansible_version(version: str = "") -> Version:
     return parse_ansible_version(proc.stdout)
 
 
-class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestors
+class AnsibleConfig(
+    UserDict[str, object],
+):  # pylint: disable=too-many-ancestors # noqa: DOC605
     """Interface to query Ansible configuration.
 
     This should allow user to access everything provided by `ansible-config dump` without having to parse the data himself.
+
+    Attributes:
+        _aliases:
+        action_warnings:
+        agnostic_become_prompt:
+        allow_world_readable_tmpfiles:
+        ansible_connection_path:
+        ansible_cow_acceptlist:
+        ansible_cow_path:
+        ansible_cow_selection:
+        ansible_force_color:
+        ansible_nocolor:
+        ansible_nocows:
+        ansible_pipelining:
+        any_errors_fatal:
+        become_allow_same_user:
+        become_plugin_path:
+        cache_plugin:
+        cache_plugin_connection:
+        cache_plugin_prefix:
+        cache_plugin_timeout:
+        callable_accept_list:
+        callbacks_enabled:
+        collections_on_ansible_version_mismatch:
+        collections_paths:
+        collections_scan_sys_path:
+        color_changed:
+        color_console_prompt:
+        color_debug:
+        color_deprecate:
+        color_diff_add:
+        color_diff_lines:
+        color_diff_remove:
+        color_error:
+        color_highlight:
+        color_ok:
+        color_skip:
+        color_unreachable:
+        color_verbose:
+        color_warn:
+        command_warnings:
+        conditional_bare_vars:
+        connection_facts_modules:
+        controller_python_warning:
+        coverage_remote_output:
+        coverage_remote_paths:
+        default_action_plugin_path:
+        default_allow_unsafe_lookups:
+        default_ask_pass:
+        default_ask_vault_pass:
+        default_become:
+        default_become_ask_pass:
+        default_become_exe:
+        default_become_flags:
+        default_become_method:
+        default_become_user:
+        default_cache_plugin_path:
+        default_callback_plugin_path:
+        default_cliconf_plugin_path:
+        default_collections_path:
+        default_connection_plugin_path:
+        default_debug:
+        default_executable:
+        default_fact_path:
+        default_filter_plugin_path:
+        default_force_handlers:
+        default_forks:
+        default_gather_subset:
+        default_gather_timeout:
+        default_gathering:
+        default_handler_includes_static:
+        default_hash_behaviour:
+        default_host_list:
+        default_httpapi_plugin_path:
+        default_internal_poll_interval:
+        default_inventory_plugin_path:
+        default_jinja2_extensions:
+        default_jinja2_native:
+        default_keep_remote_files:
+        default_libvirt_lxc_noseclabel:
+        default_load_callback_plugins:
+        default_local_tmp:
+        default_log_filter:
+        default_log_path:
+        default_lookup_plugin_path:
+        default_managed_str:
+        default_module_args:
+        default_module_compression:
+        default_module_name:
+        default_module_path:
+        default_module_utils_path:
+        default_netconf_plugin_path:
+        default_no_log:
+        default_no_target_syslog:
+        default_null_representation:
+        default_poll_interval:
+        default_private_key_file:
+        default_private_role_vars:
+        default_remote_port:
+        default_remote_user:
+        default_roles_path:
+        default_selinux_special_fs:
+        default_stdout_callback:
+        default_strategy:
+        default_strategy_plugin_path:
+        default_su:
+        default_syslog_facility:
+        default_task_includes_static:
+        default_terminal_plugin_path:
+        default_test_plugin_path:
+        default_timeout:
+        default_transport:
+        default_undefined_var_behavior:
+        default_vars_plugin_path:
+        default_vault_encrypt_identity:
+        default_vault_id_match:
+        default_vault_identity:
+        default_vault_identity_list:
+        default_vault_password_file:
+        default_verbosity:
+        deprecation_warnings:
+        devel_warning:
+        diff_always:
+        diff_context:
+        display_args_to_stdout:
+        display_skipped_hosts:
+        doc_fragment_plugin_path:
+        docsite_root_url:
+        duplicate_yaml_dict_key:
+        enable_task_debugger:
+        error_on_missing_handler:
+        facts_modules:
+        galaxy_cache_dir:
+        galaxy_display_progress:
+        galaxy_ignore_certs:
+        galaxy_role_skeleton:
+        galaxy_role_skeleton_ignore:
+        galaxy_server:
+        galaxy_server_list:
+        galaxy_token_path:
+        host_key_checking:
+        host_pattern_mismatch:
+        inject_facts_as_vars:
+        interpreter_python:
+        interpreter_python_distro_map:
+        interpreter_python_fallback:
+        invalid_task_attribute_failed:
+        inventory_any_unparsed_is_failed:
+        inventory_cache_enabled:
+        inventory_cache_plugin:
+        inventory_cache_plugin_connection:
+        inventory_cache_plugin_prefix:
+        inventory_cache_timeout:
+        inventory_enabled:
+        inventory_export:
+        inventory_ignore_exts:
+        inventory_ignore_patterns:
+        inventory_unparsed_is_failed:
+        localhost_warning:
+        max_file_size_for_diff:
+        module_ignore_exts:
+        netconf_ssh_config:
+        network_group_modules:
+        old_plugin_cache_clearing:
+        paramiko_host_key_auto_add:
+        paramiko_look_for_keys:
+        persistent_command_timeout:
+        persistent_connect_retry_timeout:
+        persistent_connect_timeout:
+        persistent_control_path_dir:
+        playbook_dir:
+        playbook_vars_root:
+        plugin_filters_cfg:
+        python_module_rlimit_nofile:
+        retry_files_enabled:
+        retry_files_save_path:
+        run_vars_plugins:
+        show_custom_stats:
+        string_conversion_action:
+        string_type_filters:
+        system_warnings:
+        tags_run:
+        tags_skip:
+        task_debugger_ignore_errors:
+        task_timeout:
+        transform_invalid_group_chars:
+        use_persistent_connections:
+        variable_plugins_enabled:
+        variable_precedence:
+        verbose_to_stderr:
+        win_async_startup_timeout:
+        worker_shutdown_poll_count:
+        worker_shutdown_poll_delay:
+        yaml_filename_extensions:
     """
 
     _aliases = {
@@ -157,9 +353,9 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     ]
     default_force_handlers: bool = False
     default_forks: int = 5
-    default_gathering: Literal["smart", "explicit", "implicit"] = "smart"
     default_gather_subset: list[str] = ["all"]
     default_gather_timeout: int = 10
+    default_gathering: Literal["smart", "explicit", "implicit"] = "smart"
     default_handler_includes_static: bool = False
     default_hash_behaviour: str = "replace"
     default_host_list: list[str] = ["/etc/ansible/hosts"]
@@ -180,7 +376,7 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
     default_local_tmp: str = "~/.ansible/tmp"
     default_log_filter: list[str] = []
     default_log_path: str | None = None
-    default_lookup_lugin_path: list[str] = [
+    default_lookup_plugin_path: list[str] = [
         "~/.ansible/plugins/lookup",
         "/usr/share/ansible/plugins/lookup",
     ]
@@ -251,9 +447,9 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
         "/usr/share/ansible/plugins/vars",
     ]
     default_vault_encrypt_identity: str | None = None
+    default_vault_id_match: bool = False
     default_vault_identity: str = "default"
     default_vault_identity_list: list[str] = []
-    default_vault_id_match: bool = False
     default_vault_password_file: str | None = None
     default_verbosity: int = 0
     deprecation_warnings: bool = False
@@ -418,17 +614,6 @@ class AnsibleConfig(UserDict[str, object]):  # pylint: disable=too-many-ancestor
                     self[key] = ast.literal_eval(value)
                 except (NameError, SyntaxError, ValueError):
                     self[key] = value
-        # inject isolation collections paths into the config
-        if self.cache_dir:
-            cpaths = self.data["COLLECTIONS_PATHS"]
-            if cpaths and isinstance(cpaths, list):
-                cpaths.insert(
-                    0,
-                    f"{self.cache_dir}/collections",
-                )
-            else:  # pragma: no cover
-                msg = f"Unexpected data type for COLLECTIONS_PATHS: {cpaths}"
-                raise RuntimeError(msg)
         if data:
             return
 

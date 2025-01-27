@@ -21,15 +21,14 @@ V2_COLLECTION_FULL_NAME = f"{V2_COLLECTION_NAMESPACE}.{V2_COLLECTION_NAME}"
 @pytest.mark.parametrize(
     ("scan", "raises_not_found"),
     (
-        pytest.param(False, True, id="0"),
-        pytest.param(True, False, id="1"),
+        pytest.param(False, True, id="disabled"),
+        pytest.param(True, False, id="enabled"),
     ),
     ids=str,
 )
 def test_scan_sys_path(
     venv_module: VirtualEnvironment,
     monkeypatch: MonkeyPatch,
-    runtime_tmp: Runtime,
     tmp_path: Path,
     scan: bool,
     raises_not_found: bool,
@@ -39,7 +38,6 @@ def test_scan_sys_path(
     Args:
         venv_module: Fixture for a virtual environment
         monkeypatch: Fixture for monkeypatching
-        runtime_tmp: Fixture for a Runtime object
         tmp_path: Fixture for a temporary directory
         scan: Whether to scan the sys path
         raises_not_found: Whether the collection is expected to be found
@@ -48,6 +46,12 @@ def test_scan_sys_path(
     # that might be installed by other tests.
     monkeypatch.setenv("VIRTUAL_ENV", venv_module.project.as_posix())
     monkeypatch.setenv("ANSIBLE_HOME", tmp_path.as_posix())
+    # Set the sys scan path environment variable
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(scan))
+    # Set the ansible collections paths to avoid bleed from other tests
+    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", str(tmp_path))
+
+    runtime_tmp = Runtime(project_dir=tmp_path, isolated=True)
     first_site_package_dir = venv_module.site_package_dirs()[0]
 
     installed_to = (
@@ -66,10 +70,6 @@ def test_scan_sys_path(
         )
     # Confirm the collection is installed
     assert installed_to.exists()
-    # Set the sys scan path environment variable
-    monkeypatch.setenv("ANSIBLE_COLLECTIONS_SCAN_SYS_PATH", str(scan))
-    # Set the ansible collections paths to avoid bleed from other tests
-    monkeypatch.setenv("ANSIBLE_COLLECTIONS_PATH", str(tmp_path))
 
     script = textwrap.dedent(
         f"""
@@ -91,3 +91,5 @@ def test_scan_sys_path(
         result = json.loads(proc.stdout)
         assert result["found_version"] == V2_COLLECTION_VERSION
         assert result["collection_path"] == str(installed_to)
+
+    runtime_tmp.clean()
