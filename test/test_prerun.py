@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -37,4 +38,17 @@ def test_get_cache_dir_isolation_no_venv(monkeypatch: MonkeyPatch) -> None:
     """
     monkeypatch.delenv("VIRTUAL_ENV", raising=False)
     monkeypatch.delenv("ANSIBLE_HOME", raising=False)
-    assert get_cache_dir(Path(), isolated=True) == Path() / ".ansible"
+    cache_dir = get_cache_dir(Path(), isolated=True)
+    assert cache_dir == Path().cwd() / ".ansible"
+
+
+def test_get_cache_dir_isolation_no_venv_root(monkeypatch: MonkeyPatch) -> None:
+    """Test behaviors of get_cache_dir.
+
+    Args:
+        monkeypatch: Pytest fixture for monkeypatching
+    """
+    monkeypatch.delenv("VIRTUAL_ENV", raising=False)
+    monkeypatch.delenv("ANSIBLE_HOME", raising=False)
+    cache_dir = get_cache_dir(Path("/"), isolated=True)
+    assert cache_dir.as_posix().startswith(tempfile.gettempdir())
