@@ -42,6 +42,16 @@ jobs:
   - job: tests
     trigger: pull_request
     branch: main
+    require:
+      label:
+        present:
+          - bug
+          - dependencies
+          - enhancement
+          - major
+          - minor
+        absent:
+          - skip-changelog
     targets:
       - fedora-latest
       - fedora-rawhide
