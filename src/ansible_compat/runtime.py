@@ -292,7 +292,7 @@ class Runtime:
 
             if collections_paths != self.config.collections_paths:
                 _logger.info(
-                    "Collection paths was patch to include extra directories %s",
+                    "Collection paths was patched to include extra directories %s",
                     ",".join(collections_paths),
                 )
         else:
