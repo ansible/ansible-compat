@@ -13,7 +13,6 @@ from shutil import rmtree
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from ansible.plugins.loader import module_loader
 from packaging.version import Version
 
 from ansible_compat.constants import INVALID_PREREQUISITES_RC
@@ -758,19 +757,11 @@ def test_load_plugins(
 ) -> None:
     """Tests ability to load plugin from a collection installed by requirement."""
     with cwd(Path(path)):
-        from ansible_compat.prerun import get_cache_dir
-
-        rmtree(get_cache_dir(Path.cwd()), ignore_errors=True)
         runtime = Runtime(isolated=True, require_module=True)
         runtime.prepare_environment(install_local=True)
         for plugin_name in expected_plugins:
-            loaded_module = module_loader.find_plugin_with_context(
-                plugin_name,
-                ignore_deprecated=True,
-                check_aliases=True,
-            )
             assert (
-                loaded_module.resolved_fqcn is not None
+                plugin_name in runtime.plugins.module
             ), f"Unable to load module {plugin_name}"
 
         runtime.clean()
