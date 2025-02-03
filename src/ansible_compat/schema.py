@@ -81,7 +81,7 @@ def validate(
         Any errors encountered
 
     Raises:
-        SchemaError if the schema is invalid
+        jsonschema.SchemaError: if the schema is invalid
     """
     errors: list[JsonSchemaError] = []
 

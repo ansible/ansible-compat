@@ -127,12 +127,6 @@ src/ansible_compat/schema.py
     DOC601: Class `JsonSchemaError`: Class docstring contains fewer class attributes than actual class attributes.  (Please read https://jsh9.github.io/pydoclint/checking_class_attributes.html on how to correctly document class attributes.)
     DOC603: Class `JsonSchemaError`: Class docstring attributes are different from actual class attributes. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Attributes in the class definition but not in the docstring: [data_path: str, expected: bool | int | str, found: str, json_path: str, message: str, relative_schema: str, schema_path: str, validator: str]. (Please read https://jsh9.github.io/pydoclint/checking_class_attributes.html on how to correctly document class attributes.)
     DOC201: Method `JsonSchemaError.to_friendly` does not have a return section in docstring
-    DOC001: Function/method `validate`: Potential formatting errors in docstring. Error message: Expected a colon in 'SchemaError if the schema is invalid'. (Note: DOC001 could trigger other unrelated violations under this function/method too. Please fix the docstring formatting first.)
-    DOC101: Function `validate`: Docstring contains fewer arguments than in function signature.
-    DOC103: Function `validate`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [data: JSON, schema: JSON].
-    DOC201: Function `validate` does not have a return section in docstring
-    DOC501: Function `validate` has "raise" statements, but the docstring does not have a "Raises" section
-    DOC503: Function `validate` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['jsonschema.SchemaError'].
 --------------------
 test/conftest.py
     DOC101: Function `runtime`: Docstring contains fewer arguments than in function signature.
