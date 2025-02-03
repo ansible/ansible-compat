@@ -16,7 +16,12 @@
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true
   },
+  "[toml]": {
+    "editor.defaultFormatter": "panekj.even-betterer-toml"
+  },
   "editor.formatOnSave": true,
+  "evenBetterToml.formatter.alignComments": false,
+  "evenBetterToml.formatter.arrayTrailingComma": true,
   "files.exclude": {
     "*.egg-info": true,
     ".pytest_cache": true,
@@ -42,10 +47,5 @@
   "yaml.completion": true,
   "yaml.customTags": ["!encrypted/pkcs1-oaep scalar", "!vault scalar"],
   "yaml.format.enable": false,
-  "yaml.validate": true,
-  "evenBetterToml.formatter.alignComments": false,
-  "evenBetterToml.formatter.arrayTrailingComma": true,
-  "[toml]": {
-    "editor.defaultFormatter": "panekj.even-betterer-toml"
-  }
+  "yaml.validate": true
 }
