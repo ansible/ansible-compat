@@ -400,7 +400,7 @@ def test__update_env(
 
 
 def test_require_collection_wrong_version(runtime: Runtime) -> None:
-    """Tests behaviour of require_collection."""
+    """Tests behavior of require_collection."""
     subprocess.check_output(
         [
             "ansible-galaxy",
@@ -472,7 +472,7 @@ def test_require_collection_missing(
     install: bool,
     runtime: Runtime,
 ) -> None:
-    """Tests behaviour of require_collection, missing case."""
+    """Tests behavior of require_collection, missing case."""
     with pytest.raises(AnsibleCompatError) as pytest_wrapped_e:
         runtime.require_collection(name=name, version=version, install=install)
     assert pytest_wrapped_e.type == InvalidPrerequisiteError
@@ -637,7 +637,7 @@ def test_upgrade_collection(runtime_tmp: Runtime) -> None:
     # ensure that we inject our tmp folders in ansible paths
     runtime_tmp.prepare_environment()
 
-    # we install specific oudated version of a collection
+    # we install specific outdated version of a collection
     runtime_tmp.install_collection("examples/reqs_v2/community-molecule-0.1.0.tar.gz")
     with pytest.raises(
         InvalidPrerequisiteError,
