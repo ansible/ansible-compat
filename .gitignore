@@ -136,3 +136,4 @@ ansible_collections
 src/ansible_compat/_version.py
 node_modules
 _readthedocs
+test/roles/acme.missing_deps/.ansible
