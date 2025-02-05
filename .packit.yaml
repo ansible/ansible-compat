@@ -21,6 +21,16 @@ jobs:
   - job: copr_build
     trigger: pull_request
     branch: main
+    require:
+      label:
+        present:
+          - bug
+          - dependencies
+          - enhancement
+          - major
+          - minor
+        absent:
+          - skip-changelog
     targets:
       - fedora-rawhide-x86_64
       - fedora-rawhide-aarch64
