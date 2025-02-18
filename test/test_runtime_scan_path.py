@@ -1,6 +1,8 @@
 """Test the scan path functionality of the runtime."""
 
 import json
+import os
+import subprocess
 import textwrap
 from pathlib import Path
 
@@ -93,3 +95,31 @@ def test_scan_sys_path(
         assert result["collection_path"] == str(installed_to)
 
     runtime_tmp.clean()
+
+
+def test_ro_venv() -> None:
+    """Tests behavior when the virtual environment is read-only.
+
+    See Related https://github.com/ansible/ansible-compat/pull/470
+    """
+    tox_work_dir = os.environ.get("TOX_WORK_DIR", ".tox")
+    venv_path = f"{tox_work_dir}/ro"
+    commands = [
+        f"mkdir -p {venv_path}",
+        f"chmod -R a+w {venv_path}",
+        f"python -m venv --symlinks {venv_path}",
+        f"{venv_path}/bin/python -m pip install -q -e .",
+        f"chmod -R a-w {venv_path}",
+        f"{venv_path}/bin/python -c \"from ansible_compat.runtime import Runtime; r = Runtime(); r.install_collection('ansible.posix:>=2.0.0')\"",
+    ]
+    for cmd in commands:
+        result = subprocess.run(  # noqa: S602
+            cmd,
+            check=False,
+            shell=True,
+            text=True,
+            capture_output=True,
+        )
+        assert (
+            result.returncode == 0
+        ), f"Got {result.returncode} running {cmd}\n\tstderr: {result.stderr}\n\tstdout: {result.stdout}"

@@ -270,6 +270,7 @@ class Runtime:
           ansible-core and ade behavior and trick ansible-galaxy to install
           default to the venv site-packages location (isolation).
         """
+        # ansible-core normal precedence is: adjacent, local paths, configured paths, site paths
         collections_paths: list[str] = self.config.collections_paths.copy()
         if self.config.collections_scan_sys_path:
             for path in sys.path:
@@ -280,15 +281,13 @@ class Runtime:
                     collections_paths.append(  # pylint: disable=E1101
                         path,
                     )
-            # When inside a venv, we also add the site-packages to the top of the
-            # collections path because this is the first place where ansible-core
+            # When inside a venv, we also add the site-packages to the end of the
+            # collections path because this is the last place where ansible-core
             # will look for them. This also ensures that when calling ansible-galaxy
-            # to install content, it will be installed in the venv site-packages instead
-            # of altering the user configuration. Matches behavior of ADE and
-            # ensures isolation.
+            # to install content.
             for path in reversed(site.getsitepackages()):
                 if path not in collections_paths:
-                    collections_paths.insert(0, path)
+                    collections_paths.append(path)
 
             if collections_paths != self.config.collections_paths:
                 _logger.info(
