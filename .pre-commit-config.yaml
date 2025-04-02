@@ -8,8 +8,6 @@ ci:
     # https://github.com/pre-commit-ci/issues/issues/55
     - ccv
     - pip-compile
-    # No docker on pre-commit.ci
-    - validate-config-in-container
 default_language_version:
   # Needed in order to make pip-compile output predictable.
   python: python3.10
@@ -127,12 +125,6 @@ repos:
         pass_filenames: false
         additional_dependencies:
           - uv>=0.4.3
-  - repo: https://github.com/packit/pre-commit-hooks
-    rev: v1.2.0
-    hooks:
-      - id: validate-config-in-container
-        name: packit
-        alias: packit
   - repo: https://github.com/mashi/codecov-validator
     rev: "1.0.1"
     hooks:
