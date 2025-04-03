@@ -2,12 +2,12 @@ src/ansible_compat/config.py
     DOC101: Function `parse_ansible_version`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `parse_ansible_version`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [stdout: str].
     DOC201: Function `parse_ansible_version` does not have a return section in docstring
-    DOC501: Function `parse_ansible_version` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Function `parse_ansible_version` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Function `parse_ansible_version` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['InvalidPrerequisiteError'].
     DOC101: Function `ansible_version`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `ansible_version`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [version: str].
     DOC201: Function `ansible_version` does not have a return section in docstring
-    DOC501: Function `ansible_version` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Function `ansible_version` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Function `ansible_version` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['MissingAnsibleError'].
     DOC604: Class `AnsibleConfig`: Attributes are the same in docstring and class def, but are in a different order.  (Please read https://jsh9.github.io/pydoclint/checking_class_attributes.html on how to correctly document class attributes.)
     DOC605: Class `AnsibleConfig`: Attribute names match, but type hints in these attributes do not match: action_warnings, agnostic_become_prompt, allow_world_readable_tmpfiles, ansible_connection_path, ansible_cow_acceptlist, ansible_cow_path, ansible_cow_selection, ansible_force_color, ansible_nocolor, ansible_nocows, ansible_pipelining, any_errors_fatal, become_allow_same_user, become_plugin_path, cache_plugin, cache_plugin_connection, cache_plugin_prefix, cache_plugin_timeout, callable_accept_list, callbacks_enabled, collections_on_ansible_version_mismatch, collections_paths, collections_scan_sys_path, color_changed, color_console_prompt, color_debug, color_deprecate, color_diff_add, color_diff_lines, color_diff_remove, color_error, color_highlight, color_ok, color_skip, color_unreachable, color_verbose, color_warn, command_warnings, conditional_bare_vars, connection_facts_modules, controller_python_warning, coverage_remote_output, coverage_remote_paths, default_action_plugin_path, default_allow_unsafe_lookups, default_ask_pass, default_ask_vault_pass, default_become, default_become_ask_pass, default_become_exe, default_become_flags, default_become_method, default_become_user, default_cache_plugin_path, default_callback_plugin_path, default_cliconf_plugin_path, default_connection_plugin_path, default_debug, default_executable, default_fact_path, default_filter_plugin_path, default_force_handlers, default_forks, default_gather_subset, default_gather_timeout, default_gathering, default_handler_includes_static, default_hash_behaviour, default_host_list, default_httpapi_plugin_path, default_internal_poll_interval, default_inventory_plugin_path, default_jinja2_extensions, default_jinja2_native, default_keep_remote_files, default_libvirt_lxc_noseclabel, default_load_callback_plugins, default_local_tmp, default_log_filter, default_log_path, default_lookup_plugin_path, default_managed_str, default_module_args, default_module_compression, default_module_name, default_module_path, default_module_utils_path, default_netconf_plugin_path, default_no_log, default_no_target_syslog, default_null_representation, default_poll_interval, default_private_key_file, default_private_role_vars, default_remote_port, default_remote_user, default_collections_path, default_roles_path, default_selinux_special_fs, default_stdout_callback, default_strategy, default_strategy_plugin_path, default_su, default_syslog_facility, default_task_includes_static, default_terminal_plugin_path, default_test_plugin_path, default_timeout, default_transport, default_undefined_var_behavior, default_vars_plugin_path, default_vault_encrypt_identity, default_vault_id_match, default_vault_identity, default_vault_identity_list, default_vault_password_file, default_verbosity, deprecation_warnings, devel_warning, diff_always, diff_context, display_args_to_stdout, display_skipped_hosts, docsite_root_url, doc_fragment_plugin_path, duplicate_yaml_dict_key, enable_task_debugger, error_on_missing_handler, facts_modules, galaxy_cache_dir, galaxy_display_progress, galaxy_ignore_certs, galaxy_role_skeleton, galaxy_role_skeleton_ignore, galaxy_server, galaxy_server_list, galaxy_token_path, host_key_checking, host_pattern_mismatch, inject_facts_as_vars, interpreter_python, interpreter_python_distro_map, interpreter_python_fallback, invalid_task_attribute_failed, inventory_any_unparsed_is_failed, inventory_cache_enabled, inventory_cache_plugin, inventory_cache_plugin_connection, inventory_cache_plugin_prefix, inventory_cache_timeout, inventory_enabled, inventory_export, inventory_ignore_exts, inventory_ignore_patterns, inventory_unparsed_is_failed, localhost_warning, max_file_size_for_diff, module_ignore_exts, netconf_ssh_config, network_group_modules, old_plugin_cache_clearing, paramiko_host_key_auto_add, paramiko_look_for_keys, persistent_command_timeout, persistent_connect_retry_timeout, persistent_connect_timeout, persistent_control_path_dir, playbook_dir, playbook_vars_root, plugin_filters_cfg, python_module_rlimit_nofile, retry_files_enabled, retry_files_save_path, run_vars_plugins, show_custom_stats, string_conversion_action, string_type_filters, system_warnings, tags_run, tags_skip, task_debugger_ignore_errors, task_timeout, transform_invalid_group_chars, use_persistent_connections, variable_plugins_enabled, variable_precedence, verbose_to_stderr, win_async_startup_timeout, worker_shutdown_poll_count, worker_shutdown_poll_delay, yaml_filename_extensions  (Please read https://jsh9.github.io/pydoclint/checking_class_attributes.html on how to correctly document class attributes.)
@@ -45,7 +45,7 @@ src/ansible_compat/loaders.py
     DOC101: Function `colpath_from_path`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `colpath_from_path`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [path: Path].
     DOC201: Function `colpath_from_path` does not have a return section in docstring
-    DOC501: Function `colpath_from_path` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Function `colpath_from_path` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Function `colpath_from_path` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['InvalidPrerequisiteError'].
 --------------------
 src/ansible_compat/runtime.py
@@ -58,26 +58,26 @@ src/ansible_compat/runtime.py
     DOC101: Method `Plugins.__getattribute__`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Plugins.__getattribute__`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [attr: str].
     DOC201: Method `Plugins.__getattribute__` does not have a return section in docstring
-    DOC501: Method `Plugins.__getattribute__` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Plugins.__getattribute__` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Plugins.__getattribute__` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AnsibleCompatError'].
     DOC601: Class `Runtime`: Class docstring contains fewer class attributes than actual class attributes.  (Please read https://jsh9.github.io/pydoclint/checking_class_attributes.html on how to correctly document class attributes.)
     DOC603: Class `Runtime`: Class docstring attributes are different from actual class attributes. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Attributes in the class definition but not in the docstring: [_has_playbook_cache: dict[tuple[str, Path | None], bool], _version: Version | None, cache_dir: Path, collections: OrderedDict[str, Collection], initialized: bool, plugins: Plugins, require_module: bool]. (Please read https://jsh9.github.io/pydoclint/checking_class_attributes.html on how to correctly document class attributes.)
     DOC101: Method `Runtime.__init__`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.__init__`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [environ: dict[str, str] | None, isolated: bool, max_retries: int, min_required_version: str | None, project_dir: Path | None, require_module: bool, verbosity: int].
-    DOC501: Method `Runtime.__init__` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime.__init__` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime.__init__` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['RuntimeError'].
     DOC101: Function `warning`: Docstring contains fewer arguments than in function signature.
-    DOC103: Function `warning`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [formatted: bool, msg: str, self: Display].
+    DOC103: Function `warning`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [formatted: bool, help_text: str | None, msg: str, obj: Any, self: Display].
     DOC101: Method `Runtime.initialize_logger`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.initialize_logger`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [level: int].
-    DOC501: Method `Runtime.load_collections` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime.load_collections` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime.load_collections` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['RuntimeError', 'TypeError'].
-    DOC501: Method `Runtime._ensure_module_available` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime._ensure_module_available` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime._ensure_module_available` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['RuntimeError'].
     DOC101: Method `Runtime.run`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.run`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [args: str | list[str], cwd: Path | None, env: dict[str, str] | None, retry: bool, set_acp: bool, tee: bool].
     DOC201: Method `Runtime.run` does not have a return section in docstring
-    DOC501: Method `Runtime.version` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime.version` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime.version` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['MissingAnsibleError'].
     DOC101: Method `Runtime.version_in_range`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.version_in_range`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [lower: str | None, upper: str | None].
@@ -87,22 +87,22 @@ src/ansible_compat/runtime.py
     DOC201: Method `Runtime.has_playbook` does not have a return section in docstring
     DOC101: Method `Runtime.install_collection`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.install_collection`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [collection: str | Path, destination: Path | None, force: bool].
-    DOC501: Method `Runtime.install_collection` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime.install_collection` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime.install_collection` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['InvalidPrerequisiteError'].
     DOC101: Method `Runtime.install_collection_from_disk`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.install_collection_from_disk`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [destination: Path | None, path: Path].
     DOC101: Method `Runtime.install_requirements`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.install_requirements`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [offline: bool, requirement: Path, retry: bool].
-    DOC501: Method `Runtime.install_requirements` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime.install_requirements` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime.install_requirements` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AnsibleCommandError', 'InvalidPrerequisiteError'].
     DOC101: Method `Runtime.prepare_environment`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.prepare_environment`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [install_local: bool, offline: bool, required_collections: dict[str, str] | None, retry: bool, role_name_check: int].
-    DOC501: Method `Runtime.require_collection` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime.require_collection` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime.require_collection` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['InvalidPrerequisiteError'].
-    DOC501: Method `Runtime._prepare_ansible_paths` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime._prepare_ansible_paths` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime._prepare_ansible_paths` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['RuntimeError'].
     DOC201: Method `Runtime._get_roles_path` does not have a return section in docstring
-    DOC501: Method `Runtime._install_galaxy_role` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `Runtime._install_galaxy_role` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime._install_galaxy_role` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['InvalidPrerequisiteError'].
     DOC101: Method `Runtime._update_env`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime._update_env`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [default: str, value: list[str], varname: str].
@@ -112,7 +112,7 @@ src/ansible_compat/runtime.py
     DOC101: Function `_get_galaxy_role_ns`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `_get_galaxy_role_ns`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [galaxy_infos: dict[str, Any]].
     DOC201: Function `_get_galaxy_role_ns` does not have a return section in docstring
-    DOC501: Function `_get_galaxy_role_ns` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Function `_get_galaxy_role_ns` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Function `_get_galaxy_role_ns` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AnsibleCompatError'].
     DOC101: Function `_get_galaxy_role_name`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `_get_galaxy_role_name`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [galaxy_infos: dict[str, Any]].
@@ -147,58 +147,26 @@ test/conftest.py
     DOC103: Method `VirtualEnvironment.python_script_run`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [script: str].
     DOC201: Method `VirtualEnvironment.python_script_run` does not have a return section in docstring
     DOC201: Method `VirtualEnvironment.site_package_dirs` does not have a return section in docstring
-    DOC501: Method `VirtualEnvironment.site_package_dirs` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `VirtualEnvironment.site_package_dirs` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `VirtualEnvironment.site_package_dirs` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['TypeError'].
     DOC101: Function `venv_module`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `venv_module`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [tmp_path_factory: pytest.TempPathFactory].
     DOC201: Function `venv_module` does not have a return section in docstring
 --------------------
 test/test_config.py
-    DOC501: Function `test_config` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_config` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_config_with_dump` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_config_with_dump` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_config_copy` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_config_copy` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_ansible_version_missing`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_ansible_version_missing`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch].
-    DOC501: Function `test_ansible_version` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_ansible_version` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_ansible_version_arg` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_ansible_version_arg` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
---------------------
-test/test_configuration_example.py
-    DOC501: Function `test_example_config` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_example_config` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
---------------------
-test/test_loaders.py
-    DOC501: Function `test_colpath_from_path` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_colpath_from_path` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
---------------------
-test/test_prerun.py
-    DOC501: Function `test_get_cache_dir_relative` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_get_cache_dir_relative` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_get_cache_dir_no_isolation_no_venv` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_get_cache_dir_no_isolation_no_venv` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_get_cache_dir_isolation_no_venv` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_get_cache_dir_isolation_no_venv` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_get_cache_dir_isolation_no_venv_root` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_get_cache_dir_isolation_no_venv_root` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_get_cache_dir_venv_ro_project_ro` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_get_cache_dir_venv_ro_project_ro` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
 --------------------
 test/test_runtime.py
     DOC101: Function `test_runtime_version`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_version`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
-    DOC501: Function `test_runtime_version` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_version` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_runtime_version_outdated`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_version_outdated`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [require_module: bool].
     DOC101: Function `test_runtime_missing_ansible_module`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_missing_ansible_module`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch].
     DOC101: Method `RaiseException.__init__`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `RaiseException.__init__`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [**kwargs: Any, *args: Any].
-    DOC501: Method `RaiseException.__init__` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Method `RaiseException.__init__` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Method `RaiseException.__init__` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['ModuleNotFoundError'].
     DOC101: Function `test_runtime_mismatch_ansible_module`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_mismatch_ansible_module`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch].
@@ -208,56 +176,32 @@ test/test_runtime.py
     DOC103: Function `test_runtime_version_fail_cli`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [mocker: MockerFixture].
     DOC101: Function `test_runtime_install_role`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_install_role`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [caplog: pytest.LogCaptureFixture, folder: str, isolated: bool, role_name: str].
-    DOC501: Function `test_runtime_install_role` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_install_role` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_prepare_environment_with_collections`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_prepare_environment_with_collections`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime_tmp: Runtime].
-    DOC501: Function `test_prepare_environment_with_collections` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_prepare_environment_with_collections` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_runtime_install_requirements_invalid_file`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_install_requirements_invalid_file`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [exc: type[Any], file: Path, msg: str].
     DOC101: Function `cwd`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `cwd`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [path: Path].
     DOC101: Function `test_prerun_reqs_v1`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_prerun_reqs_v1`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [caplog: pytest.LogCaptureFixture].
-    DOC501: Function `test_prerun_reqs_v1` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_prerun_reqs_v1` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_prerun_reqs_v2`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_prerun_reqs_v2`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [caplog: pytest.LogCaptureFixture].
-    DOC501: Function `test_prerun_reqs_v2` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_prerun_reqs_v2` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test__update_env_no_old_value_no_default_no_value`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test__update_env_no_old_value_no_default_no_value`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch].
-    DOC501: Function `test__update_env_no_old_value_no_default_no_value` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test__update_env_no_old_value_no_default_no_value` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test__update_env_no_old_value_no_value`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test__update_env_no_old_value_no_value`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch].
-    DOC501: Function `test__update_env_no_old_value_no_value` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test__update_env_no_old_value_no_value` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test__update_env_no_default_no_value`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test__update_env_no_default_no_value`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch].
-    DOC501: Function `test__update_env_no_default_no_value` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test__update_env_no_default_no_value` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test__update_env_no_old_value_no_default`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test__update_env_no_old_value_no_default`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch, result: str, value: list[str]].
-    DOC501: Function `test__update_env_no_old_value_no_default` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test__update_env_no_old_value_no_default` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test__update_env_no_old_value`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test__update_env_no_old_value`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [default: str, monkeypatch: MonkeyPatch, result: str, value: list[str]].
-    DOC501: Function `test__update_env_no_old_value` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test__update_env_no_old_value` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test__update_env_no_default`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test__update_env_no_default`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch, old_value: str, result: str, value: list[str]].
-    DOC501: Function `test__update_env_no_default` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test__update_env_no_default` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test__update_env`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test__update_env`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [default: str, monkeypatch: MonkeyPatch, old_value: str, result: str, value: list[str]].
-    DOC501: Function `test__update_env` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test__update_env` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_require_collection_wrong_version`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_require_collection_wrong_version`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
-    DOC501: Function `test_require_collection_wrong_version` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_require_collection_wrong_version` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_require_collection_invalid_name`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_require_collection_invalid_name`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
     DOC101: Function `test_require_collection_invalid_collections_path`: Docstring contains fewer arguments than in function signature.
@@ -266,62 +210,40 @@ test/test_runtime.py
     DOC103: Function `test_require_collection_preexisting_broken`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime_tmp: Runtime].
     DOC101: Function `test_require_collection_install`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_require_collection_install`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime_tmp: Runtime].
-    DOC501: Function `test_require_collection_install` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_require_collection_install` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_require_collection_missing`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_require_collection_missing`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [install: bool, name: str, runtime: Runtime, version: str].
-    DOC501: Function `test_require_collection_missing` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_require_collection_missing` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_install_collection`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_collection`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
     DOC101: Function `test_install_collection_git`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_collection_git`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
     DOC101: Function `test_install_collection_dest`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_collection_dest`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime, tmp_path: pathlib.Path].
-    DOC501: Function `test_install_collection_dest` has raise/assert statements, but the docstring does not have a "Raises" section
+    DOC501: Function `test_install_collection_dest` has "raise" statements, but the docstring does not have a "Raises" section
     DOC503: Function `test_install_collection_dest` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError'].
     DOC101: Function `test_install_collection_fail`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_collection_fail`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
-    DOC501: Function `test_install_collection_fail` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_install_collection_fail` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_install_galaxy_role`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_galaxy_role`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime_tmp: Runtime].
     DOC101: Function `test_install_galaxy_role_unlink`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_galaxy_role_unlink`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [caplog: pytest.LogCaptureFixture].
-    DOC501: Function `test_install_galaxy_role_unlink` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_install_galaxy_role_unlink` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_install_galaxy_role_bad_namespace`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_galaxy_role_bad_namespace`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime_tmp: Runtime].
     DOC101: Function `test_install_galaxy_role_no_meta`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_galaxy_role_no_meta`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime_tmp: Runtime].
     DOC101: Function `test_install_galaxy_role_name_role_name_check_equals_to_1`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_galaxy_role_name_role_name_check_equals_to_1`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [caplog: pytest.LogCaptureFixture, galaxy_info: str, runtime_tmp: Runtime].
-    DOC501: Function `test_install_galaxy_role_name_role_name_check_equals_to_1` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_install_galaxy_role_name_role_name_check_equals_to_1` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_install_galaxy_role_no_checks`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_galaxy_role_no_checks`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime_tmp: Runtime].
-    DOC501: Function `test_install_galaxy_role_no_checks` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_install_galaxy_role_no_checks` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_upgrade_collection`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_upgrade_collection`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime_tmp: Runtime].
     DOC101: Function `test_runtime_env_ansible_library`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_env_ansible_library`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: MonkeyPatch].
-    DOC501: Function `test_runtime_env_ansible_library` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_env_ansible_library` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_runtime_version_in_range`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_version_in_range`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [expected: bool, lower: str | None, upper: str | None].
-    DOC501: Function `test_runtime_version_in_range` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_version_in_range` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_install_collection_from_disk`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_install_collection_from_disk`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [expected_collections: list[str], path: str, scenario: str].
-    DOC501: Function `test_install_collection_from_disk` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_install_collection_from_disk` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_load_plugins`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_load_plugins`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [expected_plugins: list[str], path: str].
-    DOC501: Function `test_load_plugins` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_load_plugins` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_install_collection_from_disk_fail` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_install_collection_from_disk_fail` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_load_collections_failure`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_load_collections_failure`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [mocker: MockerFixture].
     DOC101: Function `test_load_collections_garbage`: Docstring contains fewer arguments than in function signature.
@@ -330,52 +252,22 @@ test/test_runtime.py
     DOC103: Function `test_load_collections_invalid_json`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [mocker: MockerFixture, value: str].
     DOC101: Function `test_prepare_environment_offline_role`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_prepare_environment_offline_role`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [caplog: pytest.LogCaptureFixture].
-    DOC501: Function `test_prepare_environment_offline_role` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_prepare_environment_offline_role` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_runtime_run`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_run`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
-    DOC501: Function `test_runtime_run` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_run` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_runtime_exec_cwd`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_exec_cwd`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
-    DOC501: Function `test_runtime_exec_cwd` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_exec_cwd` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_runtime_exec_env`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_exec_env`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
-    DOC501: Function `test_runtime_exec_env` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_exec_env` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_runtime_plugins`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_plugins`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [runtime: Runtime].
-    DOC501: Function `test_runtime_plugins` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_plugins` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_galaxy_path`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_galaxy_path`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [path: Path, result: list[Path]].
-    DOC501: Function `test_galaxy_path` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_galaxy_path` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_is_url`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_is_url`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [name: str, result: bool].
-    DOC501: Function `test_is_url` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_is_url` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_prepare_environment_symlink`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_prepare_environment_symlink`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [caplog: pytest.LogCaptureFixture, dest: str | Path, message: str].
-    DOC501: Function `test_prepare_environment_symlink` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_prepare_environment_symlink` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_get_galaxy_role_name_invalid` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_get_galaxy_role_name_invalid` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_runtime_has_playbook` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_has_playbook` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
     DOC101: Function `test_runtime_exception`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_runtime_exception`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [monkeypatch: pytest.MonkeyPatch].
---------------------
-test/test_runtime_example.py
-    DOC501: Function `test_runtime_example` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_runtime_example` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
---------------------
-test/test_runtime_scan_path.py
-    DOC501: Function `test_scan_sys_path` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_scan_sys_path` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_ro_venv` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_ro_venv` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
 --------------------
 test/test_schema.py
     DOC101: Function `json_from_asset`: Docstring contains fewer arguments than in function signature.
@@ -386,18 +278,4 @@ test/test_schema.py
     DOC201: Function `jsonify` does not have a return section in docstring
     DOC101: Function `test_schema`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `test_schema`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [index: int].
-    DOC501: Function `test_schema` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_schema` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_json_path` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_json_path` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
-    DOC501: Function `test_validate_invalid_schema` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_validate_invalid_schema` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
---------------------
-test/test_types.py
-    DOC501: Function `test_types` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_types` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
---------------------
-test/test_version.py
-    DOC501: Function `test_version_module` has raise/assert statements, but the docstring does not have a "Raises" section
-    DOC503: Function `test_version_module` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AssertionError (implicitly from the `assert` statement)'].
 --------------------

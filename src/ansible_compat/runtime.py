@@ -230,11 +230,13 @@ class Runtime:
         from ansible.utils.display import Display
 
         # pylint: disable=unused-argument
-        def warning(
+        def warning(  # noqa: DOC103
             self: Display,  # noqa: ARG001
             msg: str,
+            formatted: bool = False,  # noqa: ARG001,FBT001,FBT002
             *,
-            formatted: bool = False,  # noqa: ARG001
+            help_text: str | None = None,  # noqa: ARG001
+            obj: Any = None,  # noqa: ARG001,ANN401
         ) -> None:  # pragma: no cover
             """Override ansible.utils.display.Display.warning to avoid printing warnings."""
             warnings.warn(
