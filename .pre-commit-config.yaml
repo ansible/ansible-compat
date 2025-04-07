@@ -17,7 +17,7 @@ exclude: |
   )$
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.9.9"
+    rev: "v0.11.4"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -56,14 +56,14 @@ repos:
     hooks:
       - id: codespell
   - repo: https://github.com/jsh9/pydoclint
-    rev: 0.6.0
+    rev: 0.6.5
     hooks:
       - id: pydoclint
         # This allows automatic reduction of the baseline file when needed.
         entry: sh -ec "pydoclint . && pydoclint --generate-baseline=1 ."
         pass_filenames: false
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.35.1
+    rev: v1.37.0
     hooks:
       - id: yamllint
         files: \.(yaml|yml)$
@@ -96,7 +96,7 @@ repos:
           - types-setuptools
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v3.3.4
+    rev: v3.3.6
     hooks:
       - id: pylint
         additional_dependencies:
