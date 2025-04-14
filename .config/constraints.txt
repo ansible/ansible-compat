@@ -31,7 +31,7 @@ jsmin==3.0.1              # via mkdocs-minify-plugin
 jsonschema==4.23.0        # via ansible-compat (pyproject.toml)
 jsonschema-specifications==2024.10.1  # via jsonschema
 linkchecker==10.5.0       # via mkdocs-ansible
-markdown==3.7             # via markdown-include, mkdocs, mkdocs-autorefs, mkdocs-htmlproofer-plugin, mkdocs-material, mkdocstrings, pymdown-extensions
+markdown==3.8             # via markdown-include, mkdocs, mkdocs-autorefs, mkdocs-htmlproofer-plugin, mkdocs-material, mkdocstrings, pymdown-extensions
 markdown-exec==1.10.3     # via mkdocs-ansible
 markdown-include==0.8.1   # via mkdocs-ansible
 markupsafe==3.0.2         # via jinja2, mkdocs, mkdocs-autorefs, mkdocstrings
@@ -53,7 +53,7 @@ mypy-extensions==1.0.0    # via black
 packaging==24.2           # via ansible-core, black, mkdocs, mkdocs-macros-plugin, pytest, ansible-compat (pyproject.toml)
 paginate==0.5.7           # via mkdocs-material
 pathspec==0.12.1          # via black, mkdocs, mkdocs-macros-plugin
-pillow==11.1.0            # via cairosvg, mkdocs-ansible
+pillow==11.2.1            # via cairosvg, mkdocs-ansible
 platformdirs==4.3.7       # via black, mkdocs-get-deps
 pluggy==1.5.0             # via pytest
 pycparser==2.22           # via cffi
@@ -78,7 +78,7 @@ termcolor==3.0.1          # via mkdocs-macros-plugin
 text-unidecode==1.3       # via python-slugify
 tinycss2==1.4.0           # via cairosvg, cssselect2
 tomli==2.2.1              # via argparse-manpage, black, pytest
-urllib3==2.3.0            # via requests
+urllib3==2.4.0            # via requests
 watchdog==6.0.0           # via mkdocs
 webencodings==0.5.1       # via cssselect2, tinycss2
 
