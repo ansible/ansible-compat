@@ -357,6 +357,7 @@ filterwarnings = [
   # https://github.com/ansible/ansible/issues/81906
   "ignore:'importlib.abc.TraversableResources' is deprecated and slated for removal in Python 3.14:DeprecationWarning"
 ]
+junit_family = "legacy" # see https://docs.codecov.com/docs/test-analytics
 testpaths = ["test"]
 
 [tool.ruff]
