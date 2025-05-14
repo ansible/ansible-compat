@@ -22,21 +22,12 @@ theme:
     - navigation.indexes
     - navigation.tracking
     - toc.integrate
-extra:
-  social:
-    - icon: fontawesome/brands/github-alt
-      link: https://github.com/ansible/ansible-compat
-      name: GitHub
-    - icon: fontawesome/brands/discourse
-      link: https://forum.ansible.com/c/project/7
-      name: Ansible forum
 nav:
   - examples: index.md
   - api: api.md
 plugins:
   - autorefs
   - search
-  - material/social
   - material/tags
   - mkdocstrings:
       handlers:
