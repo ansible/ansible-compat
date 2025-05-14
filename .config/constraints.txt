@@ -36,17 +36,16 @@ markdown-exec==1.10.3     # via mkdocs-ansible
 markdown-include==0.8.1   # via mkdocs-ansible
 markupsafe==3.0.2         # via jinja2, mkdocs, mkdocs-autorefs, mkdocstrings
 mergedeep==1.3.4          # via mkdocs, mkdocs-get-deps
-mkdocs==1.6.1             # via mkdocs-ansible, mkdocs-autorefs, mkdocs-gen-files, mkdocs-htmlproofer-plugin, mkdocs-macros-plugin, mkdocs-material, mkdocs-minify-plugin, mkdocs-monorepo-plugin, mkdocstrings
-mkdocs-ansible==25.2.0    # via ansible-compat (pyproject.toml)
+mkdocs==1.6.1             # via mkdocs-ansible, mkdocs-autorefs, mkdocs-gen-files, mkdocs-htmlproofer-plugin, mkdocs-macros-plugin, mkdocs-material, mkdocs-minify-plugin, mkdocstrings
+mkdocs-ansible==25.5.0    # via ansible-compat (pyproject.toml)
 mkdocs-autorefs==1.4.1    # via mkdocstrings, mkdocstrings-python
 mkdocs-gen-files==0.5.0   # via mkdocs-ansible
 mkdocs-get-deps==0.2.0    # via mkdocs
 mkdocs-htmlproofer-plugin==1.3.0  # via mkdocs-ansible
 mkdocs-macros-plugin==1.3.7  # via mkdocs-ansible
-mkdocs-material==9.6.13   # via mkdocs-ansible
+mkdocs-material==9.6.14   # via mkdocs-ansible
 mkdocs-material-extensions==1.3.1  # via mkdocs-ansible, mkdocs-material
 mkdocs-minify-plugin==0.8.0  # via mkdocs-ansible
-mkdocs-monorepo-plugin==1.1.0  # via mkdocs-ansible
 mkdocstrings==0.29.1      # via mkdocs-ansible, mkdocstrings-python
 mkdocstrings-python==1.16.10  # via mkdocs-ansible
 mypy-extensions==1.1.0    # via black
@@ -64,9 +63,8 @@ pytest-instafail==0.5.0   # via ansible-compat (pyproject.toml)
 pytest-mock==3.14.0       # via ansible-compat (pyproject.toml)
 pytest-plus==0.8.1        # via ansible-compat (pyproject.toml)
 python-dateutil==2.9.0.post0  # via ghp-import, mkdocs-macros-plugin
-python-slugify==8.0.4     # via mkdocs-monorepo-plugin
 pyyaml==6.0.2             # via ansible-core, mkdocs, mkdocs-get-deps, mkdocs-macros-plugin, pymdown-extensions, pyyaml-env-tag, ansible-compat (pyproject.toml)
-pyyaml-env-tag==1.0       # via mkdocs
+pyyaml-env-tag==1.1       # via mkdocs
 referencing==0.36.2       # via jsonschema, jsonschema-specifications
 requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
 rpds-py==0.24.0           # via jsonschema, referencing
@@ -75,7 +73,6 @@ soupsieve==2.7            # via beautifulsoup4
 subprocess-tee==0.4.2     # via ansible-compat (pyproject.toml)
 super-collections==0.5.3  # via mkdocs-macros-plugin
 termcolor==3.1.0          # via mkdocs-macros-plugin
-text-unidecode==1.3       # via python-slugify
 tinycss2==1.4.0           # via cairosvg, cssselect2
 tomli==2.2.1              # via argparse-manpage, black, pytest
 urllib3==2.4.0            # via requests
