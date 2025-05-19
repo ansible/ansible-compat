@@ -14,7 +14,7 @@ charset-normalizer==3.4.2  # via requests
 click==8.2.0              # via black, mkdocs
 colorama==0.4.6           # via griffe, mkdocs-material
 coverage==7.8.0           # via ansible-compat (pyproject.toml)
-cryptography==44.0.3      # via ansible-core
+cryptography==45.0.2      # via ansible-core
 csscompressor==0.9.5      # via mkdocs-minify-plugin
 cssselect2==0.8.0         # via cairosvg
 defusedxml==0.7.1         # via cairosvg
@@ -54,7 +54,7 @@ paginate==0.5.7           # via mkdocs-material
 pathspec==0.12.1          # via black, mkdocs, mkdocs-macros-plugin
 pillow==11.2.1            # via cairosvg, mkdocs-ansible
 platformdirs==4.3.8       # via black, mkdocs-get-deps
-pluggy==1.5.0             # via pytest
+pluggy==1.6.0             # via pytest
 pycparser==2.22           # via cffi
 pygments==2.19.1          # via mkdocs-material
 pymdown-extensions==10.15  # via markdown-exec, mkdocs-ansible, mkdocs-material, mkdocstrings
@@ -67,7 +67,7 @@ pyyaml==6.0.2             # via ansible-core, mkdocs, mkdocs-get-deps, mkdocs-ma
 pyyaml-env-tag==1.1       # via mkdocs
 referencing==0.36.2       # via jsonschema, jsonschema-specifications
 requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
-rpds-py==0.24.0           # via jsonschema, referencing
+rpds-py==0.25.0           # via jsonschema, referencing
 six==1.17.0               # via python-dateutil
 soupsieve==2.7            # via beautifulsoup4
 subprocess-tee==0.4.2     # via ansible-compat (pyproject.toml)
