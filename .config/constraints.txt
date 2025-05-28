@@ -7,7 +7,7 @@ backrefs==5.8             # via mkdocs-material
 beautifulsoup4==4.13.4    # via linkchecker, mkdocs-htmlproofer-plugin
 black==25.1.0             # via ansible-compat (pyproject.toml)
 cairocffi==1.7.1          # via cairosvg
-cairosvg==2.8.2           # via mkdocs-ansible
+cairosvg==2.7.1           # via mkdocs-ansible
 certifi==2025.4.26        # via requests
 cffi==1.17.1              # via cairocffi, cryptography
 charset-normalizer==3.4.2  # via requests
