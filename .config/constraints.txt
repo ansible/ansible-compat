@@ -66,7 +66,7 @@ python-dateutil==2.9.0.post0  # via ghp-import, mkdocs-macros-plugin
 pyyaml==6.0.2             # via ansible-core, mkdocs, mkdocs-get-deps, mkdocs-macros-plugin, pymdown-extensions, pyyaml-env-tag, ansible-compat (pyproject.toml)
 pyyaml-env-tag==1.1       # via mkdocs
 referencing==0.36.2       # via jsonschema, jsonschema-specifications
-requests==2.32.3          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
+requests==2.32.4          # via linkchecker, mkdocs-htmlproofer-plugin, mkdocs-material
 rpds-py==0.25.1           # via jsonschema, referencing
 six==1.17.0               # via python-dateutil
 soupsieve==2.7            # via beautifulsoup4
