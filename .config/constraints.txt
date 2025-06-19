@@ -75,7 +75,7 @@ super-collections==0.5.3  # via mkdocs-macros-plugin
 termcolor==3.1.0          # via mkdocs-macros-plugin
 tinycss2==1.4.0           # via cairosvg, cssselect2
 tomli==2.2.1              # via argparse-manpage, black, pytest
-urllib3==2.4.0            # via requests
+urllib3==2.5.0            # via requests
 watchdog==6.0.0           # via mkdocs
 webencodings==0.5.1       # via cssselect2, tinycss2
 
