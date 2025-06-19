@@ -30,7 +30,7 @@ jobs:
           - major
           - minor
         absent:
-          - skip-changelog
+          - chore
     targets:
       - fedora-rawhide-x86_64
       - fedora-rawhide-aarch64
@@ -51,7 +51,7 @@ jobs:
           - major
           - minor
         absent:
-          - skip-changelog
+          - chore
     targets:
       - fedora-latest
       - fedora-rawhide
