@@ -31,7 +31,7 @@ jsmin==3.0.1              # via mkdocs-minify-plugin
 jsonschema==4.24.0        # via ansible-compat (pyproject.toml)
 jsonschema-specifications==2025.4.1  # via jsonschema
 linkchecker==10.5.0       # via mkdocs-ansible
-markdown==3.8             # via markdown-include, mkdocs, mkdocs-autorefs, mkdocs-htmlproofer-plugin, mkdocs-material, mkdocstrings, pymdown-extensions
+markdown==3.8.2           # via markdown-include, mkdocs, mkdocs-autorefs, mkdocs-htmlproofer-plugin, mkdocs-material, mkdocstrings, pymdown-extensions
 markdown-exec==1.10.3     # via mkdocs-ansible
 markdown-include==0.8.1   # via mkdocs-ansible
 markupsafe==3.0.2         # via jinja2, mkdocs, mkdocs-autorefs, mkdocstrings
@@ -58,7 +58,7 @@ pluggy==1.6.0             # via pytest
 pycparser==2.22           # via cffi
 pygments==2.19.1          # via mkdocs-material, pytest
 pymdown-extensions==10.15  # via markdown-exec, mkdocs-ansible, mkdocs-material, mkdocstrings
-pytest==8.4.0             # via pytest-instafail, pytest-mock, pytest-plus, ansible-compat (pyproject.toml)
+pytest==8.4.1             # via pytest-instafail, pytest-mock, pytest-plus, ansible-compat (pyproject.toml)
 pytest-instafail==0.5.0   # via ansible-compat (pyproject.toml)
 pytest-mock==3.14.1       # via ansible-compat (pyproject.toml)
 pytest-plus==0.8.1        # via ansible-compat (pyproject.toml)
@@ -75,7 +75,7 @@ super-collections==0.5.3  # via mkdocs-macros-plugin
 termcolor==3.1.0          # via mkdocs-macros-plugin
 tinycss2==1.4.0           # via cairosvg, cssselect2
 tomli==2.2.1              # via argparse-manpage, black, pytest
-urllib3==2.4.0            # via requests
+urllib3==2.5.0            # via requests
 watchdog==6.0.0           # via mkdocs
 webencodings==0.5.1       # via cssselect2, tinycss2
 
