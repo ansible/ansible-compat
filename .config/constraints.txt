@@ -8,7 +8,7 @@ beautifulsoup4==4.13.4    # via linkchecker, mkdocs-htmlproofer-plugin
 black==25.1.0             # via ansible-compat (pyproject.toml)
 cairocffi==1.7.1          # via cairosvg
 cairosvg==2.7.1           # via mkdocs-ansible
-certifi==2025.6.15        # via requests
+certifi==2025.7.9        # via requests
 cffi==1.17.1              # via cairocffi, cryptography
 charset-normalizer==3.4.2  # via requests
 click==8.2.1              # via black, mkdocs
