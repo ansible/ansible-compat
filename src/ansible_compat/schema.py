@@ -107,7 +107,8 @@ def validate(
         errors.append(error)
         return errors
 
-    for validation_error in validator(schema).iter_errors(data):
+    # https://github.com/python-jsonschema/jsonschema/issues/1382
+    for validation_error in validator(schema).iter_errors(data):  # type: ignore[call-arg]
         if isinstance(validation_error, jsonschema.ValidationError):
             error = JsonSchemaError(
                 message=validation_error.message,
