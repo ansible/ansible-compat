@@ -58,11 +58,6 @@ src/ansible_compat/runtime.py
     DOC101: Method `Plugins.__getattribute__`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Plugins.__getattribute__`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [attr: str].
     DOC201: Method `Plugins.__getattribute__` does not have a return section in docstring
-<<<<<<< HEAD
-    DOC501: Method `Plugins.__getattribute__` has raise statements, but the docstring does not have a "Raises" section
-    DOC601: Class `Runtime`: Class docstring contains fewer class attributes than actual class attributes.  (Please read https://jsh9.github.io/pydoclint/checking_class_attributes.html on how to correctly document class attributes.)
-=======
->>>>>>> b9dc15d (lint fixes)
     DOC101: Method `Runtime.__init__`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.__init__`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [environ: dict[str, str] | None, isolated: bool, max_retries: int, min_required_version: str | None, project_dir: Path | None, require_module: bool, verbosity: int].
     DOC501: Method `Runtime.__init__` has raise statements, but the docstring does not have a "Raises" section
