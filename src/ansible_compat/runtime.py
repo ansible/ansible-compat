@@ -411,12 +411,15 @@ class Runtime:
         # Unload ansible modules that cache plugin/collection state
         # This ensures fresh plugin loader and collection finder state
         modules_to_remove = [
-            mod for mod in sys.modules
-            if mod.startswith((
-                "ansible.plugins.",                    # Plugin loaders and cached plugins
-                "ansible.utils.collection_loader",    # Collection finder system
-                "ansible.collections.",               # Loaded collection modules
-            ))
+            mod
+            for mod in sys.modules
+            if mod.startswith(
+                (
+                    "ansible.plugins.",  # Plugin loaders and cached plugins
+                    "ansible.utils.collection_loader",  # Collection finder system
+                    "ansible.collections.",  # Loaded collection modules
+                )
+            )
         ]
         for mod in modules_to_remove:
             del sys.modules[mod]
