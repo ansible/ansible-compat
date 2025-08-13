@@ -14,10 +14,15 @@ from ansible_compat.runtime import Runtime
 
 
 @pytest.fixture
-# pylint: disable=unused-argument
-def runtime(scope: str = "session") -> Generator[Runtime, None, None]:  # noqa: ARG001
-    """Isolated runtime fixture."""
-    instance = Runtime(isolated=True)
+def runtime(request: pytest.FixtureRequest) -> Generator[Runtime, None, None]:
+    """Isolated runtime fixture with configurable parameters.
+
+    Args:
+        request: Pytest fixture request object containing test parameters.
+    """
+    provided_params = getattr(request, "param", {}) if hasattr(request, "param") else {}
+    use_params = provided_params or {"isolated": True}
+    instance = Runtime(**use_params)
     yield instance
     instance.clean()
 

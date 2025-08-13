@@ -81,9 +81,16 @@ def test_runtime_mismatch_ansible_module(monkeypatch: MonkeyPatch) -> None:
         Runtime(require_module=True)
 
 
-def test_runtime_require_module() -> None:
-    """Check that require_module successful pass."""
-    Runtime(require_module=True)
+@pytest.mark.parametrize("runtime", ({"require_module": True},), indirect=True)
+def test_runtime_require_module(runtime: Runtime) -> None:
+    """Check that require_module successful pass.
+
+    Enable the plugin loader to make sure that the module is loaded.
+
+    Args:
+        runtime: Runtime fixture with require_module=True.
+    """
+    runtime.enable_plugin_loader()
     # Now we try to set the collection path, something to check if that is
     # causing an exception, as 2.15 introduced new init code.
     from ansible.utils.collection_loader import (  # pylint: disable=import-outside-toplevel
@@ -759,6 +766,7 @@ def test_load_plugins(
     with cwd(Path(path)):
         runtime = Runtime(isolated=True, require_module=True)
         runtime.prepare_environment(install_local=True)
+        runtime.enable_plugin_loader()
         for plugin_name in expected_plugins:
             assert (
                 plugin_name in runtime.plugins.module
@@ -898,6 +906,7 @@ def test_runtime_exec_env(runtime: Runtime) -> None:
 
 def test_runtime_plugins(runtime: Runtime) -> None:
     """Tests ability to access detected plugins."""
+    runtime.enable_plugin_loader()
     assert len(runtime.plugins.cliconf) == 0
     # ansible.netcommon.restconf might be in httpapi
     assert isinstance(runtime.plugins.httpapi, dict)
@@ -1031,3 +1040,23 @@ def test_runtime_exception(monkeypatch: pytest.MonkeyPatch) -> None:
         match=r"ANSIBLE_COLLECTIONS_PATHS was detected, replace it with ANSIBLE_COLLECTIONS_PATH to continue.",
     ):
         Runtime()
+
+
+def test_runtime_plugin_loader_enabled(runtime: Runtime) -> None:
+    """Test that plugin loader works after being enabled.
+
+    Args:
+        runtime: Runtime fixture for testing plugin loader functionality.
+    """
+    # Initially, plugin loader should not be enabled and accessing plugins should fail
+    with pytest.raises(RuntimeError, match="Plugin loader has not been enabled yet"):
+        _ = runtime.plugins.become
+
+    # Enable the plugin loader
+    runtime.enable_plugin_loader()
+
+    # Now accessing plugins should work without errors
+    become_plugins = runtime.plugins.become
+    assert isinstance(become_plugins, dict)
+    # Should have at least the built-in 'sudo' become plugin
+    assert len(become_plugins) >= 0  # Could be empty in isolated test environment

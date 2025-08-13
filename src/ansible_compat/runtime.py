@@ -107,7 +107,12 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
 
     @no_type_check
     def __getattribute__(self, attr: str):  # noqa: ANN204
-        """Get attribute."""
+        """Get attribute.
+
+        Raises:
+            RuntimeError: If plugin loader has not been enabled yet.
+            AnsibleCompatError: If unexpected output from ansible-doc.
+        """
         if attr in {
             "become",
             "cache",
@@ -130,6 +135,14 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
             try:
                 result = super().__getattribute__(attr)
             except AttributeError as exc:
+                # If plugin loader is not enabled yet, raise RuntimeError
+                if not Runtime.plugin_loader_enabled:
+                    msg = (
+                        f"Plugin loader has not been enabled yet. "
+                        f"Cannot access runtime.plugins.{attr} before calling "
+                        f"runtime.enable_plugin_loader()."
+                    )
+                    raise RuntimeError(msg) from exc
                 proc = self.runtime.run(
                     ["ansible-doc", "--json", "-l", "-t", attr],
                 )
@@ -146,7 +159,18 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
 
 # pylint: disable=too-many-instance-attributes
 class Runtime:
-    """Ansible Runtime manager."""
+    """Ansible Runtime manager.
+
+    Attributes:
+        _version: Cached version of Ansible.
+        collections: Ordered dictionary of collections.
+        cache_dir: Path to cache directory.
+        initialized: Flag tracking if Ansible runtime has been initialized.
+        plugin_loader_enabled: Flag controlling when plugin loader initialization is allowed.
+        plugins: Plugins instance for accessing Ansible plugins.
+        _has_playbook_cache: Cache for playbook existence checks.
+        require_module: Flag indicating if module is required.
+    """
 
     _version: Version | None = None
     collections: OrderedDict[str, Collection] = OrderedDict()
@@ -154,6 +178,8 @@ class Runtime:
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple tilmes will cause runtime warnings from within ansible-core
     initialized: bool = False
+    # Flag to control when plugin loader initialization is allowed
+    plugin_loader_enabled: bool = False
     plugins: Plugins
     _has_playbook_cache: dict[tuple[str, Path | None], bool] = {}
     require_module: bool = False
@@ -368,10 +394,15 @@ class Runtime:
             msg = f"Ansible CLI ({self.version}) and python module ({ansible_module_version}) versions do not match. This indicates a broken execution environment."
             raise RuntimeError(msg)
 
-        # We need to initialize the plugin loader
-        # https://github.com/ansible/ansible-lint/issues/2945
+    def enable_plugin_loader(self) -> None:
+        """Enable plugin loader initialization with current collections paths."""
+        Runtime.plugin_loader_enabled = True
+
+        # Initialize the plugin loader now with the full collections paths
         if not Runtime.initialized:
-            col_path = [f"{self.cache_dir}/collections"]
+            col_paths = self.config.collections_paths
+            if self.isolated:
+                col_paths = [str(self.cache_dir / "collections"), *col_paths]
             # noinspection PyProtectedMember
             # pylint: disable=import-outside-toplevel,no-name-in-module
             from ansible.plugins.loader import init_plugin_loader
@@ -379,14 +410,35 @@ class Runtime:
                 _AnsibleCollectionFinder,  # noqa: PLC2701
             )
 
-            _AnsibleCollectionFinder(  # noqa: SLF001
-                paths=col_path,
-            )._remove()  # pylint: disable=protected-access
-            init_plugin_loader(col_path)
+            with contextlib.suppress(Exception):
+                _AnsibleCollectionFinder()._remove()  # pylint: disable=protected-access  # noqa: SLF001
+
+            init_plugin_loader(col_paths)
+            Runtime.initialized = True
 
     def clean(self) -> None:
-        """Remove content of cache_dir."""
+        """Remove content of cache_dir and reset global Runtime state."""
         shutil.rmtree(self.cache_dir, ignore_errors=True)
+
+        # Reset global Runtime class state to allow fresh initialization
+        Runtime.initialized = False
+        Runtime.plugin_loader_enabled = False
+
+        # Unload ansible modules that cache plugin/collection state
+        # This ensures fresh plugin loader and collection finder state
+        modules_to_remove = [
+            mod
+            for mod in sys.modules
+            if mod.startswith(
+                (
+                    "ansible.plugins.",  # Plugin loaders and cached plugins
+                    "ansible.utils.collection_loader",  # Collection finder system
+                    "ansible.collections.",  # Loaded collection modules
+                ),
+            )
+        ]
+        for mod in modules_to_remove:
+            del sys.modules[mod]
 
     def run(  # ruff: disable=PLR0913
         self,
@@ -667,6 +719,7 @@ class Runtime:
             required_collections = {}
 
         self._prepare_ansible_paths()
+
         # first one is standard for collection layout repos and the last two
         # are part of Tower specification
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
