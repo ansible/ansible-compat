@@ -107,7 +107,12 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
 
     @no_type_check
     def __getattribute__(self, attr: str):  # noqa: ANN204
-        """Get attribute."""
+        """Get attribute.
+
+        Raises:
+            RuntimeError: If plugin loader has not been enabled yet.
+            AnsibleCompatError: If unexpected output from ansible-doc.
+        """
         if attr in {
             "become",
             "cache",
@@ -154,7 +159,18 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
 
 # pylint: disable=too-many-instance-attributes
 class Runtime:
-    """Ansible Runtime manager."""
+    """Ansible Runtime manager.
+
+    Attributes:
+        _version: Cached version of Ansible.
+        collections: Ordered dictionary of collections.
+        cache_dir: Path to cache directory.
+        initialized: Flag tracking if Ansible runtime has been initialized.
+        plugin_loader_enabled: Flag controlling when plugin loader initialization is allowed.
+        plugins: Plugins instance for accessing Ansible plugins.
+        _has_playbook_cache: Cache for playbook existence checks.
+        require_module: Flag indicating if module is required.
+    """
 
     _version: Version | None = None
     collections: OrderedDict[str, Collection] = OrderedDict()
@@ -395,7 +411,7 @@ class Runtime:
             )
 
             with contextlib.suppress(Exception):
-                _AnsibleCollectionFinder()._remove()  # pylint: disable=protected-access
+                _AnsibleCollectionFinder()._remove()  # pylint: disable=protected-access  # noqa: SLF001
 
             init_plugin_loader(col_paths)
             Runtime.initialized = True
@@ -418,7 +434,7 @@ class Runtime:
                     "ansible.plugins.",  # Plugin loaders and cached plugins
                     "ansible.utils.collection_loader",  # Collection finder system
                     "ansible.collections.",  # Loaded collection modules
-                )
+                ),
             )
         ]
         for mod in modules_to_remove:

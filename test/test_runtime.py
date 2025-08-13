@@ -86,6 +86,9 @@ def test_runtime_require_module(runtime: Runtime) -> None:
     """Check that require_module successful pass.
 
     Enable the plugin loader to make sure that the module is loaded.
+
+    Args:
+        runtime: Runtime fixture with require_module=True.
     """
     runtime.enable_plugin_loader()
     # Now we try to set the collection path, something to check if that is
@@ -1040,7 +1043,11 @@ def test_runtime_exception(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_runtime_plugin_loader_enabled(runtime: Runtime) -> None:
-    """Test that plugin loader works after being enabled."""
+    """Test that plugin loader works after being enabled.
+
+    Args:
+        runtime: Runtime fixture for testing plugin loader functionality.
+    """
     # Initially, plugin loader should not be enabled and accessing plugins should fail
     with pytest.raises(RuntimeError, match="Plugin loader has not been enabled yet"):
         _ = runtime.plugins.become
