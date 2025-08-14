@@ -16,6 +16,9 @@ REQUIREMENT_LOCATIONS = [
 # Minimal version of Ansible we support for runtime
 ANSIBLE_MIN_VERSION = "2.16"
 
+# ansible-lint version below which we auto-enable plugin loader for backwards compatibility
+ANSIBLE_LINT_MIN_VERSION_EARLY_LOADER = "25.8.1"
+
 # Based on https://docs.ansible.com/ansible/latest/reference_appendices/config.html
 ANSIBLE_DEFAULT_ROLES_PATH = (
     "~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles"
