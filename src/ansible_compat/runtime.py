@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, no_type_check
 import subprocess_tee
 from packaging.version import Version
 
+from ansible_compat.compatibility import should_auto_enable_plugin_loader
 from ansible_compat.config import (
     AnsibleConfig,
     parse_ansible_version,
@@ -251,6 +252,10 @@ class Runtime:
         if require_module:
             self.require_module = True
             self._ensure_module_available()
+
+        # For backwards compatibility with ansible-lint < 25.8.1
+        if should_auto_enable_plugin_loader():
+            self.enable_plugin_loader()
 
         # pylint: disable=import-outside-toplevel
         from ansible.utils.display import Display
