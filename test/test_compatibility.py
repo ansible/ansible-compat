@@ -51,6 +51,6 @@ def test_should_auto_enable_plugin_loader(
     )
 
     result = should_auto_enable_plugin_loader()
-    assert (
-        result is expected
-    ), f"Expected {expected} for ansible-lint {ansible_lint_version}, got {result}"
+    assert result is expected, (
+        f"Expected {expected} for ansible-lint {ansible_lint_version}, got {result}"
+    )
