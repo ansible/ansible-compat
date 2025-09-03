@@ -739,9 +739,9 @@ def test_install_collection_from_disk(
         assert result.returncode == 0, result.stdout
         runtime.load_collections()
         for collection_name in expected_collections:
-            assert (
-                collection_name in runtime.collections
-            ), f"{collection_name} not found in {runtime.collections.keys()}"
+            assert collection_name in runtime.collections, (
+                f"{collection_name} not found in {runtime.collections.keys()}"
+            )
         runtime.clean()
 
 
@@ -768,9 +768,9 @@ def test_load_plugins(
         runtime.prepare_environment(install_local=True)
         runtime.enable_plugin_loader()
         for plugin_name in expected_plugins:
-            assert (
-                plugin_name in runtime.plugins.module
-            ), f"Unable to load module {plugin_name}"
+            assert plugin_name in runtime.plugins.module, (
+                f"Unable to load module {plugin_name}"
+            )
 
         runtime.clean()
 

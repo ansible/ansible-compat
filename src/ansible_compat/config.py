@@ -32,7 +32,7 @@ def parse_ansible_version(stdout: str) -> Version:
     )
     if match:
         return Version(match.group("version"))
-    msg = f"Unable to parse ansible cli version: {stdout}\nKeep in mind that only {ANSIBLE_MIN_VERSION } or newer are supported."
+    msg = f"Unable to parse ansible cli version: {stdout}\nKeep in mind that only {ANSIBLE_MIN_VERSION} or newer are supported."
     raise InvalidPrerequisiteError(msg)
 
 

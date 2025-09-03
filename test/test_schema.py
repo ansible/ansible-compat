@@ -64,9 +64,9 @@ def test_schema(index: int) -> None:
         assert sorted(found_errors) == found_errors, "multiple errors not sorted"
 
         found_errors_json = jsonify(found_errors)
-        assert (
-            found_errors_json == expected
-        ), f"inconsistent returns: {found_errors_json}"
+        assert found_errors_json == expected, (
+            f"inconsistent returns: {found_errors_json}"
+        )
 
 
 def test_json_path() -> None:

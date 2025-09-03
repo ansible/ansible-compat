@@ -22,7 +22,6 @@ tmp_path = Path(tempfile.gettempdir()) / f"ansible-compat-smoke-{checksum}"
 logger.info("Using %s temporary directory...", tmp_path)
 
 for project in ("molecule", "ansible-lint"):
-
     logger.info("Running tests for %s", project)
     project_dir = tmp_path / project
     if (project_dir / ".git").exists():

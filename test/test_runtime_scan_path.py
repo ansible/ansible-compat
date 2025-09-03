@@ -120,6 +120,6 @@ def test_ro_venv() -> None:
             text=True,
             capture_output=True,
         )
-        assert (
-            result.returncode == 0
-        ), f"Got {result.returncode} running {cmd}\n\tstderr: {result.stderr}\n\tstdout: {result.stdout}"
+        assert result.returncode == 0, (
+            f"Got {result.returncode} running {cmd}\n\tstderr: {result.stderr}\n\tstdout: {result.stdout}"
+        )
