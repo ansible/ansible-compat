@@ -1,7 +1,0 @@
-coverage
-pip
-pytest-instafail
-pytest-mock
-pytest-plus>=0.6.1
-pytest>=7.2.0
-uv>=0.4.30
