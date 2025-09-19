@@ -47,5 +47,6 @@
   "yaml.completion": true,
   "yaml.customTags": ["!encrypted/pkcs1-oaep scalar", "!vault scalar"],
   "yaml.format.enable": false,
-  "yaml.validate": true
+  "yaml.validate": true,
+  "cursorpyright.analysis.exclude": ["build"]
 }
