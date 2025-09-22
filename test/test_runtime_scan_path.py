@@ -107,10 +107,12 @@ def test_ro_venv() -> None:
     commands = [
         f"mkdir -p {venv_path}",
         f"chmod -R a+w {venv_path}",
-        f"python -m venv --symlinks {venv_path}",
-        f"{venv_path}/bin/python -m pip install -q -e .",
+        f"uv venv --no-project --clear {venv_path}",
+        f"VIRTUAL_ENV={venv_path} uv pip install -q -e .",
         f"chmod -R a-w {venv_path}",
         f"{venv_path}/bin/python -c \"from ansible_compat.runtime import Runtime; r = Runtime(); r.install_collection('ansible.posix:>=2.0.0')\"",
+        f"chmod -R a+w {venv_path}",
+        f"rm -rf {venv_path}",
     ]
     for cmd in commands:
         result = subprocess.run(  # noqa: S602

@@ -8,24 +8,28 @@ ci:
 
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
-    - ccv
-    - pip-compile
-default_language_version:
-  # Needed in order to make pip-compile output predictable.
-  python: python3.10
+    - deps
 exclude: |
   (?x)^(
     test/assets/.*
   )$
 repos:
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.8.15
+    hooks:
+      - id: uv-sync
+      - id: uv-lock
+        name: "deps: upgrade via uv sync --upgrade"
+        alias: deps
+        args: ["--upgrade"]
+        stages: [manual]
   - repo: https://github.com/rbubley/mirrors-prettier
     # keep it before yamllint
-    rev: "v3.6.2"
+    rev: v3.6.2
     hooks:
       - id: prettier
         additional_dependencies:
           - prettier
-          - prettier-plugin-toml
           - prettier-plugin-sort-json
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
     rev: v6.0.0
@@ -67,11 +71,6 @@ repos:
       - id: toml-sort-fix
         alias: toml
 
-  - repo: https://github.com/tox-dev/tox-ini-fmt
-    rev: 1.6.0
-    hooks:
-      - id: tox-ini-fmt
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.13.1
     hooks:
@@ -105,30 +104,3 @@ repos:
           - PyYAML
           - pytest
           - typing_extensions
-  # Keep last due to being considerably slower than the others:
-  - repo: local
-    hooks:
-      - id: pip-compile-upgrade
-        # To run it execute: `pre-commit run pip-compile-upgrade --hook-stage manual`
-        name: Upgrade constraints files and requirements
-        files: ^(pyproject\.toml|requirements\.txt)$
-        language: python
-        entry: python3 -m uv pip compile -q --all-extras --output-file=.config/constraints.txt pyproject.toml --upgrade
-        pass_filenames: false
-        stages:
-          - manual
-        additional_dependencies:
-          - uv>=0.4.3
-      - id: pip-compile
-        name: Check constraints files and requirements
-        files: ^(pyproject\.toml|requirements\.txt)$
-        language: python
-        entry: python3 -m uv pip compile -q --all-extras --output-file=.config/constraints.txt pyproject.toml
-        pass_filenames: false
-        additional_dependencies:
-          - uv>=0.4.3
-  - repo: https://github.com/mashi/codecov-validator
-    rev: "1.0.1"
-    hooks:
-      - id: ccv
-        name: codecov
