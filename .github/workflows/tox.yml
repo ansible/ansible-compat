@@ -38,8 +38,9 @@ jobs:
         py312-ansible218
         py312-devel
         py313-ansible218
-        py313-devel
+        py314-devel
         py310-macos:tox -e py310
-        py313-macos:tox -e py313
+        py314-macos:tox -e py314
         smoke
       skip_explode: "1"
+    secrets: inherit
