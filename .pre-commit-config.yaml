@@ -1,52 +1,53 @@
 ---
 ci:
-  # format compatible with commitlint
-  autoupdate_commit_msg: "chore: pre-commit autoupdate"
-  # we rely on renovate to update it but there is no way to fully disable it
+  # We rely on renovate to update it but there is no way to fully disable it
+  # https://github.com/pre-commit-ci/issues/issues/83
   autoupdate_schedule: quarterly
-  autofix_commit_msg: "chore: auto fixes from pre-commit.com hooks"
-
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - deps
+    - tombi-format
+    - tombi-lint
 exclude: |
   (?x)^(
     test/assets/.*
   )$
 repos:
+  - repo: meta
+    hooks:
+      - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.8.22
     hooks:
       - id: uv-sync
       - id: uv-lock
+      - id: uv-lock
         name: "deps: upgrade via uv sync --upgrade"
         alias: deps
         args: ["--upgrade"]
         stages: [manual]
-  - repo: https://github.com/rbubley/mirrors-prettier
-    # keep it before yamllint
-    rev: v3.6.2
+  - repo: https://github.com/biomejs/pre-commit
+    rev: "v2.2.4"
     hooks:
-      - id: prettier
-        additional_dependencies:
-          - prettier
-          - prettier-plugin-sort-json
+      - id: biome-check
+        name: biome
+        alias: biome
+        args: [--unsafe]
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
     rev: v6.0.0
     hooks:
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
-        exclude: >
-          (?x)^(
-            examples/playbooks/(with-skip-tag-id|unicode).yml|
-            examples/playbooks/example.yml
-          )$
-      - id: mixed-line-ending
-      - id: fix-byte-order-marker
+      - id: check-added-large-files
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
       - id: debug-statements
-        language_version: python3
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+      - id: trailing-whitespace
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:
@@ -65,10 +66,13 @@ repos:
         files: \.(yaml|yml)$
         types: [file, yaml]
         entry: yamllint --strict
-  - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.3
+
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: v0.6.19
     hooks:
-      - id: toml-sort-fix
+      - id: tombi-format
+        alias: toml
+      - id: tombi-lint
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit

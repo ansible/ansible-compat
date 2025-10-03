@@ -87,7 +87,7 @@ docs = [
 lint = [
     { name = "pip", specifier = ">=25.2" },
     { name = "pre-commit", specifier = ">=4.0.1" },
-    { name = "pre-commit-uv", specifier = ">=1.15" },
+    { name = "pre-commit-uv", specifier = ">=4.1.4" },
 ]
 pkg = [
     { name = "build", specifier = ">=0.9" },
