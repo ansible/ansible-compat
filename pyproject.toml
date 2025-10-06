@@ -21,6 +21,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Software Development :: Bug Tracking",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
@@ -479,6 +480,7 @@ env_list = [
   "py312-ansible218",
   "py313-ansible218",
   "py313-devel",
+  "py314-devel",
 ]
 requires = [
   "setuptools>=65.3",
@@ -586,6 +588,11 @@ description = "ansible-core 2.18 py{py_dot_ver}"
 runner = "uv-venv-runner"
 
 [tool.tox.env.py313-devel]
+deps = ["ansible-core @ git+https://github.com/ansible/ansible.git@devel"]
+description = "ansible-core devel py{py_dot_ver}"
+runner = "uv-venv-runner"
+
+[tool.tox.env.py314-devel]
 deps = ["ansible-core @ git+https://github.com/ansible/ansible.git@devel"]
 description = "ansible-core devel py{py_dot_ver}"
 runner = "uv-venv-runner"

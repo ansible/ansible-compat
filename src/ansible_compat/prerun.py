@@ -1,10 +1,25 @@
-"""Utilities for configuring ansible runtime environment."""
+"""Utilities for configuring ansible runtime environment.
+
+No import of ansible-core must happen within this file!
+"""
 
 import hashlib
 import os
+import sys
 import tempfile
 import warnings
+from importlib.metadata import version
 from pathlib import Path
+
+from packaging.version import Version
+
+# This module is early loaded by tools like ansible-lint and we want to fail
+# fast even for `ansible-lint --version` if the setup is known as broken.
+if sys.version_info >= (3, 14):
+    core_version = Version(version("ansible-core"))
+    if core_version < Version("2.20.0dev0"):  # pragma: no cover
+        msg = f"Python 3.14 requires ansible-core version >= 2.20.0, and we found {core_version}."
+        raise RuntimeError(msg)
 
 
 def is_writable(path: Path) -> bool:
@@ -43,7 +58,7 @@ def get_cache_dir(project_dir: Path, *, isolated: bool = True) -> Path:
         if is_writable(path):
             cache_dir = path
         else:
-            msg = f"Found VIRTUAL_ENV={os.environ['VIRTUAL_ENV']} but we cannot use it for caching as it is not writable."
+            msg = f"Found VIRTUAL_ENV={os.environ['VIRTUAL_ENV']} but we cannot use it for caching as it is not writable."  # pylint: disable=W0621
             warnings.warn(
                 message=msg,
                 stacklevel=2,

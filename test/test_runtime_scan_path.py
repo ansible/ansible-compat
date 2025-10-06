@@ -3,6 +3,7 @@
 import json
 import os
 import subprocess
+import sys
 import textwrap
 from pathlib import Path
 
@@ -20,6 +21,10 @@ V2_COLLECTION_VERSION = "0.1.0"
 V2_COLLECTION_FULL_NAME = f"{V2_COLLECTION_NAMESPACE}.{V2_COLLECTION_NAME}"
 
 
+@pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="Python 3.14 requires unreleased ansible-core which will fail this test.",
+)
 @pytest.mark.parametrize(
     ("scan", "raises_not_found"),
     (
