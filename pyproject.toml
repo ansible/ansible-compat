@@ -87,7 +87,8 @@ omit = ["_version.py"]
 # avoid failse positive warning, we still fail if coverage level is not met
 disable_warnings = ["no-data-collected"]
 parallel = true
-source = ["src"]
+relative_files = true
+source_pkgs = ["ansible_compat"]
 
 [tool.mypy]
 color_output = true
