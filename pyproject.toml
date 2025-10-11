@@ -79,6 +79,9 @@ show_missing = true
 skip_covered = true
 skip_empty = true
 
+[tool.coverage.paths]
+source = ["src", "test", ".tox/*/site-packages"]
+
 [tool.coverage.run]
 # branch is more reliable than lines, protects against false positives
 branch = true
@@ -87,8 +90,7 @@ omit = ["_version.py"]
 # avoid failse positive warning, we still fail if coverage level is not met
 disable_warnings = ["no-data-collected"]
 parallel = true
-relative_files = true
-source_pkgs = ["ansible_compat"]
+source = ["src"]
 
 [tool.mypy]
 color_output = true
