@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.3
+    rev: 0.9.5
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -27,7 +27,7 @@ repos:
         args: ["--upgrade"]
         stages: [manual]
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.2.6"
+    rev: "v2.2.7"
     hooks:
       - id: biome-check
         name: biome
@@ -53,7 +53,7 @@ repos:
     hooks:
       - id: codespell
   - repo: https://github.com/jsh9/pydoclint
-    rev: 0.7.3
+    rev: 0.7.4
     hooks:
       - id: pydoclint
         # This allows automatic reduction of the baseline file when needed.
@@ -68,7 +68,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.6.34
+    rev: v0.6.38
     hooks:
       - id: tombi-format
         alias: toml
@@ -76,7 +76,7 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.1
+    rev: v0.14.2
     hooks:
       - id: ruff-format
         alias: ruff
@@ -101,7 +101,7 @@ repos:
           - types-setuptools
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v4.0.1
+    rev: v4.0.2
     hooks:
       - id: pylint
         additional_dependencies:
