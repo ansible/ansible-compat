@@ -1,3 +1,5 @@
+#:tombi schema.strict = false
+
 [project]
 name = "ansible-compat"
 description = "Ansible compatibility goodies"
