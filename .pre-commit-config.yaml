@@ -108,3 +108,7 @@ repos:
           - PyYAML
           - pytest
           - typing_extensions
+  - repo: https://github.com/ansible/team-devtools
+    rev: v25.12.8
+    hooks:
+      - id: check-platform-constraints
