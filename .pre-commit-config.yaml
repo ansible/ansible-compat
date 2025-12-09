@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.13
+    rev: 0.9.16
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -68,7 +68,7 @@ repos:
         entry: yamllint --strict
 
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.7.0
+    rev: v0.7.3
     hooks:
       - id: tombi-format
         alias: toml
@@ -76,7 +76,7 @@ repos:
         alias: toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.7
+    rev: v0.14.8
     hooks:
       - id: ruff-format
         alias: ruff
@@ -101,7 +101,7 @@ repos:
           - types-setuptools
           - types-jsonschema>=4.4.9
   - repo: https://github.com/pycqa/pylint
-    rev: v4.0.3
+    rev: v4.0.4
     hooks:
       - id: pylint
         additional_dependencies:
