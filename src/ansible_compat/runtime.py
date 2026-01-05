@@ -445,7 +445,7 @@ class Runtime:
         for mod in modules_to_remove:
             del sys.modules[mod]
 
-    def run(  # ruff: disable=PLR0913
+    def run(
         self,
         args: str | list[str],
         *,
