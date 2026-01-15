@@ -1,4 +1,5 @@
 """ansible_compat package."""
+# ruff: noqa: RUF067
 
 from importlib.metadata import PackageNotFoundError, version
 
