@@ -6,8 +6,14 @@ ci:
   skip:
     # https://github.com/pre-commit-ci/issues/issues/55
     - deps
-    - tombi-format
-    - tombi-lint
+    - cspell # missing uv
+    - codecov # missing uv
+    - shellcheck # no docker support on pre-commit.ci
+    # uv not present on pre-commit.ci
+    - mypy
+    - pylint
+    - ruff
+    - toml
 exclude: |
   (?x)^(
     test/assets/.*
@@ -16,8 +22,26 @@ repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
+        priority: 0
+  - repo: https://github.com/ansible/actions
+    rev: v0.5.1
+    hooks:
+      - id: toml
+        priority: 0
+      - id: mypy
+        priority: 2
+      - id: ruff
+        priority: 0
+      - id: cspell
+        priority: 0
+      - id: pylint
+        priority: 5
+      - id: codecov
+        priority: 0
+      - id: shellcheck
+        priority: 0
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.10.0
+    rev: 0.10.6
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -27,88 +51,42 @@ repos:
         args: ["--upgrade"]
         stages: [manual]
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v2.3.14"
+    rev: "v2.4.4"
     hooks:
       - id: biome-check
         name: biome
         alias: biome
         args: [--unsafe]
+        priority: 0
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
+        priority: 0
       - id: check-executables-have-shebangs
+        priority: 0
       - id: check-merge-conflict
-      - id: check-merge-conflict
+        priority: 0
       - id: check-symlinks
+        priority: 0
       - id: debug-statements
-      - id: debug-statements
+        priority: 0
       - id: detect-private-key
+        priority: 0
       - id: end-of-file-fixer
-      - id: fix-byte-order-marker
+        priority: 0
       - id: mixed-line-ending
-      - id: trailing-whitespace
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
-    hooks:
-      - id: codespell
+        priority: 0
   - repo: https://github.com/jsh9/pydoclint
-    rev: 0.8.3
+    rev: "0.8.3"
     hooks:
       - id: pydoclint
         # This allows automatic reduction of the baseline file when needed.
-        entry: sh -ec "pydoclint . && pydoclint --generate-baseline=1 ."
+        entry: sh -ec "pydoclint -q . && pydoclint --generate-baseline=1 ."
         pass_filenames: false
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.38.0
-    hooks:
-      - id: yamllint
-        files: \.(yaml|yml)$
-        types: [file, yaml]
-        entry: yamllint --strict
-
-  - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.7.27
-    hooks:
-      - id: tombi-format
-        alias: toml
-      - id: tombi-lint
-        alias: toml
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.0
-    hooks:
-      - id: ruff-format
-        alias: ruff
-      - id: ruff-check
-        alias: ruff
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
-    hooks:
-      - id: mypy
-        # empty args needed in order to match mypy cli behavior
-        args: ["--strict"]
-        additional_dependencies:
-          - ansible-core>=2.16.0
-          - cached_property
-          - packaging
-          - pytest
-          - pytest-mock
-          - subprocess-tee>=0.4.1
-          - "typing-extensions>=4.5.0;python_version<'3.10'"
-          - types-PyYAML
-          - types-setuptools
-          - types-jsonschema>=4.4.9
-  - repo: https://github.com/pycqa/pylint
-    rev: v4.0.4
-    hooks:
-      - id: pylint
-        additional_dependencies:
-          - PyYAML
-          - pytest
-          - typing_extensions
+        priority: 6
   - repo: https://github.com/ansible/team-devtools
-    rev: v26.1.0
+    rev: v26.2.0
     hooks:
       - id: check-platform-constraints
+        priority: 0

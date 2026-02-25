@@ -1,0 +1,15 @@
+dictionaryDefinitions:
+  - name: words
+    path: .config/dictionary.txt
+    addWords: true
+dictionaries:
+  - bash
+  - cpp-compound-words
+  - software-terms
+  - networking-terms
+  - makefile
+  - python
+  - words
+enabled: true
+useGitignore: true
+  - \.*.svg

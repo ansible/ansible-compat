@@ -1,5 +1,6 @@
 """Tests for ansible_compat.prerun module."""
 
+# cspell:ignore monkeypatching
 from __future__ import annotations
 
 import tempfile

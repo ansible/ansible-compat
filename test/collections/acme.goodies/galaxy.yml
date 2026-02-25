@@ -1,3 +1,4 @@
+# cspell:ignore stestr
 name: goodies
 namespace: acme
 version: 1.0.0

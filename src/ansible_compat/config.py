@@ -1,5 +1,6 @@
 """Store configuration options as a singleton."""
 
+# cspell:ignore dellos exos monkeypatching aireos voss slxos
 from __future__ import annotations
 
 import ast
@@ -644,7 +645,7 @@ class AnsibleConfig(
         return AnsibleConfig(data=self.data)
 
     def __deepcopy__(self, memo: object) -> AnsibleConfig:
-        """Allow users to run deeepcopy on Config."""
+        """Allow users to run deepcopy on Config."""
         return AnsibleConfig(data=self.data)
 
 

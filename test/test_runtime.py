@@ -1,5 +1,6 @@
 """Tests for Runtime class."""
 
+# cspell:ignore netconf delenv netcommon restconf
 # pylint: disable=protected-access,too-many-lines
 from __future__ import annotations
 
@@ -992,7 +993,7 @@ def test_prepare_environment_symlink(
     message: str,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Ensure avalid symlinks to collections are properly detected."""
+    """Ensure valid symlinks to collections are properly detected."""
     project_dir = Path(__file__).parent / "collections" / "acme.minimal"
     runtime = Runtime(isolated=True, project_dir=project_dir)
     assert runtime.cache_dir
