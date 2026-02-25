@@ -1,3 +1,4 @@
+# cspell:ignore stestr
 name: minimal
 namespace: acme
 version: 1.0.0

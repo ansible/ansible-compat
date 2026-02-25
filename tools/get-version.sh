@@ -1,4 +1,5 @@
 #!/bin/bash
+# cspell:ignore PIPARGS
 set -e
 {
     python3 -c "import setuptools_scm" >/dev/null || {

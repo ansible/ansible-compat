@@ -1,4 +1,5 @@
 ---
+# cspell:ignore pymdownx fontawesome superfences inlinehilite
 site_name: Ansible Compat Library
 site_url: https://ansible.readthedocs.io/projects/compat/
 repo_url: https://github.com/ansible/ansible-compat

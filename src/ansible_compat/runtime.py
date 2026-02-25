@@ -177,7 +177,7 @@ class Runtime:
     collections: OrderedDict[str, Collection] = OrderedDict()
     cache_dir: Path
     # Used to track if we have already initialized the Ansible runtime as attempts
-    # to do it multiple tilmes will cause runtime warnings from within ansible-core
+    # to do it multiple times will cause runtime warnings from within ansible-core
     initialized: bool = False
     # Flag to control when plugin loader initialization is allowed
     plugin_loader_enabled: bool = False
@@ -408,12 +408,14 @@ class Runtime:
             col_paths = self.config.collections_paths
             if self.isolated:
                 col_paths = [str(self.cache_dir / "collections"), *col_paths]
+            # ruff: disable[PLC2701]
             # noinspection PyProtectedMember
             # pylint: disable=import-outside-toplevel,no-name-in-module
             from ansible.plugins.loader import init_plugin_loader
             from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
-                _AnsibleCollectionFinder,  # noqa: PLC2701
+                _AnsibleCollectionFinder,
             )
+            # ruff: enable[PLC2701]
 
             with contextlib.suppress(Exception):
                 _AnsibleCollectionFinder()._remove()  # pylint: disable=protected-access  # noqa: SLF001

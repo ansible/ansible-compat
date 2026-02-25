@@ -44,7 +44,7 @@ def test_scan_sys_path(
 
     Args:
         venv_module: Fixture for a virtual environment
-        monkeypatch: Fixture for monkeypatching
+        monkeypatch: Fixture for monkey patching
         tmp_path: Fixture for a temporary directory
         scan: Whether to scan the sys path
         raises_not_found: Whether the collection is expected to be found
