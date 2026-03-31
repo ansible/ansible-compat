@@ -1074,8 +1074,12 @@ def search_galaxy_paths(search_dir: Path) -> list[Path]:
             continue
         if file_path.is_dir() and namespace_re.match(file_path.name):
             file_path /= "galaxy.yml"
-            if file_path.exists():
-                galaxy_paths.append(file_path)
+            try:
+                if file_path.exists():
+                    galaxy_paths.append(file_path)
+            except PermissionError:  # pragma: no cover
+                # we silently ignore permissions errors, can happen with use of /tmp
+                pass
     return galaxy_paths
 
 
