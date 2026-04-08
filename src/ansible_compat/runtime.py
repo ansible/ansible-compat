@@ -670,7 +670,7 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-        # Run galaxy collection install works on v2 equirements.yml/requirements.yaml.
+        # Run galaxy collection install works on v2 requirements.yml/requirements.yaml.
         if (
             isinstance(reqs_yaml, dict)
             and "collections" in reqs_yaml
@@ -781,13 +781,15 @@ class Runtime:
                         Path.cwd(),
                     )
                     colpath.unlink()
-    
                 # molecule scenario within a collection
                 self.install_collection_from_disk(
                     galaxy_path.parent,
                     destination=destination,
                 )
-            elif Path.cwd().parent.name == "roles" and Path(f"../../galaxy.{extension}").exists():
+            elif (
+                Path.cwd().parent.name == "roles"
+                and Path(f"../../galaxy.{extension}").exists()
+            ):
                 # molecule scenario located within roles/<role-name>/molecule inside
                 # a collection
                 self.install_collection_from_disk(
@@ -1071,7 +1073,7 @@ def search_galaxy_paths(search_dir: Path) -> list[Path]:
         # We ignore any folders that are not valid namespaces, just like
         # ansible galaxy does at this moment.
         file_path = item.resolve()
-        if file_path.is_file() and (file_path.name == "galaxy.yml" or file_path.name == "galaxy.yaml"):
+        if file_path.is_file() and file_path.name in {"galaxy.yml", "galaxy.yaml"}:
             galaxy_paths.append(file_path)
             continue
         if file_path.is_dir() and namespace_re.match(file_path.name):

@@ -16,7 +16,7 @@ REQUIREMENT_LOCATIONS = [
     "tests/integration/requirements.yml",  # 3
     "tests/integration/requirements.yaml",
     "tests/unit/requirements.yml",  # 1
-    "tests/unit/requirements.yaml", 
+    "tests/unit/requirements.yaml",
 ]
 
 # Minimal version of Ansible we support for runtime
