@@ -5,12 +5,18 @@ from pathlib import Path
 META_MAIN = (Path("meta") / Path("main.yml"), Path("meta") / Path("main.yaml"))
 REQUIREMENT_LOCATIONS = [
     "requirements.yml",
+    "requirements.yaml",
     "roles/requirements.yml",
+    "roles/requirements.yaml",
     "collections/requirements.yml",
+    "collections/requirements.yaml",
     # These is more of less the official way to store test requirements in collections so far, comments shows number of repos using this reported by https://sourcegraph.com/ at the time of writing
     "tests/requirements.yml",  # 170
+    "tests/requirements.yaml",
     "tests/integration/requirements.yml",  # 3
+    "tests/integration/requirements.yaml",
     "tests/unit/requirements.yml",  # 1
+    "tests/unit/requirements.yaml",
 ]
 
 # Minimal version of Ansible we support for runtime
