@@ -882,7 +882,11 @@ class Runtime:
             raise RuntimeError(msg) from exc
 
         alterations_list: list[tuple[list[str], str, bool]] = [
-            (library_paths, str((self.project_dir / "plugins" / "modules").absolute()), True),
+            (
+                library_paths,
+                str((self.project_dir / "plugins" / "modules").absolute()),
+                True,
+            ),
             (roles_path, str((self.project_dir / "roles").absolute()), True),
         ]
 
