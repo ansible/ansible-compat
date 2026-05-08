@@ -5,6 +5,7 @@ No import of ansible-core must happen within this file!
 
 import hashlib
 import os
+import platform
 import sys
 import tempfile
 import warnings
@@ -15,11 +16,10 @@ from packaging.version import Version
 
 # This module is early loaded by tools like ansible-lint and we want to fail
 # fast even for `ansible-lint --version` if the setup is known as broken.
-if sys.version_info >= (3, 14):
-    core_version = Version(version("ansible-core"))
-    if core_version < Version("2.20.0dev0"):  # pragma: no cover
-        msg = f"Python 3.14 requires ansible-core version >= 2.20.0, and we found {core_version}."
-        raise RuntimeError(msg)
+core_version = Version(version("ansible-core"))
+if core_version >= Version("2.20.0dev0") and sys.version_info < (3, 14):  # pragma: no cover
+    msg = f"ansible-core version >= 2.20.0 requires Python 3.14 and we found {platform.python_version()}."
+    raise RuntimeError(msg)
 
 
 def is_writable(path: Path) -> bool:
