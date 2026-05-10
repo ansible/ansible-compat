@@ -626,9 +626,9 @@ class Runtime:
         retry: bool = False,
         offline: bool = False,
     ) -> None:
-        """Install dependencies from a requirements.yml.
+        """Install dependencies from a requirements.yml/requirements.yaml.
 
-        :param requirement: path to requirements.yml file
+        :param requirement: path to requirements.yml/requirements.yaml file
         :param retry: retry network operations on failures
         :param offline: bypass installation, may fail if requirements are not met.
         """
@@ -670,7 +670,7 @@ class Runtime:
                     _logger.error(result.stderr)
                     raise AnsibleCommandError(result)
 
-        # Run galaxy collection install works on v2 requirements.yml
+        # Run galaxy collection install works on v2 requirements.yml/requirements.yaml.
         if (
             isinstance(reqs_yaml, dict)
             and "collections" in reqs_yaml
@@ -741,15 +741,16 @@ class Runtime:
             return
 
         for item in search_galaxy_paths(self.project_dir):
-            # processing all found galaxy.yml files
+            # processing all found galaxy.yml/galaxy.yaml files
             if item.exists():
                 data = yaml_from_file(item)
                 if isinstance(data, dict) and "dependencies" in data:
                     for name, required_version in data["dependencies"].items():
                         _logger.info(
-                            "Provisioning collection %s:%s from galaxy.yml",
+                            "Provisioning collection %s:%s from %s",
                             name,
                             required_version,
+                            item.name,
                         )
                         self.install_collection(
                             f"{name}{',' if is_url(name) else ':'}{required_version}",
@@ -762,43 +763,46 @@ class Runtime:
                 destination=destination,
             )
 
-        galaxy_path = self.project_dir / "galaxy.yml"
-        if (galaxy_path).exists():
-            # while function can return None, that would not break the logic
-            colpath = Path(
-                f"{destination}/ansible_collections/{colpath_from_path(self.project_dir)}",
-            )
-            if colpath.is_symlink():
-                if os.path.realpath(colpath) == str(Path.cwd()):
-                    _logger.warning(
-                        "Found symlinked collection, skipping its installation.",
-                    )
-                    return
-                _logger.warning(
-                    "Collection is symlinked, but not pointing to %s directory, so we will remove it.",
-                    Path.cwd(),
+        for extension in ("yml", "yaml"):
+            galaxy_path = self.project_dir / f"galaxy.{extension}"
+            if galaxy_path.exists():
+                # while function can return None, that would not break the logic
+                colpath = Path(
+                    f"{destination}/ansible_collections/{colpath_from_path(self.project_dir)}",
                 )
-                colpath.unlink()
-
-            # molecule scenario within a collection
-            self.install_collection_from_disk(
-                galaxy_path.parent,
-                destination=destination,
-            )
-        elif Path.cwd().parent.name == "roles" and Path("../../galaxy.yml").exists():
-            # molecule scenario located within roles/<role-name>/molecule inside
-            # a collection
-            self.install_collection_from_disk(
-                Path("../.."),
-                destination=destination,
-            )
-        else:
-            # no collection, try to recognize and install a standalone role
-            self._install_galaxy_role(
-                self.project_dir,
-                role_name_check=role_name_check,
-                ignore_errors=True,
-            )
+                if colpath.is_symlink():
+                    if os.path.realpath(colpath) == str(Path.cwd()):
+                        _logger.warning(
+                            "Found symlinked collection, skipping its installation.",
+                        )
+                        return
+                    _logger.warning(
+                        "Collection is symlinked, but not pointing to %s directory, so we will remove it.",
+                        Path.cwd(),
+                    )
+                    colpath.unlink()
+                # molecule scenario within a collection
+                self.install_collection_from_disk(
+                    galaxy_path.parent,
+                    destination=destination,
+                )
+            elif (
+                Path.cwd().parent.name == "roles"
+                and Path(f"../../galaxy.{extension}").exists()
+            ):
+                # molecule scenario located within roles/<role-name>/molecule inside
+                # a collection
+                self.install_collection_from_disk(
+                    Path("../.."),
+                    destination=destination,
+                )
+            else:
+                # no collection, try to recognize and install a standalone role
+                self._install_galaxy_role(
+                    self.project_dir,
+                    role_name_check=role_name_check,
+                    ignore_errors=True,
+                )
         # reload collections
         self.load_collections()
 
@@ -945,7 +949,7 @@ class Runtime:
 
         Our implementation aims to match ansible-galaxy's behavior for installing
         roles from a tarball or scm. For example ansible-galaxy will install a role
-        that has both galaxy.yml and meta/main.yml present but empty. Also missing
+        that has both galaxy.yml/galaxy.yaml and meta/main.yml present but empty. Also missing
         galaxy.yml is accepted but missing meta/main.yml is not.
         """
         yaml = None
@@ -1062,24 +1066,25 @@ def search_galaxy_paths(search_dir: Path) -> list[Path]:
     """Search for galaxy paths (only one level deep).
 
     Returns:
-        list[Path]: List of galaxy.yml found.
+        list[Path]: List of galaxy.yml/galaxy.yaml found.
     """
     galaxy_paths: list[Path] = []
     for item in [Path(), *search_dir.iterdir()]:
         # We ignore any folders that are not valid namespaces, just like
         # ansible galaxy does at this moment.
         file_path = item.resolve()
-        if file_path.is_file() and file_path.name == "galaxy.yml":
+        if file_path.is_file() and file_path.name in {"galaxy.yml", "galaxy.yaml"}:
             galaxy_paths.append(file_path)
             continue
         if file_path.is_dir() and namespace_re.match(file_path.name):
-            file_path /= "galaxy.yml"
-            try:
-                if file_path.exists():
-                    galaxy_paths.append(file_path)
-            except PermissionError:  # pragma: no cover
-                # we silently ignore permissions errors, can happen with use of /tmp
-                pass
+            for extension in ("yml", "yaml"):
+                file_path /= f"galaxy.{extension}"
+                try:
+                    if file_path.exists():
+                        galaxy_paths.append(file_path)
+                except PermissionError:  # pragma: no cover
+                    # we silently ignore permissions errors, can happen with use of /tmp
+                    pass
     return galaxy_paths
 
 

@@ -20,12 +20,13 @@ def yaml_from_file(path: Path) -> Any:  # noqa: ANN401
 
 def colpath_from_path(path: Path) -> str | None:
     """Return a FQCN from a path."""
-    galaxy_file = path / "galaxy.yml"
-    if galaxy_file.exists():
-        galaxy = yaml_from_file(galaxy_file)
-        for k in ("namespace", "name"):
-            if k not in galaxy:
-                msg = f"{galaxy_file} is missing the following mandatory field {k}"
-                raise InvalidPrerequisiteError(msg)
-        return f"{galaxy['namespace']}/{galaxy['name']}"
+    for extension in ("yml", "yaml"):
+        galaxy_file = path / f"galaxy.{extension}"
+        if galaxy_file.exists():
+            galaxy = yaml_from_file(galaxy_file)
+            for k in ("namespace", "name"):
+                if k not in galaxy:
+                    msg = f"{galaxy_file} is missing the following mandatory field {k}"
+                    raise InvalidPrerequisiteError(msg)
+            return f"{galaxy['namespace']}/{galaxy['name']}"
     return None
