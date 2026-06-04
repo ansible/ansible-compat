@@ -1061,3 +1061,117 @@ def test_runtime_plugin_loader_enabled(runtime: Runtime) -> None:
     assert isinstance(become_plugins, dict)
     # Should have at least the built-in 'sudo' become plugin
     assert len(become_plugins) >= 0  # Could be empty in isolated test environment
+
+
+def test_prepare_ansible_paths_uses_absolute_roles_path(tmp_path: pathlib.Path) -> None:
+    """Verify that _prepare_ansible_paths produces absolute paths for roles.
+
+    This is a regression test for a bug where relative paths like "roles"
+    were injected into ANSIBLE_ROLES_PATH. When the CWD changed (e.g.,
+    during Molecule scenario execution), these relative paths became invalid,
+    causing role discovery failures.
+
+    Args:
+        tmp_path: Pytest temporary directory fixture.
+    """
+    # Create a project with a roles directory
+    project_dir = tmp_path / "my_project"
+    project_dir.mkdir()
+    roles_dir = project_dir / "roles"
+    roles_dir.mkdir()
+
+    runtime = Runtime(project_dir=project_dir, isolated=False)
+    runtime._prepare_ansible_paths()
+
+    roles_path_env = runtime.environ.get("ANSIBLE_ROLES_PATH", "")
+    paths = roles_path_env.split(":")
+
+    # The project roles path must be absolute
+    project_roles_path = str(roles_dir.absolute())
+    assert project_roles_path in paths, (
+        f"Expected absolute path '{project_roles_path}' in ANSIBLE_ROLES_PATH, "
+        f"got: {roles_path_env}"
+    )
+
+    # No relative "roles" entry should exist
+    for p in paths:
+        if p:
+            assert Path(p).is_absolute(), (
+                f"Found relative path '{p}' in ANSIBLE_ROLES_PATH — "
+                f"this will break when CWD changes"
+            )
+
+
+def test_prepare_ansible_paths_uses_absolute_library_path(
+    tmp_path: pathlib.Path,
+) -> None:
+    """Verify that _prepare_ansible_paths produces absolute paths for plugins/modules.
+
+    Same regression scenario as roles: relative "plugins/modules" paths
+    break when CWD shifts during Molecule execution.
+
+    Args:
+        tmp_path: Pytest temporary directory fixture.
+    """
+    # Create a project with a plugins/modules directory
+    project_dir = tmp_path / "my_project"
+    project_dir.mkdir()
+    modules_dir = project_dir / "plugins" / "modules"
+    modules_dir.mkdir(parents=True)
+
+    runtime = Runtime(project_dir=project_dir, isolated=False)
+    runtime._prepare_ansible_paths()
+
+    library_env = runtime.environ.get("ANSIBLE_LIBRARY", "")
+    paths = library_env.split(":")
+
+    # The project library path must be absolute
+    project_library_path = str(modules_dir.absolute())
+    assert project_library_path in paths, (
+        f"Expected absolute path '{project_library_path}' in ANSIBLE_LIBRARY, "
+        f"got: {library_env}"
+    )
+
+
+def test_prepare_ansible_paths_survives_cwd_change(tmp_path: pathlib.Path) -> None:
+    """Verify that resolved paths remain valid even after changing CWD.
+
+    This is the end-to-end regression test: create a project, prepare
+    the paths, change directories, and confirm the paths still point
+    to real directories.
+
+    Args:
+        tmp_path: Pytest temporary directory fixture.
+    """
+    # Create a project structure
+    project_dir = tmp_path / "my_project"
+    project_dir.mkdir()
+    (project_dir / "roles").mkdir()
+    (project_dir / "plugins" / "modules").mkdir(parents=True)
+
+    runtime = Runtime(project_dir=project_dir, isolated=False)
+    runtime._prepare_ansible_paths()
+
+    roles_path_env = runtime.environ.get("ANSIBLE_ROLES_PATH", "")
+    library_env = runtime.environ.get("ANSIBLE_LIBRARY", "")
+
+    # Now change to a completely different directory
+    different_dir = tmp_path / "somewhere_else"
+    different_dir.mkdir()
+
+    with cwd(different_dir):
+        # All paths in ANSIBLE_ROLES_PATH should still resolve
+        for p in roles_path_env.split(":"):
+            if p and str(project_dir) in p:
+                assert Path(p).exists(), (
+                    f"Path '{p}' from ANSIBLE_ROLES_PATH does not exist "
+                    f"after CWD changed to {different_dir}"
+                )
+
+        # All paths in ANSIBLE_LIBRARY should still resolve
+        for p in library_env.split(":"):
+            if p and str(project_dir) in p:
+                assert Path(p).exists(), (
+                    f"Path '{p}' from ANSIBLE_LIBRARY does not exist "
+                    f"after CWD changed to {different_dir}"
+                )
