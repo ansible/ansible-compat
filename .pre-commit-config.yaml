@@ -41,7 +41,7 @@ repos:
       - id: shellcheck
         priority: 0
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.18
+    rev: 0.11.19
     hooks:
       - id: uv-sync
       - id: uv-lock
@@ -78,7 +78,7 @@ repos:
       - id: mixed-line-ending
         priority: 0
   - repo: https://github.com/jsh9/pydoclint
-    rev: "0.8.5"
+    rev: "0.8.6"
     hooks:
       - id: pydoclint
         # This allows automatic reduction of the baseline file when needed.
