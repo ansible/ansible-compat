@@ -286,7 +286,11 @@ def test_prerun_reqs_broken() -> None:
 
 
 def test_prerun_yaml_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
-    """Checks that the linter can auto-install requirements v1 with a .yaml extension."""
+    """Checks that the linter can auto-install requirements v1 with a .yaml extension.
+
+    Args:
+        caplog: Log CaptureFixture.
+    """
     path = Path(__file__).parent.parent / "examples" / "reqs_v1_yaml"
     runtime = Runtime(project_dir=path, verbosity=1)
     with cwd(path):
@@ -301,7 +305,11 @@ def test_prerun_yaml_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
 
 
 def test_prerun_yaml_reqs_v2(caplog: pytest.LogCaptureFixture) -> None:
-    """Checks that the linter can auto-install requirements v2 with a .yaml extension."""
+    """Checks that the linter can auto-install requirements v2 with a .yaml extension.
+
+    Args:
+        caplog: Log CaptureFixture.
+    """
     path = (Path(__file__).parent.parent / "examples" / "reqs_v2_yaml").resolve()
     runtime = Runtime(project_dir=path, verbosity=1)
     with cwd(path):
@@ -579,7 +587,11 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
 
 
 def test_install_galaxy_role_yaml(runtime_tmp: Runtime) -> None:
-    """Check install role with empty galaxy file."""
+    """Check install role with empty galaxy.yaml file.
+
+    Args:
+        runtime_tmp: Runtime fixture for testing the .yaml loader functionality.
+    """
     pathlib.Path(f"{runtime_tmp.project_dir}/galaxy.yaml").touch()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yaml").touch()
@@ -1003,7 +1015,7 @@ def test_runtime_plugins(runtime: Runtime) -> None:
             Path("test/assets/galaxy_paths/foo"),
             [Path("test/assets/galaxy_paths/foo/galaxy.yml").resolve()],
             id="3",
-        ),        
+        ),
         pytest.param(
             Path("test/assets/galaxy_paths_yaml"),
             [Path("test/assets/galaxy_paths_yaml/foo/galaxy.yaml").resolve()],
