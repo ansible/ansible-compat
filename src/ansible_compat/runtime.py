@@ -950,7 +950,7 @@ class Runtime:
         Our implementation aims to match ansible-galaxy's behavior for installing
         roles from a tarball or scm. For example ansible-galaxy will install a role
         that has both galaxy.yml/galaxy.yaml and meta/main.yml present but empty. Also missing
-        galaxy.yml is accepted but missing meta/main.yml is not.
+        galaxy.yml/galaxy.yaml is accepted but missing meta/main.yml is not.
         """
         yaml = None
         galaxy_info = {}
@@ -1078,10 +1078,10 @@ def search_galaxy_paths(search_dir: Path) -> list[Path]:
             continue
         if file_path.is_dir() and namespace_re.match(file_path.name):
             for extension in ("yml", "yaml"):
-                file_path /= f"galaxy.{extension}"
+                galaxy_path = file_path / f"galaxy.{extension}"
                 try:
-                    if file_path.exists():
-                        galaxy_paths.append(file_path)
+                    if galaxy_path.exists():
+                        galaxy_paths.append(galaxy_path)
                 except PermissionError:  # pragma: no cover
                     # we silently ignore permissions errors, can happen with use of /tmp
                     pass
