@@ -503,7 +503,7 @@ class Runtime:
 
     @property
     def version(self) -> Version:
-        """Return current Version object for Ansible.
+        """Current Version object for Ansible.
 
         If version is not mentioned, it returns current version as detected.
         When version argument is mentioned, it return converts the version string
