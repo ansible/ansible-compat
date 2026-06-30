@@ -285,6 +285,53 @@ def test_prerun_reqs_broken() -> None:
         runtime.prepare_environment()
 
 
+def test_prerun_yaml_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
+    """Checks that the linter can auto-install requirements v1 with a .yaml extension.
+
+    Args:
+        caplog: Log CaptureFixture.
+    """
+    path = Path(__file__).parent.parent / "examples" / "reqs_v1_yaml"
+    runtime = Runtime(project_dir=path, verbosity=1)
+    with cwd(path):
+        runtime.prepare_environment()
+    assert any(
+        msg.startswith("Running ansible-galaxy role install") for msg in caplog.messages
+    )
+    assert all(
+        "Running ansible-galaxy collection install" not in msg
+        for msg in caplog.messages
+    )
+
+
+def test_prerun_yaml_reqs_v2(caplog: pytest.LogCaptureFixture) -> None:
+    """Checks that the linter can auto-install requirements v2 with a .yaml extension.
+
+    Args:
+        caplog: Log CaptureFixture.
+    """
+    path = (Path(__file__).parent.parent / "examples" / "reqs_v2_yaml").resolve()
+    runtime = Runtime(project_dir=path, verbosity=1)
+    with cwd(path):
+        runtime.prepare_environment()
+        assert any(
+            msg.startswith("Running ansible-galaxy role install")
+            for msg in caplog.messages
+        )
+        assert any(
+            msg.startswith("Running ansible-galaxy collection install")
+            for msg in caplog.messages
+        )
+
+
+def test_prerun_yaml_reqs_broken() -> None:
+    """Checks that the we report invalid requirements.yaml file."""
+    path = (Path(__file__).parent.parent / "examples" / "reqs_broken_yaml").resolve()
+    runtime = Runtime(project_dir=path, verbosity=1)
+    with cwd(path), pytest.raises(InvalidPrerequisiteError):
+        runtime.prepare_environment()
+
+
 def test__update_env_no_old_value_no_default_no_value(monkeypatch: MonkeyPatch) -> None:
     """Make sure empty value does not touch environment."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
@@ -527,6 +574,27 @@ def test_install_galaxy_role(runtime_tmp: Runtime) -> None:
     pathlib.Path(f"{runtime_tmp.project_dir}/galaxy.yml").touch()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
     pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yml").touch()
+    # this should only raise a warning
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
+    # this should test the bypass role name check path
+    runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=2)
+    # this should raise an error
+    with pytest.raises(
+        InvalidPrerequisiteError,
+        match="does not follow current galaxy requirements",
+    ):
+        runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=0)
+
+
+def test_install_galaxy_role_yaml(runtime_tmp: Runtime) -> None:
+    """Check install role with empty galaxy.yaml file.
+
+    Args:
+        runtime_tmp: Runtime fixture for testing the .yaml loader functionality.
+    """
+    pathlib.Path(f"{runtime_tmp.project_dir}/galaxy.yaml").touch()
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta").mkdir()
+    pathlib.Path(f"{runtime_tmp.project_dir}/meta/main.yaml").touch()
     # this should only raise a warning
     runtime_tmp._install_galaxy_role(runtime_tmp.project_dir, role_name_check=1)
     # this should test the bypass role name check path
@@ -947,6 +1015,16 @@ def test_runtime_plugins(runtime: Runtime) -> None:
             Path("test/assets/galaxy_paths/foo"),
             [Path("test/assets/galaxy_paths/foo/galaxy.yml").resolve()],
             id="3",
+        ),
+        pytest.param(
+            Path("test/assets/galaxy_paths_yaml"),
+            [Path("test/assets/galaxy_paths_yaml/foo/galaxy.yaml").resolve()],
+            id="4",
+        ),
+        pytest.param(
+            Path("test/assets/galaxy_paths_yaml/foo"),
+            [Path("test/assets/galaxy_paths_yaml/foo/galaxy.yaml").resolve()],
+            id="5",
         ),
     ),
 )
