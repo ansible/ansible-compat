@@ -370,7 +370,8 @@ class Runtime:
 
         :param data: Parsed JSON output from ``ansible-galaxy collection list --format=json``.
 
-        :raises TypeError: If the collection data has an unexpected type.
+        Raises:
+            TypeError: If the collection data has an unexpected type.
         """
         for path, path_data in data.items():
             if not isinstance(path_data, dict):
@@ -674,7 +675,8 @@ class Runtime:
         :param retry: retry network operations on failures
         :param offline: bypass installation, may fail if requirements are not met.
 
-        :raises AnsibleCommandError: If the ansible-galaxy command fails.
+        Raises:
+            AnsibleCommandError: If the ansible-galaxy command fails.
         """
         cmd = [
             "ansible-galaxy",
@@ -715,7 +717,8 @@ class Runtime:
         :param retry: retry network operations on failures
         :param offline: bypass installation, may fail if requirements are not met.
 
-        :raises AnsibleCommandError: If the ansible-galaxy command fails.
+        Raises:
+            AnsibleCommandError: If the ansible-galaxy command fails.
         """
         cmd = [
             "ansible-galaxy",
@@ -923,7 +926,8 @@ class Runtime:
         When the installed version is too old and *install* is True the
         collection is upgraded in-place before returning.
 
-        :raises InvalidPrerequisiteError: If MANIFEST.json is missing or version is too old.
+        Raises:
+            InvalidPrerequisiteError: If MANIFEST.json is missing or version is too old.
         """
         if not collpath.exists():
             return None
@@ -1093,7 +1097,8 @@ def _validate_requirements_yaml(
     :param reqs_yaml: Parsed YAML content from a requirements file.
     :param requirement: Path to the file (used for error messages).
 
-    :raises InvalidPrerequisiteError: If the requirements file is malformed.
+    Raises:
+        InvalidPrerequisiteError: If the requirements file is malformed.
     """
     if not isinstance(reqs_yaml, dict | list):
         msg = f"{requirement} file is not a valid Ansible requirements file."
@@ -1133,7 +1138,8 @@ def _resolve_role_fqrn_with_check(
     :param role_name_check: 0 = error, 1 = warn, 2 = skip name checking.
     :returns: The fully-qualified role name to use for symlinking.
 
-    :raises InvalidPrerequisiteError: If role_name_check is 0 and the name is invalid.
+    Raises:
+        InvalidPrerequisiteError: If role_name_check is 0 and the name is invalid.
     """
     fqrn = _get_role_fqrn(galaxy_info, project_dir)
 
