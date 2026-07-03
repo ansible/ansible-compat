@@ -655,7 +655,10 @@ class Runtime:
             and reqs_yaml["collections"] is not None
         ):
             self._install_collection_requirements(
-                requirement, reqs_yaml, retry=retry, offline=offline,
+                requirement,
+                reqs_yaml,
+                retry=retry,
+                offline=offline,
             )
 
         if self.require_module:
@@ -898,7 +901,10 @@ class Runtime:
         for path in paths:
             collpath = Path(path) / "ansible_collections" / ns / coll
             result = self._check_collection_at_path(
-                collpath, name=name, version=version, install=install,
+                collpath,
+                name=name,
+                version=version,
+                install=install,
             )
             if result is not None:
                 return result
