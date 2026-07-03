@@ -91,8 +91,6 @@ src/ansible_compat/runtime.py
     DOC103: Method `Runtime.install_collection_from_disk`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [destination: Path | None, path: Path].
     DOC101: Method `Runtime.install_requirements`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime.install_requirements`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [offline: bool, requirement: Path, retry: bool].
-    DOC501: Method `Runtime.install_requirements` has raise statements, but the docstring does not have a "Raises" section
-    DOC503: Method `Runtime.install_requirements` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['AnsibleCommandError', 'InvalidPrerequisiteError'].
     DOC101: Method `Runtime._install_role_requirements`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime._install_role_requirements`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [offline: bool, requirement: Path, retry: bool].
     DOC101: Method `Runtime._install_collection_requirements`: Docstring contains fewer arguments than in function signature.
@@ -111,18 +109,16 @@ src/ansible_compat/runtime.py
     DOC501: Method `Runtime._prepare_ansible_paths` has raise statements, but the docstring does not have a "Raises" section
     DOC503: Method `Runtime._prepare_ansible_paths` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['RuntimeError'].
     DOC201: Method `Runtime._get_roles_path` does not have a return section in docstring
-    DOC501: Method `Runtime._install_galaxy_role` has raise statements, but the docstring does not have a "Raises" section
-    DOC503: Method `Runtime._install_galaxy_role` exceptions in the "Raises" section in the docstring do not match those in the function body. Raised exceptions in the docstring: []. Raised exceptions in the body: ['InvalidPrerequisiteError'].
     DOC101: Method `Runtime._update_env`: Docstring contains fewer arguments than in function signature.
     DOC103: Method `Runtime._update_env`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [default: str, value: list[str], varname: str].
     DOC101: Function `_validate_requirements_yaml`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `_validate_requirements_yaml`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [reqs_yaml: Any, requirement: Path].
-    DOC101: Function `_resolve_role_fqrn_with_check`: Docstring contains fewer arguments than in function signature.
-    DOC103: Function `_resolve_role_fqrn_with_check`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [galaxy_info: dict[str, Any], project_dir: Path, role_name_check: int].
-    DOC201: Function `_resolve_role_fqrn_with_check` does not have a return section in docstring
     DOC101: Function `_get_role_fqrn`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `_get_role_fqrn`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [galaxy_infos: dict[str, Any], project_dir: Path].
     DOC201: Function `_get_role_fqrn` does not have a return section in docstring
+    DOC101: Function `_resolve_role_fqrn_with_check`: Docstring contains fewer arguments than in function signature.
+    DOC103: Function `_resolve_role_fqrn_with_check`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [galaxy_info: dict[str, Any], project_dir: Path, role_name_check: int].
+    DOC201: Function `_resolve_role_fqrn_with_check` does not have a return section in docstring
     DOC101: Function `_get_galaxy_role_ns`: Docstring contains fewer arguments than in function signature.
     DOC103: Function `_get_galaxy_role_ns`: Docstring arguments are different from function arguments. (Or could be other formatting issues: https://jsh9.github.io/pydoclint/violation_codes.html#notes-on-doc103 ). Arguments in the function signature but not in the docstring: [galaxy_infos: dict[str, Any]].
     DOC201: Function `_get_galaxy_role_ns` does not have a return section in docstring
