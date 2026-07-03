@@ -363,11 +363,21 @@ class Runtime:
         if not isinstance(data, dict):
             msg = f"Unexpected collection data, {data}"
             raise TypeError(msg)
-        for path in data:
-            if not isinstance(data[path], dict):
-                msg = f"Unexpected collection data, {data[path]}"
+        self._parse_galaxy_collection_list(data)
+
+    def _parse_galaxy_collection_list(self, data: dict[str, Any]) -> None:
+        """Parse ansible-galaxy collection list JSON output into self.collections.
+
+        :param data: Parsed JSON output from ``ansible-galaxy collection list --format=json``.
+
+        Raises:
+            TypeError: If the collection data has an unexpected type.
+        """
+        for path, path_data in data.items():
+            if not isinstance(path_data, dict):
+                msg = f"Unexpected collection data, {path_data}"
                 raise TypeError(msg)
-            for collection, collection_info in data[path].items():
+            for collection, collection_info in path_data.items():
                 if not isinstance(collection_info, dict):
                     msg = f"Unexpected collection data, {collection_info}"
                     raise TypeError(msg)
@@ -379,7 +389,7 @@ class Runtime:
                     self.collections[collection] = Collection(
                         name=collection,
                         version=collection_info["version"],
-                        path=path,
+                        path=Path(path),
                     )
 
     def _ensure_module_available(self) -> None:
@@ -618,8 +628,7 @@ class Runtime:
         """Build and install collection from a given disk path."""
         self.install_collection(path, destination=destination, force=True)
 
-    # pylint: disable=too-many-branches
-    def install_requirements(  # noqa: C901
+    def install_requirements(
         self,
         requirement: Path,
         *,
@@ -635,83 +644,117 @@ class Runtime:
         if not Path(requirement).exists():
             return
         reqs_yaml = yaml_from_file(Path(requirement))
-        if not isinstance(reqs_yaml, dict | list):
-            msg = f"{requirement} file is not a valid Ansible requirements file."
-            raise InvalidPrerequisiteError(msg)
-
-        if isinstance(reqs_yaml, dict):
-            for key in reqs_yaml:
-                if key not in {"roles", "collections"}:
-                    msg = f"{requirement} file is not a valid Ansible requirements file. Only 'roles' and 'collections' keys are allowed at root level. Recognized valid locations are: {', '.join(REQUIREMENT_LOCATIONS)}"
-                    raise InvalidPrerequisiteError(msg)
+        _validate_requirements_yaml(reqs_yaml, requirement)
 
         if isinstance(reqs_yaml, list) or "roles" in reqs_yaml:
-            cmd = [
-                "ansible-galaxy",
-                "role",
-                "install",
-                "-r",
-                f"{requirement}",
-            ]
-            if self.verbosity > 0:
-                cmd.extend(["-" + ("v" * self.verbosity)])
-            cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
+            self._install_role_requirements(requirement, retry=retry, offline=offline)
 
-            if offline:
-                _logger.warning(
-                    "Skipped installing old role dependencies due to running in offline mode.",
-                )
-            else:
-                _logger.info("Running %s", " ".join(cmd))
-
-                result = self.run(cmd, retry=retry)
-                _logger.debug(result.stdout)
-                if result.returncode != 0:
-                    _logger.error(result.stderr)
-                    raise AnsibleCommandError(result)
-
-        # Run galaxy collection install works on v2 requirements.yml
         if (
             isinstance(reqs_yaml, dict)
             and "collections" in reqs_yaml
             and reqs_yaml["collections"] is not None
         ):
-            cmd = [
-                "ansible-galaxy",
-                "collection",
-                "install",
-            ]
-            if self.verbosity > 0:
-                cmd.extend(["-" + ("v" * self.verbosity)])
+            self._install_collection_requirements(
+                requirement,
+                reqs_yaml,
+                retry=retry,
+                offline=offline,
+            )
 
-            for collection in reqs_yaml["collections"]:
-                if isinstance(collection, dict) and collection.get("type", "") == "git":
-                    _logger.info(
-                        "Adding '--pre' to ansible-galaxy collection install because we detected one collection being sourced from git.",
-                    )
-                    cmd.append("--pre")
-                    break
-            if offline:
-                _logger.warning(
-                    "Skipped installing collection dependencies due to running in offline mode.",
-                )
-            else:
-                cmd.extend(["-r", str(requirement)])
-                _logger.info("Running %s", " ".join(cmd))
-                result = self.run(
-                    cmd,
-                    retry=retry,
-                )
-                _logger.debug(result.stdout)
-                if result.returncode != 0:
-                    _logger.error(result.stderr)
-                    raise AnsibleCommandError(result)
         if self.require_module:
             Runtime.initialized = False
             self._ensure_module_available()
 
-    # pylint: disable=too-many-locals
-    def prepare_environment(  # noqa: C901
+    def _install_role_requirements(
+        self,
+        requirement: Path,
+        *,
+        retry: bool,
+        offline: bool,
+    ) -> None:
+        """Install role dependencies from a requirements file.
+
+        :param requirement: path to requirements.yml file
+        :param retry: retry network operations on failures
+        :param offline: bypass installation, may fail if requirements are not met.
+
+        Raises:
+            AnsibleCommandError: If the ansible-galaxy command fails.
+        """
+        cmd = [
+            "ansible-galaxy",
+            "role",
+            "install",
+            "-r",
+            f"{requirement}",
+        ]
+        if self.verbosity > 0:
+            cmd.extend(["-" + ("v" * self.verbosity)])
+        cmd.extend(["--roles-path", f"{self.cache_dir}/roles"])
+
+        if offline:
+            _logger.warning(
+                "Skipped installing old role dependencies due to running in offline mode.",
+            )
+        else:
+            _logger.info("Running %s", " ".join(cmd))
+
+            result = self.run(cmd, retry=retry)
+            _logger.debug(result.stdout)
+            if result.returncode != 0:
+                _logger.error(result.stderr)
+                raise AnsibleCommandError(result)
+
+    def _install_collection_requirements(
+        self,
+        requirement: Path,
+        reqs_yaml: dict[str, Any],
+        *,
+        retry: bool,
+        offline: bool,
+    ) -> None:
+        """Install collection dependencies from a v2 requirements file.
+
+        :param requirement: path to requirements.yml file
+        :param reqs_yaml: parsed requirements YAML (must contain a ``collections`` key)
+        :param retry: retry network operations on failures
+        :param offline: bypass installation, may fail if requirements are not met.
+
+        Raises:
+            AnsibleCommandError: If the ansible-galaxy command fails.
+        """
+        cmd = [
+            "ansible-galaxy",
+            "collection",
+            "install",
+        ]
+        if self.verbosity > 0:
+            cmd.extend(["-" + ("v" * self.verbosity)])
+
+        for collection in reqs_yaml["collections"]:
+            if isinstance(collection, dict) and collection.get("type", "") == "git":
+                _logger.info(
+                    "Adding '--pre' to ansible-galaxy collection install because we detected one collection being sourced from git.",
+                )
+                cmd.append("--pre")
+                break
+        if offline:
+            _logger.warning(
+                "Skipped installing collection dependencies due to running in offline mode.",
+            )
+        else:
+            cmd.extend(["-r", str(requirement)])
+            _logger.info("Running %s", " ".join(cmd))
+            result = self.run(
+                cmd,
+                retry=retry,
+            )
+            _logger.debug(result.stdout)
+            if result.returncode != 0:
+                _logger.error(result.stderr)
+                raise AnsibleCommandError(result)
+
+    def prepare_environment(
         self,
         required_collections: dict[str, str] | None = None,
         *,
@@ -741,20 +784,8 @@ class Runtime:
             return
 
         for item in search_galaxy_paths(self.project_dir):
-            # processing all found galaxy.yml files
             if item.exists():
-                data = yaml_from_file(item)
-                if isinstance(data, dict) and "dependencies" in data:
-                    for name, required_version in data["dependencies"].items():
-                        _logger.info(
-                            "Provisioning collection %s:%s from galaxy.yml",
-                            name,
-                            required_version,
-                        )
-                        self.install_collection(
-                            f"{name}{',' if is_url(name) else ':'}{required_version}",
-                            destination=destination,
-                        )
+                self._install_deps_from_galaxy(item, destination)
 
         for name, min_version in required_collections.items():
             self.install_collection(
@@ -762,9 +793,44 @@ class Runtime:
                 destination=destination,
             )
 
+        self._handle_local_install(destination, role_name_check)
+
+    def _install_deps_from_galaxy(
+        self,
+        galaxy_path: Path,
+        destination: Path,
+    ) -> None:
+        """Install collection dependencies declared in a galaxy.yml file.
+
+        :param galaxy_path: Path to a ``galaxy.yml`` file.
+        :param destination: Target collections directory.
+        """
+        data = yaml_from_file(galaxy_path)
+        if not isinstance(data, dict) or "dependencies" not in data:
+            return
+        for name, required_version in data["dependencies"].items():
+            _logger.info(
+                "Provisioning collection %s:%s from galaxy.yml",
+                name,
+                required_version,
+            )
+            self.install_collection(
+                f"{name}{',' if is_url(name) else ':'}{required_version}",
+                destination=destination,
+            )
+
+    def _handle_local_install(
+        self,
+        destination: Path,
+        role_name_check: int,
+    ) -> None:
+        """Install the local collection or role and reload collections.
+
+        :param destination: Target collections directory.
+        :param role_name_check: Role name validation level (0/1/2).
+        """
         galaxy_path = self.project_dir / "galaxy.yml"
-        if (galaxy_path).exists():
-            # while function can return None, that would not break the logic
+        if galaxy_path.exists():
             colpath = Path(
                 f"{destination}/ansible_collections/{colpath_from_path(self.project_dir)}",
             )
@@ -780,26 +846,21 @@ class Runtime:
                 )
                 colpath.unlink()
 
-            # molecule scenario within a collection
             self.install_collection_from_disk(
                 galaxy_path.parent,
                 destination=destination,
             )
         elif Path.cwd().parent.name == "roles" and Path("../../galaxy.yml").exists():
-            # molecule scenario located within roles/<role-name>/molecule inside
-            # a collection
             self.install_collection_from_disk(
                 Path("../.."),
                 destination=destination,
             )
         else:
-            # no collection, try to recognize and install a standalone role
             self._install_galaxy_role(
                 self.project_dir,
                 role_name_check=role_name_check,
                 ignore_errors=True,
             )
-        # reload collections
         self.load_collections()
 
     def require_collection(
@@ -839,27 +900,14 @@ class Runtime:
 
         for path in paths:
             collpath = Path(path) / "ansible_collections" / ns / coll
-            if collpath.exists():
-                mpath = collpath / "MANIFEST.json"
-                if not mpath.exists():
-                    msg = f"Found collection at '{collpath}' but missing MANIFEST.json, cannot get info."
-                    _logger.fatal(msg)
-                    raise InvalidPrerequisiteError(msg)
-
-                with mpath.open(encoding="utf-8") as f:
-                    manifest = json.loads(f.read())
-                    found_version = CollectionVersion(
-                        manifest["collection_info"]["version"],
-                    )
-                    if version and found_version < CollectionVersion(version):
-                        if install:
-                            self.install_collection(f"{name}:>={version}")
-                            self.require_collection(name, version, install=False)
-                        else:
-                            msg = f"Found {name} collection {found_version} but {version} or newer is required."
-                            _logger.fatal(msg)
-                            raise InvalidPrerequisiteError(msg)
-                    return found_version, collpath.resolve()
+            result = self._check_collection_at_path(
+                collpath,
+                name=name,
+                version=version,
+                install=install,
+            )
+            if result is not None:
+                return result
         if install:
             self.install_collection(f"{name}:>={version}" if version else name)
             return self.require_collection(
@@ -870,6 +918,45 @@ class Runtime:
         msg = f"Collection '{name}' not found in '{paths}'"
         _logger.fatal(msg)
         raise InvalidPrerequisiteError(msg)
+
+    def _check_collection_at_path(
+        self,
+        collpath: Path,
+        *,
+        name: str,
+        version: str | None,
+        install: bool,
+    ) -> tuple[CollectionVersion, Path] | None:
+        """Return (version, path) if the collection exists at *collpath*, else None.
+
+        When the installed version is too old and *install* is True the
+        collection is upgraded in-place before returning.
+
+        Raises:
+            InvalidPrerequisiteError: If MANIFEST.json is missing or version is too old.
+        """
+        if not collpath.exists():
+            return None
+        mpath = collpath / "MANIFEST.json"
+        if not mpath.exists():
+            msg = f"Found collection at '{collpath}' but missing MANIFEST.json, cannot get info."
+            _logger.fatal(msg)
+            raise InvalidPrerequisiteError(msg)
+
+        with mpath.open(encoding="utf-8") as f:
+            manifest = json.loads(f.read())
+            found_version = CollectionVersion(
+                manifest["collection_info"]["version"],
+            )
+            if version and found_version < CollectionVersion(version):
+                if install:
+                    self.install_collection(f"{name}:>={version}")
+                    self.require_collection(name, version, install=False)
+                else:
+                    msg = f"Found {name} collection {found_version} but {version} or newer is required."
+                    _logger.fatal(msg)
+                    raise InvalidPrerequisiteError(msg)
+            return found_version, collpath.resolve()
 
     def _prepare_ansible_paths(self) -> None:
         """Configure Ansible environment variables."""
@@ -969,23 +1056,8 @@ class Runtime:
         if yaml and "galaxy_info" in yaml:
             galaxy_info = yaml["galaxy_info"]
 
-        fqrn = _get_role_fqrn(galaxy_info, project_dir)
+        fqrn = _resolve_role_fqrn_with_check(galaxy_info, project_dir, role_name_check)
 
-        if role_name_check in {0, 1}:
-            if not re.match(r"[a-z0-9][a-z0-9_-]+\.[a-z][a-z0-9_]+$", fqrn):
-                msg = MSG_INVALID_FQRL.format(fqrn)
-                if role_name_check == 1:
-                    _logger.warning(msg)
-                else:
-                    _logger.error(msg)
-                    raise InvalidPrerequisiteError(msg)
-        elif "role_name" in galaxy_info:
-            # when 'role-name' is in skip_list, we stick to plain role names
-            role_namespace = _get_galaxy_role_ns(galaxy_info)
-            role_name = _get_galaxy_role_name(galaxy_info)
-            fqrn = f"{role_namespace}{role_name}"
-        else:
-            fqrn = Path(project_dir).absolute().name
         path = self._get_roles_path()
         path.mkdir(parents=True, exist_ok=True)
         link_path = path / fqrn
@@ -1022,6 +1094,29 @@ class Runtime:
             _logger.info("Set %s=%s", varname, value_str)
 
 
+def _validate_requirements_yaml(
+    reqs_yaml: Any,  # noqa: ANN401
+    requirement: Path,
+) -> None:
+    """Validate that *reqs_yaml* is a well-formed Ansible requirements structure.
+
+    :param reqs_yaml: Parsed YAML content from a requirements file.
+    :param requirement: Path to the file (used for error messages).
+
+    Raises:
+        InvalidPrerequisiteError: If the requirements file is malformed.
+    """
+    if not isinstance(reqs_yaml, dict | list):
+        msg = f"{requirement} file is not a valid Ansible requirements file."
+        raise InvalidPrerequisiteError(msg)
+
+    if isinstance(reqs_yaml, dict):
+        for key in reqs_yaml:
+            if key not in {"roles", "collections"}:
+                msg = f"{requirement} file is not a valid Ansible requirements file. Only 'roles' and 'collections' keys are allowed at root level. Recognized valid locations are: {', '.join(REQUIREMENT_LOCATIONS)}"
+                raise InvalidPrerequisiteError(msg)
+
+
 def _get_role_fqrn(galaxy_infos: dict[str, Any], project_dir: Path) -> str:
     """Compute role fqrn."""
     role_namespace = _get_galaxy_role_ns(galaxy_infos)
@@ -1035,6 +1130,40 @@ def _get_role_fqrn(galaxy_infos: dict[str, Any], project_dir: Path) -> str:
         )[-1]
 
     return f"{role_namespace}{role_name}"
+
+
+def _resolve_role_fqrn_with_check(
+    galaxy_info: dict[str, Any],
+    project_dir: Path,
+    role_name_check: int,
+) -> str:
+    """Resolve role FQRN and validate the name according to *role_name_check*.
+
+    :param galaxy_info: Parsed ``galaxy_info`` section from ``meta/main.yml``.
+    :param project_dir: Path to the role directory.
+    :param role_name_check: 0 = error, 1 = warn, 2 = skip name checking.
+    :returns: The fully-qualified role name to use for symlinking.
+
+    Raises:
+        InvalidPrerequisiteError: If role_name_check is 0 and the name is invalid.
+    """
+    fqrn = _get_role_fqrn(galaxy_info, project_dir)
+
+    if role_name_check in {0, 1}:
+        if not re.match(r"[a-z0-9][a-z0-9_-]+\.[a-z][a-z0-9_]+$", fqrn):
+            msg = MSG_INVALID_FQRL.format(fqrn)
+            if role_name_check == 1:
+                _logger.warning(msg)
+            else:
+                _logger.error(msg)
+                raise InvalidPrerequisiteError(msg)
+    elif "role_name" in galaxy_info:
+        role_namespace = _get_galaxy_role_ns(galaxy_info)
+        role_name = _get_galaxy_role_name(galaxy_info)
+        fqrn = f"{role_namespace}{role_name}"
+    else:
+        fqrn = Path(project_dir).absolute().name
+    return fqrn
 
 
 def _get_galaxy_role_ns(galaxy_infos: dict[str, Any]) -> str:
