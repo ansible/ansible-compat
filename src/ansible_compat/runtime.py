@@ -386,7 +386,7 @@ class Runtime:
                     self.collections[collection] = Collection(
                         name=collection,
                         version=collection_info["version"],
-                        path=path,
+                        path=Path(path),
                     )
 
     def _ensure_module_available(self) -> None:
