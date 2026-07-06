@@ -29,6 +29,7 @@ from ansible_compat.config import (
     parse_ansible_version,
 )
 from ansible_compat.constants import (
+    GALAXY_YML,
     META_MAIN,
     MSG_INVALID_FQRL,
     RC_ANSIBLE_OPTIONS_ERROR,
@@ -829,7 +830,7 @@ class Runtime:
         :param destination: Target collections directory.
         :param role_name_check: Role name validation level (0/1/2).
         """
-        galaxy_path = self.project_dir / "galaxy.yml"
+        galaxy_path = self.project_dir / GALAXY_YML
         if galaxy_path.exists():
             colpath = Path(
                 f"{destination}/ansible_collections/{colpath_from_path(self.project_dir)}",
@@ -1202,11 +1203,11 @@ def search_galaxy_paths(search_dir: Path) -> list[Path]:
         # We ignore any folders that are not valid namespaces, just like
         # ansible galaxy does at this moment.
         file_path = item.resolve()
-        if file_path.is_file() and file_path.name == "galaxy.yml":
+        if file_path.is_file() and file_path.name == GALAXY_YML:
             galaxy_paths.append(file_path)
             continue
         if file_path.is_dir() and namespace_re.match(file_path.name):
-            file_path /= "galaxy.yml"
+            file_path /= GALAXY_YML
             try:
                 if file_path.exists():
                     galaxy_paths.append(file_path)

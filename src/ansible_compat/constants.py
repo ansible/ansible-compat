@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+GALAXY_YML = "galaxy.yml"
 META_MAIN = (Path("meta") / Path("main.yml"), Path("meta") / Path("main.yaml"))
 REQUIREMENT_LOCATIONS = [
     "requirements.yml",
