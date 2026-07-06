@@ -605,7 +605,7 @@ class AnsibleConfig(
                 )
 
             for match in re.finditer(
-                r"^(?P<key>\w+)\S* = (?P<value>.*)$",
+                r"^(?P<key>\w+)(?:\([^)]*\))? = (?P<value>.*)$",
                 config_dump,
                 re.MULTILINE,
             ):
