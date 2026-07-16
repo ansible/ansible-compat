@@ -18,5 +18,5 @@ def ansible_lint_version() -> Version | None:
     """
     try:
         return Version(version("ansible-lint"))
-    except (ImportError, PackageNotFoundError):
+    except PackageNotFoundError:
         return None
