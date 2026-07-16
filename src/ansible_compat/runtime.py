@@ -18,7 +18,7 @@ import warnings
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, no_type_check
+from typing import TYPE_CHECKING, Any, ClassVar, no_type_check
 
 import subprocess_tee
 from packaging.version import Version
@@ -175,7 +175,7 @@ class Runtime:
     """
 
     _version: Version | None = None
-    collections: OrderedDict[str, Collection] = OrderedDict()
+    collections: OrderedDict[str, Collection]
     cache_dir: Path
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple times will cause runtime warnings from within ansible-core
@@ -183,7 +183,7 @@ class Runtime:
     # Flag to control when plugin loader initialization is allowed
     plugin_loader_enabled: bool = False
     plugins: Plugins
-    _has_playbook_cache: dict[tuple[str, Path | None], bool] = {}
+    _has_playbook_cache: ClassVar[dict[tuple[str, Path | None], bool]] = {}
     require_module: bool = False
 
     def __init__(
