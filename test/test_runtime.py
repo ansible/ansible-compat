@@ -64,8 +64,8 @@ def test_runtime_missing_ansible_module(monkeypatch: MonkeyPatch) -> None:
 
         def __init__(
             self,
-            *args: Any,  # noqa: ARG002,ANN401
-            **kwargs: Any,  # noqa: ARG002,ANN401
+            *args: Any,  # ruff:ignore[unused-method-argument, any-type]
+            **kwargs: Any,  # ruff:ignore[unused-method-argument, any-type]
         ) -> None:
             raise ModuleNotFoundError
 
@@ -393,7 +393,7 @@ def test__update_env_no_default(
 def test__update_env(
     monkeypatch: MonkeyPatch,
     old_value: str,
-    default: str,  # pylint: disable=unused-argument # noqa: ARG001
+    default: str,  # pylint: disable=unused-argument # ruff:ignore[unused-function-argument]
     value: list[str],
     result: str,
 ) -> None:

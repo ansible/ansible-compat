@@ -1,5 +1,5 @@
 """ansible_compat package."""
-# ruff: noqa: RUF067
+# ruff:file-ignore[non-empty-init-module]
 
 from importlib.metadata import PackageNotFoundError, version
 
