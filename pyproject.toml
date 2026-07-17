@@ -424,22 +424,22 @@ external = [
 ]
 ignore = [
   # Disabled on purpose:
-  "COM812",  # conflicts with ISC001 on format
-  "CPY001",
-  "D203",  # incompatible with D211
-  "D211",
-  "D213",  # incompatible with D212
-  "E501",  # we use black
-  "RET504",  # Unnecessary variable assignment before `return` statement
+  "missing-trailing-comma",  # conflicts with ISC001 on format
+  "missing-copyright-notice",
+  "incorrect-blank-line-before-class",  # incompatible with D211
+  "blank-line-before-class",
+  "multi-line-summary-second-line",  # incompatible with D212
+  "line-too-long",  # we use black
+  "unnecessary-assign",  # Unnecessary variable assignment before `return` statement
   # Temporary disabled during adoption:
-  "S607",  # Starting a process with a partial executable path
-  "PLR0912",  # Bug https://github.com/charliermarsh/ruff/issues/4244
-  "PLR0913",  # Bug https://github.com/charliermarsh/ruff/issues/4244
-  "RUF012",
-  "PERF203",
-  "DOC201",  # preview
-  "PLC0415",
-  "DOC501",  # preview
+  "start-process-with-partial-path",  # Starting a process with a partial executable path
+  "too-many-branches",  # Bug https://github.com/charliermarsh/ruff/issues/4244
+  "too-many-arguments",  # Bug https://github.com/charliermarsh/ruff/issues/4244
+  "mutable-class-default",
+  "try-except-in-loop",
+  "docstring-missing-returns",  # preview
+  "import-outside-top-level",
+  "docstring-missing-exception",  # preview
 ]
 select = ["ALL"]
 
@@ -452,18 +452,18 @@ known-third-party = ["packaging"]
 
 [tool.ruff.lint.per-file-ignores]
 "test/**/*.py" = [
-  "DOC402",
-  "DOC501",
-  "FBT001",
-  "PLC2701",
-  "PLR0917",
-  "S101",
-  "S404",
-  "S603",  # subprocess
-  "S607",  # subprocess
-  "SLF001",
+  "docstring-missing-yields",
+  "docstring-missing-exception",
+  "boolean-type-hint-positional-argument",
+  "import-private-name",
+  "too-many-positional-arguments",
+  "assert",
+  "suspicious-subprocess-import",
+  "subprocess-without-shell-equals-true",  # subprocess
+  "start-process-with-partial-path",  # subprocess
+  "private-member-access",
 ]
-"tools/*.py" = ["S603"]
+"tools/*.py" = ["subprocess-without-shell-equals-true"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

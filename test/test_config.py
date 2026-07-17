@@ -68,7 +68,7 @@ def test_ansible_version_missing(monkeypatch: MonkeyPatch) -> None:
     """Validate ansible_version behavior when ansible is missing."""
     monkeypatch.setattr(
         "subprocess.run",
-        lambda *args, **kwargs: subprocess.CompletedProcess(  # noqa: ARG005
+        lambda *args, **kwargs: subprocess.CompletedProcess(  # ruff:ignore[unused-lambda-argument]
             args=[],
             returncode=1,
         ),

@@ -31,7 +31,7 @@ def runtime(request: pytest.FixtureRequest) -> Generator[Runtime, None, None]:
 # pylint: disable=unused-argument
 def runtime_tmp(
     tmp_path: pathlib.Path,
-    scope: str = "session",  # noqa: ARG001
+    scope: str = "session",  # ruff:ignore[unused-function-argument]
 ) -> Generator[Runtime, None, None]:
     """Isolated runtime fixture using a temp directory."""
     instance = Runtime(project_dir=tmp_path, isolated=True)

@@ -7,7 +7,7 @@ import ast
 import copy
 import os
 import re
-import subprocess  # noqa: S404
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 from collections import UserDict
 from typing import TYPE_CHECKING, ClassVar, Literal
 
@@ -475,7 +475,7 @@ class AnsibleConfig(
     galaxy_role_skeleton_ignore: ClassVar[list[str]] = ["^.git$", "^.*/.git_keep$"]
     galaxy_server: str = "https://galaxy.ansible.com"
     galaxy_server_list: str | None = None
-    galaxy_token_path: str = "~/.ansible/galaxy_token"  # noqa: S105
+    galaxy_token_path: str = "~/.ansible/galaxy_token"  # ruff:ignore[hardcoded-password-string]
     host_key_checking: bool = True
     host_pattern_mismatch: Literal["warning", "error", "ignore"] = "warning"
     inject_facts_as_vars: bool = True

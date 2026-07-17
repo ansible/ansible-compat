@@ -90,7 +90,7 @@ def validate(
     try:
         if not isinstance(schema, Mapping):
             msg = "Invalid schema, must be a mapping"
-            raise jsonschema.SchemaError(msg)  # noqa: TRY301
+            raise jsonschema.SchemaError(msg)  # ruff:ignore[raise-within-try]
         validator = validator_for(schema)
         validator.check_schema(schema)
     except jsonschema.SchemaError as exc:

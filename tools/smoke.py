@@ -6,7 +6,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from subprocess import run  # noqa: S404
+from subprocess import run  # ruff:ignore[suspicious-subprocess-import]
 
 logging.basicConfig(
     level=logging.DEBUG,

@@ -44,7 +44,7 @@ def json_from_asset(file_name: str) -> JSON:
         return json.load(f)  # type: ignore[no-any-return]
 
 
-def jsonify(data: Any) -> JSON:  # noqa: ANN401
+def jsonify(data: Any) -> JSON:  # ruff:ignore[any-type]
     """Convert object in JSON data structure."""
     return json.loads(json.dumps(data, default=vars, sort_keys=True))  # type: ignore[no-any-return]
 
