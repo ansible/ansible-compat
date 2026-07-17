@@ -12,7 +12,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from pathlib import Path
 
 
-def yaml_from_file(path: Path) -> Any:  # noqa: ANN401
+def yaml_from_file(path: Path) -> Any:  # ruff:ignore[ANN401]
     """Return a loaded YAML file."""
     with path.open(encoding="utf-8") as content:
         return yaml.load(content, Loader=yaml.SafeLoader)

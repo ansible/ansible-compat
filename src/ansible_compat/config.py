@@ -7,7 +7,7 @@ import ast
 import copy
 import os
 import re
-import subprocess  # noqa: S404
+import subprocess  # ruff:ignore[S404]
 from collections import UserDict
 from typing import TYPE_CHECKING, ClassVar, Literal
 
@@ -62,7 +62,7 @@ def ansible_version(version: str = "") -> Version:
 
 class AnsibleConfig(
     UserDict[str, object],
-):  # pylint: disable=too-many-ancestors # noqa: DOC605
+):  # pylint: disable=too-many-ancestors # ruff:ignore[DOC605]
     """Interface to query Ansible configuration.
 
     This should allow user to access everything provided by `ansible-config dump` without having to parse the data himself.
@@ -475,7 +475,7 @@ class AnsibleConfig(
     galaxy_role_skeleton_ignore: ClassVar[list[str]] = ["^.git$", "^.*/.git_keep$"]
     galaxy_server: str = "https://galaxy.ansible.com"
     galaxy_server_list: str | None = None
-    galaxy_token_path: str = "~/.ansible/galaxy_token"  # noqa: S105
+    galaxy_token_path: str = "~/.ansible/galaxy_token"  # ruff:ignore[S105]
     host_key_checking: bool = True
     host_pattern_mismatch: Literal["warning", "error", "ignore"] = "warning"
     inject_facts_as_vars: bool = True

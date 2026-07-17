@@ -12,7 +12,7 @@ import os
 import re
 import shutil
 import site
-import subprocess  # noqa: S404
+import subprocess  # ruff:ignore[S404]
 import sys
 import warnings
 from collections import OrderedDict
@@ -108,7 +108,7 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
     keyword: dict[str, str] = field(init=False)
 
     @no_type_check
-    def __getattribute__(self, attr: str):  # noqa: ANN204
+    def __getattribute__(self, attr: str):  # ruff:ignore[ANN204]
         """Get attribute.
 
         Raises:
@@ -262,13 +262,13 @@ class Runtime:
         from ansible.utils.display import Display
 
         # pylint: disable=unused-argument
-        def warning(  # noqa: DOC103
-            self: Display,  # noqa: ARG001
+        def warning(  # ruff:ignore[DOC103]
+            self: Display,  # ruff:ignore[ARG001]
             msg: str,
-            formatted: bool = False,  # noqa: ARG001,FBT001,FBT002
+            formatted: bool = False,  # ruff:ignore[ARG001,FBT001,FBT002]
             *,
-            help_text: str | None = None,  # noqa: ARG001
-            obj: Any = None,  # noqa: ARG001,ANN401
+            help_text: str | None = None,  # ruff:ignore[ARG001]
+            obj: Any = None,  # ruff:ignore[ARG001,ANN401]
         ) -> None:  # pragma: no cover
             """Override ansible.utils.display.Display.warning to avoid printing warnings."""
             warnings.warn(
@@ -281,7 +281,7 @@ class Runtime:
         # Monkey patch ansible warning in order to use warnings module.
         Display.warning = warning
 
-    def initialize_logger(self, level: int = 0) -> None:  # noqa: PLR6301
+    def initialize_logger(self, level: int = 0) -> None:  # ruff:ignore[PLR6301]
         """Set up the global logging level based on the verbosity number."""
         verbosity_map = {
             -2: logging.CRITICAL,
@@ -429,7 +429,7 @@ class Runtime:
             # ruff: enable[PLC2701]
 
             with contextlib.suppress(Exception):
-                _AnsibleCollectionFinder()._remove()  # pylint: disable=protected-access  # noqa: SLF001
+                _AnsibleCollectionFinder()._remove()  # pylint: disable=protected-access  # ruff:ignore[SLF001]
 
             init_plugin_loader(col_paths)
             Runtime.initialized = True
@@ -1096,7 +1096,7 @@ class Runtime:
 
 
 def _validate_requirements_yaml(
-    reqs_yaml: Any,  # noqa: ANN401
+    reqs_yaml: Any,  # ruff:ignore[ANN401]
     requirement: Path,
 ) -> None:
     """Validate that *reqs_yaml* is a well-formed Ansible requirements structure.
