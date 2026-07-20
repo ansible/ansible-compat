@@ -12,13 +12,13 @@ import os
 import re
 import shutil
 import site
-import subprocess  # noqa: S404
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import sys
 import warnings
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, no_type_check
+from typing import TYPE_CHECKING, Any, ClassVar, no_type_check
 
 import subprocess_tee
 from packaging.version import Version
@@ -108,7 +108,7 @@ class Plugins:  # pylint: disable=too-many-instance-attributes
     keyword: dict[str, str] = field(init=False)
 
     @no_type_check
-    def __getattribute__(self, attr: str):  # noqa: ANN204
+    def __getattribute__(self, attr: str):  # ruff:ignore[missing-return-type-special-method]
         """Get attribute.
 
         Raises:
@@ -175,7 +175,7 @@ class Runtime:
     """
 
     _version: Version | None = None
-    collections: OrderedDict[str, Collection] = OrderedDict()
+    collections: OrderedDict[str, Collection]
     cache_dir: Path
     # Used to track if we have already initialized the Ansible runtime as attempts
     # to do it multiple times will cause runtime warnings from within ansible-core
@@ -183,7 +183,7 @@ class Runtime:
     # Flag to control when plugin loader initialization is allowed
     plugin_loader_enabled: bool = False
     plugins: Plugins
-    _has_playbook_cache: dict[tuple[str, Path | None], bool] = {}
+    _has_playbook_cache: ClassVar[dict[tuple[str, Path | None], bool]] = {}
     require_module: bool = False
 
     def __init__(
@@ -263,12 +263,12 @@ class Runtime:
 
         # pylint: disable=unused-argument
         def warning(  # noqa: DOC103
-            self: Display,  # noqa: ARG001
+            self: Display,  # ruff:ignore[unused-function-argument]
             msg: str,
-            formatted: bool = False,  # noqa: ARG001,FBT001,FBT002
+            formatted: bool = False,  # ruff:ignore[unused-function-argument, boolean-type-hint-positional-argument, boolean-default-value-positional-argument]
             *,
-            help_text: str | None = None,  # noqa: ARG001
-            obj: Any = None,  # noqa: ARG001,ANN401
+            help_text: str | None = None,  # ruff:ignore[unused-function-argument]
+            obj: Any = None,  # ruff:ignore[unused-function-argument, any-type]
         ) -> None:  # pragma: no cover
             """Override ansible.utils.display.Display.warning to avoid printing warnings."""
             warnings.warn(
@@ -281,7 +281,7 @@ class Runtime:
         # Monkey patch ansible warning in order to use warnings module.
         Display.warning = warning
 
-    def initialize_logger(self, level: int = 0) -> None:  # noqa: PLR6301
+    def initialize_logger(self, level: int = 0) -> None:  # ruff:ignore[no-self-use]
         """Set up the global logging level based on the verbosity number."""
         verbosity_map = {
             -2: logging.CRITICAL,
@@ -419,17 +419,17 @@ class Runtime:
             col_paths = self.config.collections_paths
             if self.isolated:
                 col_paths = [str(self.cache_dir / "collections"), *col_paths]
-            # ruff: disable[PLC2701]
+            # ruff: disable[import-private-name]
             # noinspection PyProtectedMember
             # pylint: disable=import-outside-toplevel,no-name-in-module
             from ansible.plugins.loader import init_plugin_loader
             from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
                 _AnsibleCollectionFinder,
             )
-            # ruff: enable[PLC2701]
+            # ruff: enable[import-private-name]
 
             with contextlib.suppress(Exception):
-                _AnsibleCollectionFinder()._remove()  # pylint: disable=protected-access  # noqa: SLF001
+                _AnsibleCollectionFinder()._remove()  # pylint: disable=protected-access  # ruff:ignore[private-member-access]
 
             init_plugin_loader(col_paths)
             Runtime.initialized = True
@@ -1096,7 +1096,7 @@ class Runtime:
 
 
 def _validate_requirements_yaml(
-    reqs_yaml: Any,  # noqa: ANN401
+    reqs_yaml: Any,  # ruff:ignore[any-type]
     requirement: Path,
 ) -> None:
     """Validate that *reqs_yaml* is a well-formed Ansible requirements structure.

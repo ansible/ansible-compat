@@ -7,9 +7,9 @@ import ast
 import copy
 import os
 import re
-import subprocess  # noqa: S404
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 from collections import UserDict
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 from packaging.version import Version
 
@@ -262,7 +262,7 @@ class AnsibleConfig(
         yaml_filename_extensions:
     """
 
-    _aliases = {
+    _aliases: ClassVar[dict[str, str]] = {
         "COLLECTIONS_PATH": "COLLECTIONS_PATHS",  # 2.9 -> 2.10
     }
     # Expose some attributes to enable auto-complete in editors, based on
@@ -280,7 +280,7 @@ class AnsibleConfig(
     ansible_pipelining: bool = False
     any_errors_fatal: bool = False
     become_allow_same_user: bool = False
-    become_plugin_path: list[str] = [
+    become_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/become",
         "/usr/share/ansible/plugins/become",
     ]
@@ -288,8 +288,8 @@ class AnsibleConfig(
     cache_plugin_connection: str | None = None
     cache_plugin_prefix: str = "ansible_facts"
     cache_plugin_timeout: int = 86400
-    callable_accept_list: list[str] = []
-    callbacks_enabled: list[str] = []
+    callable_accept_list: ClassVar[list[str]] = []
+    callbacks_enabled: ClassVar[list[str]] = []
     collections_on_ansible_version_mismatch: Literal["warning", "ignore"] = "warning"
     collections_paths: list[str] = [
         "~/.ansible/collections",
@@ -316,7 +316,7 @@ class AnsibleConfig(
     controller_python_warning: bool = True
     coverage_remote_output: str | None
     coverage_remote_paths: list[str]
-    default_action_plugin_path: list[str] = [
+    default_action_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/action",
         "/usr/share/ansible/plugins/action",
     ]
@@ -329,55 +329,55 @@ class AnsibleConfig(
     default_become_flags: str
     default_become_method: str = "sudo"
     default_become_user: str = "root"
-    default_cache_plugin_path: list[str] = [
+    default_cache_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/cache",
         "/usr/share/ansible/plugins/cache",
     ]
-    default_callback_plugin_path: list[str] = [
+    default_callback_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/callback",
         "/usr/share/ansible/plugins/callback",
     ]
-    default_cliconf_plugin_path: list[str] = [
+    default_cliconf_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/cliconf",
         "/usr/share/ansible/plugins/cliconf",
     ]
-    default_connection_plugin_path: list[str] = [
+    default_connection_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/connection",
         "/usr/share/ansible/plugins/connection",
     ]
     default_debug: bool = False
     default_executable: str = "/bin/sh"
     default_fact_path: str | None = None
-    default_filter_plugin_path: list[str] = [
+    default_filter_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/filter",
         "/usr/share/ansible/plugins/filter",
     ]
     default_force_handlers: bool = False
     default_forks: int = 5
-    default_gather_subset: list[str] = ["all"]
+    default_gather_subset: ClassVar[list[str]] = ["all"]
     default_gather_timeout: int = 10
     default_gathering: Literal["smart", "explicit", "implicit"] = "smart"
     default_handler_includes_static: bool = False
     default_hash_behaviour: str = "replace"
-    default_host_list: list[str] = ["/etc/ansible/hosts"]
-    default_httpapi_plugin_path: list[str] = [
+    default_host_list: ClassVar[list[str]] = ["/etc/ansible/hosts"]
+    default_httpapi_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/httpapi",
         "/usr/share/ansible/plugins/httpapi",
     ]
     default_internal_poll_interval: float = 0.001
-    default_inventory_plugin_path: list[str] = [
+    default_inventory_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/inventory",
         "/usr/share/ansible/plugins/inventory",
     ]
-    default_jinja2_extensions: list[str] = []
+    default_jinja2_extensions: ClassVar[list[str]] = []
     default_jinja2_native: bool = False
     default_keep_remote_files: bool = False
     default_libvirt_lxc_noseclabel: bool = False
     default_load_callback_plugins: bool = False
     default_local_tmp: str = "~/.ansible/tmp"
-    default_log_filter: list[str] = []
+    default_log_filter: ClassVar[list[str]] = []
     default_log_path: str | None = None
-    default_lookup_plugin_path: list[str] = [
+    default_lookup_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/lookup",
         "/usr/share/ansible/plugins/lookup",
     ]
@@ -385,15 +385,15 @@ class AnsibleConfig(
     default_module_args: str
     default_module_compression: str = "ZIP_DEFLATED"
     default_module_name: str = "command"
-    default_module_path: list[str] = [
+    default_module_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/modules",
         "/usr/share/ansible/plugins/modules",
     ]
-    default_module_utils_path: list[str] = [
+    default_module_utils_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/module_utils",
         "/usr/share/ansible/plugins/module_utils",
     ]
-    default_netconf_plugin_path: list[str] = [
+    default_netconf_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/netconf",
         "/usr/share/ansible/plugins/netconf",
     ]
@@ -406,16 +406,16 @@ class AnsibleConfig(
     default_remote_port: str | None = None
     default_remote_user: str | None = None
     # https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths
-    default_collections_path: list[str] = [
+    default_collections_path: ClassVar[list[str]] = [
         "~/.ansible/collections",
         "/usr/share/ansible/collections",
     ]
-    default_roles_path: list[str] = [
+    default_roles_path: ClassVar[list[str]] = [
         "~/.ansible/roles",
         "/usr/share/ansible/roles",
         "/etc/ansible/roles",
     ]
-    default_selinux_special_fs: list[str] = [
+    default_selinux_special_fs: ClassVar[list[str]] = [
         "fuse",
         "nfs",
         "vboxsf",
@@ -425,32 +425,32 @@ class AnsibleConfig(
     ]
     default_stdout_callback: str = "default"
     default_strategy: str = "linear"
-    default_strategy_plugin_path: list[str] = [
+    default_strategy_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/strategy",
         "/usr/share/ansible/plugins/strategy",
     ]
     default_su: bool = False
     default_syslog_facility: str = "LOG_USER"
     default_task_includes_static: bool = False
-    default_terminal_plugin_path: list[str] = [
+    default_terminal_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/terminal",
         "/usr/share/ansible/plugins/terminal",
     ]
-    default_test_plugin_path: list[str] = [
+    default_test_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/test",
         "/usr/share/ansible/plugins/test",
     ]
     default_timeout: int = 10
     default_transport: str = "smart"
     default_undefined_var_behavior: bool = True
-    default_vars_plugin_path: list[str] = [
+    default_vars_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/vars",
         "/usr/share/ansible/plugins/vars",
     ]
     default_vault_encrypt_identity: str | None = None
     default_vault_id_match: bool = False
     default_vault_identity: str = "default"
-    default_vault_identity_list: list[str] = []
+    default_vault_identity_list: ClassVar[list[str]] = []
     default_vault_password_file: str | None = None
     default_verbosity: int = 0
     deprecation_warnings: bool = False
@@ -460,22 +460,22 @@ class AnsibleConfig(
     display_args_to_stdout: bool = False
     display_skipped_hosts: bool = True
     docsite_root_url: str = "https://docs.ansible.com/ansible/"
-    doc_fragment_plugin_path: list[str] = [
+    doc_fragment_plugin_path: ClassVar[list[str]] = [
         "~/.ansible/plugins/doc_fragments",
         "/usr/share/ansible/plugins/doc_fragments",
     ]
     duplicate_yaml_dict_key: Literal["warn", "error", "ignore"] = "warn"
     enable_task_debugger: bool = False
     error_on_missing_handler: bool = True
-    facts_modules: list[str] = ["smart"]
+    facts_modules: ClassVar[list[str]] = ["smart"]
     galaxy_cache_dir: str = "~/.ansible/galaxy_cache"
     galaxy_display_progress: str | None = None
     galaxy_ignore_certs: bool = False
     galaxy_role_skeleton: str | None = None
-    galaxy_role_skeleton_ignore: list[str] = ["^.git$", "^.*/.git_keep$"]
+    galaxy_role_skeleton_ignore: ClassVar[list[str]] = ["^.git$", "^.*/.git_keep$"]
     galaxy_server: str = "https://galaxy.ansible.com"
     galaxy_server_list: str | None = None
-    galaxy_token_path: str = "~/.ansible/galaxy_token"  # noqa: S105
+    galaxy_token_path: str = "~/.ansible/galaxy_token"  # ruff:ignore[hardcoded-password-string]
     host_key_checking: bool = True
     host_pattern_mismatch: Literal["warning", "error", "ignore"] = "warning"
     inject_facts_as_vars: bool = True
@@ -489,7 +489,7 @@ class AnsibleConfig(
     inventory_cache_plugin_connection: str | None = None
     inventory_cache_plugin_prefix: str = "ansible_facts"
     inventory_cache_timeout: int = 3600
-    inventory_enabled: list[str] = [
+    inventory_enabled: ClassVar[list[str]] = [
         "host_list",
         "script",
         "auto",
@@ -499,13 +499,13 @@ class AnsibleConfig(
     ]
     inventory_export: bool = False
     inventory_ignore_exts: str
-    inventory_ignore_patterns: list[str] = []
+    inventory_ignore_patterns: ClassVar[list[str]] = []
     inventory_unparsed_is_failed: bool = False
     localhost_warning: bool = True
     max_file_size_for_diff: int = 104448
     module_ignore_exts: str
     netconf_ssh_config: str | None = None
-    network_group_modules: list[str] = [
+    network_group_modules: ClassVar[list[str]] = [
         "eos",
         "nxos",
         "ios",
@@ -545,7 +545,7 @@ class AnsibleConfig(
     run_vars_plugins: str = "demand"
     show_custom_stats: bool = False
     string_conversion_action: Literal["warn", "error", "ignore"] = "warn"
-    string_type_filters: list[str] = [
+    string_type_filters: ClassVar[list[str]] = [
         "string",
         "to_json",
         "to_nice_json",
@@ -555,8 +555,8 @@ class AnsibleConfig(
         "json",
     ]
     system_warnings: bool = True
-    tags_run: list[str] = []
-    tags_skip: list[str] = []
+    tags_run: ClassVar[list[str]] = []
+    tags_skip: ClassVar[list[str]] = []
     task_debugger_ignore_errors: bool = True
     task_timeout: int = 0
     transform_invalid_group_chars: Literal[
@@ -566,8 +566,8 @@ class AnsibleConfig(
         "silently",
     ] = "never"
     use_persistent_connections: bool = False
-    variable_plugins_enabled: list[str] = ["host_group_vars"]
-    variable_precedence: list[str] = [
+    variable_plugins_enabled: ClassVar[list[str]] = ["host_group_vars"]
+    variable_precedence: ClassVar[list[str]] = [
         "all_inventory",
         "groups_inventory",
         "all_plugins_inventory",
@@ -579,7 +579,7 @@ class AnsibleConfig(
     win_async_startup_timeout: int = 5
     worker_shutdown_poll_count: int = 0
     worker_shutdown_poll_delay: float = 0.1
-    yaml_filename_extensions: list[str] = [".yml", ".yaml", ".json"]
+    yaml_filename_extensions: ClassVar[list[str]] = [".yml", ".yaml", ".json"]
 
     def __init__(
         self,

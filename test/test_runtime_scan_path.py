@@ -120,7 +120,7 @@ def test_ro_venv() -> None:
         f"rm -rf {venv_path}",
     ]
     for cmd in commands:
-        result = subprocess.run(  # noqa: S602
+        result = subprocess.run(  # ruff:ignore[subprocess-popen-with-shell-equals-true]
             cmd,
             check=False,
             shell=True,
