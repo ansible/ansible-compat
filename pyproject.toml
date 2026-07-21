@@ -31,7 +31,7 @@ classifiers = [
   "Topic :: Utilities",
 ]
 dependencies = [
-  "ansible-core>=2.16",
+  "ansible-core>=2.16.19,!=2.17.*",
   "jsonschema>=4.6.0",
   "packaging>=22.0",
   "pyyaml>=6.0.1",
@@ -47,7 +47,7 @@ repository = "https://github.com/ansible/ansible-compat"
 
 [dependency-groups]
 dev = [
-  "ansible-core>=2.16",
+  "ansible-core>=2.16.19,!=2.17.*",
   "coverage[toml]>=7.10.6",
   "jsonschema>=4.6.0",
   "packaging>=22.0",
