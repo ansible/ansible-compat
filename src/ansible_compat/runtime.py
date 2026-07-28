@@ -970,13 +970,19 @@ class Runtime:
             raise RuntimeError(msg) from exc
 
         alterations_list: list[tuple[list[str], str, bool]] = [
-            (
-                library_paths,
-                str((self.project_dir / "plugins" / "modules").absolute()),
-                True,
-            ),
             (roles_path, str((self.project_dir / "roles").absolute()), True),
         ]
+        # Collection modules must stay namespaced; do not expose as legacy
+        # ANSIBLE_LIBRARY (see https://github.com/ansible/ansible-compat/issues/605).
+        if not (self.project_dir / GALAXY_YML).exists():
+            alterations_list.insert(
+                0,
+                (
+                    library_paths,
+                    str((self.project_dir / "plugins" / "modules").absolute()),
+                    True,
+                ),
+            )
 
         alterations_list.extend(
             (
