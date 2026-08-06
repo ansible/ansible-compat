@@ -21,6 +21,19 @@ tmp_path = Path(tempfile.gettempdir()) / f"ansible-compat-smoke-{checksum}"
 
 logger.info("Using %s temporary directory...", tmp_path)
 
+# Tox sets ANSIBLE_HOME={envdir}/.ansible for ansible-compat test envs.
+# Downstream projects (especially ansible-lint via has_custom_ansible_env)
+# treat that as a user override and disable project isolation, which breaks
+# their cache_dir tests. Strip tox-local Ansible path overrides before
+# running those suites.
+for var in (
+    "ANSIBLE_HOME",
+    "ANSIBLE_LIBRARY",
+    "ANSIBLE_ROLES_PATH",
+    "ANSIBLE_COLLECTIONS_PATH",
+):
+    os.environ.pop(var, None)
+
 for project in ("molecule", "ansible-lint"):
     logger.info("Running tests for %s", project)
     project_dir = tmp_path / project
