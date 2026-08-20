@@ -51,19 +51,19 @@ dev = [
   "coverage[toml]>=7.10.6",
   "jsonschema>=4.6.0",
   "packaging>=22.0",
-  "pip>=25.2",
-  "pytest>=7.2.0",
+  "pip>=26.1.2",
+  "pytest>=9.0.3",
   "pytest-instafail>=0.5.0",
   "pytest-mock>=3.14.1",
   "pytest-xdist>=3.8.0",
   "pyyaml>=6.0.1",
   "subprocess-tee>=0.4.1",
-  "uv>=0.4.30",
+  "uv>=0.11.15",
 ]
 docs = ["argparse-manpage>=4.7", "black>=25.1.0", "mkdocs-ansible>=24.3.1"]
 lint = [
   "mypy>=1.19.1",
-  "pip>=25.2",
+  "pip>=26.1.2",
   "prek>=0.3.3",
   "pylint>=4.0.5",
   "ruff>=0.15.2",
@@ -71,12 +71,12 @@ lint = [
   "types-jsonschema>=4.26.0.20260202",
   "types-pyyaml>=6.0.12.20250915",
 ]
-pkg = ["build>=0.9", "pip>=25.2", "twine>=4.0.2"]
+pkg = ["build>=0.9", "pip>=26.1.2", "twine>=4.0.2"]
 
 [build-system]
 requires = [
   "setuptools_scm[toml] >= 7.0.5",  # required for "no-local-version" scheme
-  "setuptools >= 65.3.0",  # required by pyproject+setuptools_scm integration and editable installs
+  "setuptools >= 83.0.0",  # required by pyproject+setuptools_scm integration and editable installs
 ]
 build-backend = "setuptools.build_meta"
 
@@ -499,7 +499,7 @@ env_list = [
   "py314-devel",
 ]
 requires = [
-  "setuptools>=65.3",
+  "setuptools>=83.0.0",
   "tox>=4.30.3",
   "tox-extra>=2.1",
   "tox-uv >= 1.28.1",
@@ -703,7 +703,7 @@ PRE_COMMIT_COLOR = "always"
 constraint-dependencies = [
   "ansible-core>=2.20.0.dev0; python_version >= '3.14'",
   "cairosvg>=2.9.0",
-  "cryptography>=46.0.7",
+  "cryptography>=50.0.0",
 ]
 default-groups = ["dev", "docs", "lint", "pkg"]
 package = true
