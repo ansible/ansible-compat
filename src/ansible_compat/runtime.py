@@ -830,8 +830,15 @@ class Runtime:
         :param destination: Target collections directory.
         :param role_name_check: Role name validation level (0/1/2).
         """
-        galaxy_path = self.project_dir / GALAXY_YML
-        if galaxy_path.exists():
+        galaxy_path = next(
+            (
+                self.project_dir / f"galaxy.{ext}"
+                for ext in ("yml", "yaml")
+                if (self.project_dir / f"galaxy.{ext}").exists()
+            ),
+            None,
+        )
+        if galaxy_path is not None:
             colpath = Path(
                 f"{destination}/ansible_collections/{colpath_from_path(self.project_dir)}",
             )
@@ -851,7 +858,9 @@ class Runtime:
                 galaxy_path.parent,
                 destination=destination,
             )
-        elif Path.cwd().parent.name == "roles" and Path("../../galaxy.yml").exists():
+        elif Path.cwd().parent.name == "roles" and any(
+            Path(f"../../galaxy.{ext}").exists() for ext in ("yml", "yaml")
+        ):
             self.install_collection_from_disk(
                 Path("../.."),
                 destination=destination,
@@ -974,7 +983,7 @@ class Runtime:
         ]
         # Collection modules must stay namespaced; do not expose as legacy
         # ANSIBLE_LIBRARY (see https://github.com/ansible/ansible-compat/issues/605).
-        if not (self.project_dir / GALAXY_YML).exists():
+        if not any((self.project_dir / f"galaxy.{ext}").exists() for ext in ("yml", "yaml")):
             alterations_list.insert(
                 0,
                 (
@@ -1202,24 +1211,26 @@ def search_galaxy_paths(search_dir: Path) -> list[Path]:
     """Search for galaxy paths (only one level deep).
 
     Returns:
-        list[Path]: List of galaxy.yml found.
+        list[Path]: List of galaxy.yml/galaxy.yaml found.
     """
     galaxy_paths: list[Path] = []
     for item in [Path(), *search_dir.iterdir()]:
         # We ignore any folders that are not valid namespaces, just like
         # ansible galaxy does at this moment.
         file_path = item.resolve()
-        if file_path.is_file() and file_path.name == GALAXY_YML:
+        if file_path.is_file() and file_path.name in (GALAXY_YML, "galaxy.yaml"):
             galaxy_paths.append(file_path)
             continue
         if file_path.is_dir() and namespace_re.match(file_path.name):
-            file_path /= GALAXY_YML
-            try:
-                if file_path.exists():
-                    galaxy_paths.append(file_path)
-            except PermissionError:  # pragma: no cover
-                # we silently ignore permissions errors, can happen with use of /tmp
-                pass
+            for extension in ("yml", "yaml"):
+                candidate = file_path / f"galaxy.{extension}"
+                try:
+                    if candidate.exists():
+                        galaxy_paths.append(candidate)
+                        break
+                except PermissionError:  # pragma: no cover
+                    # we silently ignore permissions errors, can happen with use of /tmp
+                    pass
     return galaxy_paths
 
 
