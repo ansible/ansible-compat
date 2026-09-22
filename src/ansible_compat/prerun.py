@@ -5,6 +5,7 @@ No import of ansible-core must happen within this file!
 
 import hashlib
 import os
+import platform
 import sys
 import tempfile
 import warnings
@@ -13,13 +14,23 @@ from pathlib import Path
 
 from packaging.version import Version
 
-# This module is early loaded by tools like ansible-lint and we want to fail
-# fast even for `ansible-lint --version` if the setup is known as broken.
-if sys.version_info >= (3, 14):
-    core_version = Version(version("ansible-core"))
-    if core_version < Version("2.20.0dev0"):  # pragma: no cover
-        msg = f"Python 3.14 requires ansible-core version >= 2.20.0, and we found {core_version}."
-        raise RuntimeError(msg)
+# Each ansible-core release supports the three most recent Python releases at
+# the time it ships. With two ansible-core releases per year and one Python per
+# year, that gives 2.16 -> 3.12, 2.17 -> 3.12, 2.18 -> 3.13, ... 2.20 -> 3.14.
+# ansible-core enforces its minimum Python via requires-python but declares no
+# maximum, so pip will happily install an old ansible-core on a Python it was
+# never tested with. This module is early loaded by tools like ansible-lint,
+# so warn even for `ansible-lint --version` if the setup is unsupported.
+# See https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html
+core_version = Version(version("ansible-core"))
+_max_python = (3, 12 + (core_version.minor - 16) // 2)
+if sys.version_info[:2] > _max_python:  # pragma: no cover
+    msg = (
+        f"UNSUPPORTED: ansible-core {core_version} supports Python up to "
+        f"{_max_python[0]}.{_max_python[1]} and we found "
+        f"{platform.python_version()}. Some features may not work."
+    )
+    warnings.warn(msg, stacklevel=2)
 
 
 def is_writable(path: Path) -> bool:
