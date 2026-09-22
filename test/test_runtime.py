@@ -286,7 +286,11 @@ def test_prerun_reqs_broken() -> None:
 
 
 def test_prerun_yaml_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
-    """Checks that the linter can auto-install requirements v1 when using .yaml extension."""
+    """Checks that the linter can auto-install requirements v1 when using .yaml extension.
+
+    Args:
+        caplog: Pytest log capture fixture.
+    """
     path = Path(__file__).parent.parent / "examples" / "reqs_v1_yaml"
     runtime = Runtime(project_dir=path, verbosity=1)
     with cwd(path):
@@ -301,7 +305,11 @@ def test_prerun_yaml_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
 
 
 def test_prerun_yaml_reqs_v2(caplog: pytest.LogCaptureFixture) -> None:
-    """Checks that the linter can auto-install requirements v2 when using .yaml extension."""
+    """Checks that the linter can auto-install requirements v2 when using .yaml extension.
+
+    Args:
+        caplog: Pytest log capture fixture.
+    """
     path = (Path(__file__).parent.parent / "examples" / "reqs_v2_yaml").resolve()
     runtime = Runtime(project_dir=path, verbosity=1)
     with cwd(path):
