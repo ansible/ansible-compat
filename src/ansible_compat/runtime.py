@@ -991,7 +991,9 @@ class Runtime:
         ]
         # Collection modules must stay namespaced; do not expose as legacy
         # ANSIBLE_LIBRARY (see https://github.com/ansible/ansible-compat/issues/605).
-        if not any((self.project_dir / f"galaxy.{ext}").exists() for ext in ("yml", "yaml")):
+        if not any(
+            (self.project_dir / f"galaxy.{ext}").exists() for ext in ("yml", "yaml")
+        ):
             alterations_list.insert(
                 0,
                 (
