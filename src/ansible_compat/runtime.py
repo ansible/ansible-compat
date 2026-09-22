@@ -775,10 +775,18 @@ class Runtime:
         # are part of Tower specification
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
         # https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#collections-support
+        seen_req_stems: set[str] = set()
         for req_file in REQUIREMENT_LOCATIONS:
-            file_path = Path(req_file)
+            stem = req_file.removesuffix(".yaml").removesuffix(".yml")
+            if stem in seen_req_stems:
+                continue
+            seen_req_stems.add(stem)
+            yml_path = Path(stem + ".yml")
+            yaml_path = Path(stem + ".yaml")
             if self.project_dir:
-                file_path = self.project_dir / req_file
+                yml_path = self.project_dir / yml_path
+                yaml_path = self.project_dir / yaml_path
+            file_path = yml_path if yml_path.exists() else yaml_path
             self.install_requirements(file_path, retry=retry, offline=offline)
 
         if not install_local:
@@ -1218,7 +1226,7 @@ def search_galaxy_paths(search_dir: Path) -> list[Path]:
         # We ignore any folders that are not valid namespaces, just like
         # ansible galaxy does at this moment.
         file_path = item.resolve()
-        if file_path.is_file() and file_path.name in (GALAXY_YML, "galaxy.yaml"):
+        if file_path.is_file() and file_path.name in {GALAXY_YML, "galaxy.yaml"}:
             galaxy_paths.append(file_path)
             continue
         if file_path.is_dir() and namespace_re.match(file_path.name):
