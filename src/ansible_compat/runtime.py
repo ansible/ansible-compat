@@ -1229,6 +1229,11 @@ def search_galaxy_paths(search_dir: Path) -> list[Path]:
         # ansible galaxy does at this moment.
         file_path = item.resolve()
         if file_path.is_file() and file_path.name in {GALAXY_YML, "galaxy.yaml"}:
+            if (
+                file_path.name == "galaxy.yaml"
+                and (file_path.parent / GALAXY_YML).exists()
+            ):
+                continue
             galaxy_paths.append(file_path)
             continue
         if file_path.is_dir() and namespace_re.match(file_path.name):
