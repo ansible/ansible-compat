@@ -285,6 +285,53 @@ def test_prerun_reqs_broken() -> None:
         runtime.prepare_environment()
 
 
+def test_prerun_yaml_reqs_v1(caplog: pytest.LogCaptureFixture) -> None:
+    """Checks that the linter can auto-install requirements v1 when using .yaml extension.
+
+    Args:
+        caplog: Pytest log capture fixture.
+    """
+    path = Path(__file__).parent.parent / "examples" / "reqs_v1_yaml"
+    runtime = Runtime(project_dir=path, verbosity=1)
+    with cwd(path):
+        runtime.prepare_environment()
+    assert any(
+        msg.startswith("Running ansible-galaxy role install") for msg in caplog.messages
+    )
+    assert all(
+        "Running ansible-galaxy collection install" not in msg
+        for msg in caplog.messages
+    )
+
+
+def test_prerun_yaml_reqs_v2(caplog: pytest.LogCaptureFixture) -> None:
+    """Checks that the linter can auto-install requirements v2 when using .yaml extension.
+
+    Args:
+        caplog: Pytest log capture fixture.
+    """
+    path = (Path(__file__).parent.parent / "examples" / "reqs_v2_yaml").resolve()
+    runtime = Runtime(project_dir=path, verbosity=1)
+    with cwd(path):
+        runtime.prepare_environment()
+        assert any(
+            msg.startswith("Running ansible-galaxy role install")
+            for msg in caplog.messages
+        )
+        assert any(
+            msg.startswith("Running ansible-galaxy collection install")
+            for msg in caplog.messages
+        )
+
+
+def test_prerun_yaml_reqs_broken() -> None:
+    """Checks that we report invalid requirements.yaml file."""
+    path = (Path(__file__).parent.parent / "examples" / "reqs_broken_yaml").resolve()
+    runtime = Runtime(project_dir=path, verbosity=1)
+    with cwd(path), pytest.raises(InvalidPrerequisiteError):
+        runtime.prepare_environment()
+
+
 def test__update_env_no_old_value_no_default_no_value(monkeypatch: MonkeyPatch) -> None:
     """Make sure empty value does not touch environment."""
     monkeypatch.delenv("DUMMY_VAR", raising=False)
@@ -947,6 +994,16 @@ def test_runtime_plugins(runtime: Runtime) -> None:
             Path("test/assets/galaxy_paths/foo"),
             [Path("test/assets/galaxy_paths/foo/galaxy.yml").resolve()],
             id="3",
+        ),
+        pytest.param(
+            Path("test/assets/galaxy_paths_yaml"),
+            [Path("test/assets/galaxy_paths_yaml/foo/galaxy.yaml").resolve()],
+            id="4-yaml",
+        ),
+        pytest.param(
+            Path("test/assets/galaxy_paths_yaml/foo"),
+            [Path("test/assets/galaxy_paths_yaml/foo/galaxy.yaml").resolve()],
+            id="5-yaml",
         ),
     ),
 )
