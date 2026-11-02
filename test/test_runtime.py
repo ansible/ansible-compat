@@ -8,6 +8,7 @@ import logging
 import os
 import pathlib
 import subprocess
+import sys
 from contextlib import contextmanager
 from pathlib import Path
 from shutil import rmtree
@@ -103,6 +104,35 @@ def test_runtime_require_module(runtime: Runtime) -> None:
     # which is done by Ansible core 2.15+. We added special code inside Runtime
     # that should avoid initializing twice and raise that warning.
     Runtime(require_module=True)
+
+
+@pytest.mark.parametrize(
+    "loader_prefix",
+    (
+        "ansible.utils.collection_loader",
+        "ansible.module_utils._internal._collection_loader",
+    ),
+)
+def test_runtime_collection_loader_cleanup(
+    tmp_path: Path,
+    loader_prefix: str,
+) -> None:
+    """Ensure collection loaders can be initialized again after cleanup.
+
+    Args:
+        tmp_path: Temporary project directory.
+        loader_prefix: Collection loader namespace to check for cached modules.
+    """
+    for _ in range(2):
+        instance = Runtime(project_dir=tmp_path, isolated=True)
+        try:
+            instance.enable_plugin_loader()
+            assert Runtime.initialized
+        finally:
+            instance.clean()
+        assert not Runtime.initialized
+        assert not Runtime.plugin_loader_enabled
+        assert not any(name.startswith(loader_prefix) for name in sys.modules)
 
 
 def test_runtime_version_fail_module(mocker: MockerFixture) -> None:
