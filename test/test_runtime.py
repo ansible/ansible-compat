@@ -32,7 +32,7 @@ from ansible_compat.runtime import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
 
     from _pytest.monkeypatch import MonkeyPatch
     from pytest_mock import MockerFixture
@@ -266,7 +266,7 @@ def test_runtime_install_requirements_invalid_file(
 
 
 @contextmanager
-def cwd(path: Path) -> Iterator[None]:
+def cwd(path: Path) -> Generator[None]:
     """Context manager for temporary changing current working directory."""
     old_pwd = Path.cwd()
     os.chdir(path)
