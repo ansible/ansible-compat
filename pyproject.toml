@@ -703,7 +703,10 @@ PRE_COMMIT_COLOR = "always"
 constraint-dependencies = [
   "ansible-core>=2.20.0.dev0; python_version >= '3.14'",
   "cairosvg>=2.9.0",
+  "certifi>=2026.10.18",
   "cryptography>=50.0.0",
+  "dnspython>=2.9.0; python_version >= '3.11'",
+  "pillow>=13.0.0; python_version >= '3.11'",
 ]
 default-groups = ["dev", "docs", "lint", "pkg"]
 package = true
