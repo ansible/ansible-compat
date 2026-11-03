@@ -423,9 +423,15 @@ class Runtime:
             # noinspection PyProtectedMember
             # pylint: disable=import-outside-toplevel,no-name-in-module
             from ansible.plugins.loader import init_plugin_loader
-            from ansible.utils.collection_loader._collection_finder import (  # pylint: disable=import-outside-toplevel
-                _AnsibleCollectionFinder,
-            )
+
+            try:
+                from ansible.module_utils._internal._collection_loader._collection_finder import (
+                    _AnsibleCollectionFinder,
+                )
+            except ModuleNotFoundError:
+                from ansible.utils.collection_loader._collection_finder import (
+                    _AnsibleCollectionFinder,
+                )
             # ruff: enable[import-private-name]
 
             with contextlib.suppress(Exception):
@@ -451,6 +457,7 @@ class Runtime:
                 (
                     "ansible.plugins.",  # Plugin loaders and cached plugins
                     "ansible.utils.collection_loader",  # Collection finder system
+                    "ansible.module_utils._internal._collection_loader",
                     "ansible.collections.",  # Loaded collection modules
                 ),
             )
