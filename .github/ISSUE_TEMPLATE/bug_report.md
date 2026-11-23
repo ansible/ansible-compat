@@ -1,8 +1,9 @@
 ---
+
 name: Bug report
 about: >
-  Create a bug report. Ensure that it does reproduce on the main branch with
-  python >=3.10.  For anything else, please use the discussion link below.
+Create a bug report. Ensure that it does reproduce on the main branch with
+python >=3.10. For anything else, please use the discussion link below.
 labels: bug, new
 ---
 
